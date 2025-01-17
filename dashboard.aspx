@@ -106,7 +106,7 @@
         }
 
         .alert-custom {
-            animation: slideInFromRight 0.5s ease-out; /* Fast slide-in */
+            animation: slideInFromRight 0.5s ease-out;
         }
 
 
@@ -193,15 +193,32 @@
         .select2-selection__rendered .select2-selection__clear {
             margin-bottom: .25rem !important;
         }
+
+        .attachment-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .attachment-link:hover {
+                text-decoration: underline;
+            }
+
+        .dropdown-menu {
+            font-size: 15px;
+            position: absolute !important;
+            top: 0px !important;
+            left: -100px !important;
+        }
     </style>
 
 </head>
 <body style="background-color: #f8f9fa">
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
-        <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong>Success message here.
+        <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
 
     <input type="hidden" id="announcement_id" name="announcement_id" />
+    <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
     <div class="container-fluid p-0">
         <div class="row no-gutters">
             <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
@@ -286,12 +303,12 @@
                                     </div>
                                     <hr />
                                     <div class="card-body">
-                                        <div class="announcement-body" id="announcementListCard2" style="height: 300px; border: none;">
-                                            <div id="empty_leave" style="padding-top: 30%">
-                                                <p class="empty_message">
+                                        <div class="onleave-body" id="onleaveListCard" style="height: 300px; border: none;">
+                                            <div id="empty_leave" style="padding-top: 20%">
+                                                <div class="empty_message">
                                                     <img style="display: block; width: 70px; margin: 20px auto;" src="\asset\attendance.png" />
-                                                    No employees have taken leave today.
-                                                </p>
+                                                    <h5 style="color: hsl(0,0%,45%); text-align: center;">No employees have taken leave today.</h5>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -324,7 +341,13 @@
                                         <i class="fa-regular fa-eye" style="font-size: 0.9rem;"></i>
                                     </div>
                                 </div>
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                <button style="cursor: pointer; background-color: transparent; border: none; outline: none" title="Action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu" style="font-size: 15px;">
+                                    <a class="dropdown-item" href="#" onclick="editannouncement()" style="color: black">Edit</a>
+                                    <a class="dropdown-item" href="#" onclick="deleteannouncement()" style="color: red">Delete</a>
+                                </div>
                             </div>
                             <span class="text-muted fw-bold d-block mt-2">
                                 <small style="font-weight: bold;">Posted on <span class="dateformat_changer" id="posted_date"></span>
@@ -333,6 +356,10 @@
                         </div>
                         <div class="card-body">
                             <spam class="card-text" id="announcement_description"></spam>
+                            <spam id="attachment_container" class="mt-3 pt-3" style="display: none; margin-top: 10px; font-weight: bold; color: #6c757d!important;">
+                                Attachment: 
+                                <a id="attachment_link" href="#" target="_blank" class="attachment-link"></a>
+                            </spam>
                         </div>
                         <div class="card-footer mt-2" style="background-color: transparent; border-top: none;">
                             <div class="d-flex align-items-center justify-content-between">
@@ -377,11 +404,11 @@
         </div>
     </div>
     <%-- createannouncementmodal --%>
-    <div class="modal fade pt-5" id="createannouncementmodal" tabindex="-1" aria-labelledby="createannouncementmodalLabel" aria-hidden="true">
+    <div class="modal fade pt-5" id="createannouncementmodal" tabindex="-1" aria-labelledby="createannouncementmodalLabel">
         <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="max-width: 41%; margin: 0 auto;">
             <div class="modal-content" style="border-radius: 0px !important; width: 100%;">
                 <div class="modal-header" style="padding: 1.50rem 1.70rem 1rem; height: 30px; background-color: transparent; border-bottom: none;">
-                    <h2 class="modal-title" id="createannouncementmodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;">Create Announcements.</h2>
+                    <h2 class="modal-title" id="createannouncementmodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;"></h2>
                     <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -396,17 +423,26 @@
                             <label for="id_description">Description:</label>
                             <textarea id="id_description" class="form-control"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="id_attachments">Attachments:</label>
-                            <input type="file" name="attachments" class="attachment_file ml-1 mt-2" id="id_attachments" />
+                        <div class="form-group d-flex flex-column">
+                            <div class="d-flex align-items-center">
+                                <label for="id_attachments" class="mr-2">Attachments:</label>
+                                <input type="file" name="attachments" class="attachment_file" id="id_attachments" />
+                            </div>
+                            <div class="d-flex align-items-center row ml-1">
+                                <div id="id_attachments_helper">
+                                    <input type="text" id="id_attachments_helper_value" hidden="hidden" />
+                                </div>
+                                <button type="button" style="width: 17%; position: relative; left: 16%; outline: none; background-color: #f6f6f6; border: 1px solid #000; color: #000; cursor: pointer; font-size: 14px; display: none;"
+                                    class="btn btn-danger btn-sm mt-2" id="remove_attachment_btn">
+                                    Remove
+                                </button>
+                            </div>
+
                         </div>
+
                         <div class="form-group">
                             <label for="id_expire_date">Expire Date:</label>
                             <input type="date" name="expire_date" class="form-control" id="id_expire_date" />
-                        </div>
-                        <div class="form-group">
-                            <label for="id_employees">Employees:</label>
-                            <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
                             <label for="id_department">Department:</label>
@@ -417,28 +453,27 @@
                             <select name="job_position" class="form-control select2" id="id_job_position" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
+                            <label for="id_employees">Employees:</label>
+                            <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
+                        </div>
+                        <div class="form-group">
                             <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
                             <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
                         </div>
                         <div class="text-right">
-                            <button onclick="saveannouncement()" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
+                            <button onclick="publishOReditannouncement()" id="publishOReditannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
+                            <button onclick="saveannouncement()" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Discord</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <%--  <div class="oh-404" style="position:revert; transform:none">
-                        <img style="width: 80px;height: 80px; margin-bottom:20px"
-                            src="{% static 'images/ui/no-announcement.svg' %}" class="oh-404__image"
-                            alt="Page not found. 404." />
-                        <h5 class="oh-404__subtitle">{% trans "No Announcements to show." %}</h5>
-                    </div> --%>
 
     <script>
         $(document).ready(function () {
             if (sessionStorage.getItem('showAlert') === 'true') {
-                display_login_alert();
+                display_green_alert('Login successful.');
                 sessionStorage.removeItem('showAlert');
             };
 
@@ -463,17 +498,21 @@
             });
 
             populate_emp_details();
+            populate_emp_details();
             populate_announncements();
         });
 
         function opencreateannouncementmodal() {
-            populatecreateannouncementmodal();
+            clearannouncementfields();
+            populatecreateannouncementmodal("department", null, null);
             $('#createannouncementmodal').modal('show');
+            document.getElementById('createannouncementmodalLabel').innerText = "Create Announcement.";
             document.getElementById('id_expire_date').value = new Date().toISOString().split('T')[0];
         }
 
-        function display_login_alert() {
+        function display_green_alert(message) {
             document.getElementById("greenAlert").style.display = 'flex';
+            document.getElementById("greenAlertmessage").innerHTML = message;
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
 
@@ -518,9 +557,10 @@
                 success: function (response) {
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
+                    let announcementsHTML = '';
+
 
                     if (Array.isArray(data) && data.length > 0) {
-                        let announcementsHTML = '';
                         data.forEach(announcement => {
                             const announcement_id = announcement.announcement_id;
                             const profileImage = announcement.profile_img;
@@ -549,7 +589,12 @@
 
                     }
                     else {
-                        announcementsHTML = "";
+                        announcementsHTML = '<div id="empty_announcement" style="padding-top: 10%">\
+                            <div class="empty_announcement">\
+                                <img style="display: block; width: 100px; margin: 20px auto;" src="/asset/no-announcements.png" />\
+                                <h5 style="color: hsl(0,0%,45%); text-align: center;">No Announcements to show.</h5>\
+                            </div>\
+                        </div>';
                     }
                     $('#announcementListCard').html(announcementsHTML);
                 },
@@ -578,15 +623,33 @@
 
                     if (announcementList.length > 0) {
                         const announcement = announcementList[0];
-
+                        $("#announcement_id").val(announcement_id);
                         document.getElementById("heading").innerText = announcement.heading;
                         document.getElementById("viewed_by").innerText = announcement.viewed_by;
                         document.getElementById("posted_date").innerText = announcement.posted_date;
                         document.getElementById("posted_time").innerText = announcement.posted_time;
-                        document.getElementById("announcement_description").innerText = announcement.announcement_description;
+                        document.getElementById("announcement_description").innerHTML = announcement.announcement_description;
                         document.getElementById("comments_header").innerText = announcement.heading + " comments";
-                        $("#announcement_id").val(announcement_id);
-                        populatecomments();
+
+                        if (announcement.attachments != "") {
+                            const attachmentLink = document.getElementById("attachment_link");
+                            attachmentLink.href = announcement.attachments;
+                            const attachmentParts = announcement.attachments.split('/').pop().split('_');
+                            const originalFileName = attachmentParts.slice(2).join('_');
+                            attachmentLink.innerText = originalFileName;
+                            document.getElementById("attachment_container").style.display = "block";
+                        } else {
+                            const attachmentLink = document.getElementById("attachment_link");
+                            attachmentLink.href = "";
+                            attachmentLink.innerText = "";
+                            document.getElementById("attachment_container").style.display = "none";
+                        }
+                        if (announcement.comments == "False") {
+                            document.querySelector(".comment-button").style.display = 'none';
+                        } else {
+                            document.querySelector(".comment-button").style.display = 'flex';
+                            populatecomments();
+                        }
                     }
                 },
                 error: function (xhr, status, error) {
@@ -599,38 +662,45 @@
             });
         }
 
-        function populatecreateannouncementmodal() {
+        document.getElementById('remove_attachment_btn').addEventListener('click', function () {
+            document.getElementById('id_attachments_helper').style.display = 'none';
+            document.getElementById('remove_attachment_btn').style.display = 'none';
+        });
+
+        document.getElementById('id_attachments').addEventListener('change', function () {
+            const fileInput = this;
+            if (fileInput.files.length > 0) {
+                document.getElementById('id_attachments_helper').style.display = 'none';
+                document.getElementById('remove_attachment_btn').style.display = 'block';
+            }
+        });
+
+        function populatecreateannouncementmodal(dropdowntype, value, departmentValues, callback) {
             $.ajax({
                 type: "POST",
                 url: 'dashboard.aspx/populatecreateannouncementmodal',
+                data: JSON.stringify({ dropdowntype: dropdowntype, value: value, departmentValues: departmentValues }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
                     let data = response.d;
                     data = JSON.parse(data);
-
                     $('#id_employees, #id_department, #id_job_position').select2({
                         placeholder: "Select an option",
                         allowClear: true
                     });
 
-                    const employeesDropdown = $('#id_employees');
-                    employeesDropdown.empty();
-                    data.Employees.forEach(employee => {
-                        employeesDropdown.append(new Option(employee, employee));
-                    });
+                    if (dropdowntype === "department") {
+                        populateDropdown("#id_department", data);
+                    } else if (dropdowntype === "job_position") {
+                        populateDropdown("#id_job_position", data);
+                    } else if (dropdowntype === "employees") {
+                        populateDropdown("#id_employees", data);
+                    }
 
-                    const departmentsDropdown = $('#id_department');
-                    departmentsDropdown.empty();
-                    data.Departments.forEach(department => {
-                        departmentsDropdown.append(new Option(department.DepartmentName, department.DepartmentName));
-                    });
-
-                    const jobPositionDropdown = $('#id_job_position');
-                    jobPositionDropdown.empty();
-                    data.Departments.forEach(department => {
-                        jobPositionDropdown.append(new Option(department.JobPosition, department.JobPosition));
-                    });
+                    if (typeof callback === "function") {
+                        callback();
+                    }
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -642,17 +712,147 @@
             });
         }
 
-        function saveannouncement() {
+        function populateDropdown(selector, items) {
+            const dropdown = $(selector);
+            $('#id_employees').empty();
+            dropdown.empty();
+            if (items.length > 0) {
+                items.forEach(item => {
+                    dropdown.append(new Option(item.name, item.id));
+                });
+                dropdown.trigger('change');
+            }
+        }
+
+        $('#id_department').on('change', function () {
+            const selectedDepartments = $(this).val();
+            if (selectedDepartments != "") {
+                populatecreateannouncementmodal("job_position", selectedDepartments, null);
+            }
+        });
+
+        $('#id_job_position').on('change', function () {
+            const selectedJobPositions = $(this).val();
+            const selectedDepartments = $('#id_department').val();
+            if (selectedJobPositions != "" && selectedDepartments != "") {
+                populatecreateannouncementmodal("employees", selectedJobPositions, selectedDepartments);
+            }
+        });
+
+        function uploadAttachment(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const base64File = reader.result.split(',')[1];
+
+                    $.ajax({
+                        url: 'dashboard.aspx/UploadAttachment',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ fileName: file.name, fileData: base64File }),
+                        success: function (response) {
+                            resolve(response.d);
+                        },
+                        error: function (xhr, status, error) {
+                            reject(error);
+                        }
+                    });
+                };
+                reader.onerror = function () {
+                    reject("Error reading file.");
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function publishOReditannouncement(isedit = false) {
             const title = $('#id_title').val();
-            const description = $('#id_description').val();
-            const attachments = $('#id_attachments').val();
+            const description = $('#id_description').summernote('code');
             const expireDate = $('#id_expire_date').val();
             const employees = $('#id_employees').val();
             const department = $('#id_department').val();
             const jobPosition = $('#id_job_position').val();
             const disableComments = $('#id_disable_comments').is(':checked');
+            const fileInput = document.getElementById('id_attachments');
+            let attachments = '';
+            const announcementId = $("#announcement_id").val();
 
+            if (isedit == true && document.getElementById('id_attachments_helper').style.display == "block") {
+                attachments = $('#id_attachments_hidden_value').val();
+            } else {
+                if (fileInput.files.length > 0) {
+                    try {
+                        attachments = await uploadAttachment(fileInput.files[0]);
+                    } catch (error) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Failed to upload the attachment. Please try again.",
+                            icon: "error"
+                        });
+                        return;
+                    }
+                }
+            }
 
+            if ((!title) ||
+                (!description || description === "<p><br></p>") ||
+                (!expireDate) ||
+                (!employees || employees.length === 0) ||
+                (!department || department.length === 0) ||
+                (!jobPosition || jobPosition.length === 0)) {
+                Swal.fire({
+                    title: "Missing Fields",
+                    text: "Please fill in all the required fields before proceeding.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            const data = {
+                title: title,
+                description: description,
+                attachments: attachments,
+                expireDate: expireDate,
+                department: department,
+                jobPosition: jobPosition,
+                employees: employees,
+                disableComments: disableComments,
+                isedit, isedit,
+                announcementId, announcementId
+            };
+
+            $.ajax({
+                type: "POST",
+                url: 'dashboard.aspx/insertupdateannouncement',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    let data = response.d;
+                    data = JSON.parse(data);
+                    if (data == "success") {
+                        clearannouncementfields();
+                        $('#createannouncementmodal').modal('hide');
+                        if (isedit) {
+                            $('#announcement_info_modal').modal('hide');
+                        }
+                        populate_announncements();
+                        const alertMessage = isedit ? 'Announcement updated successfully.' : 'Announcement created successfully.';
+                        display_green_alert(alertMessage);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        function clearannouncementfields() {
+            document.getElementById('id_attachments_helper').style.display = 'none';
             $('#id_title').val('');
             $('#id_description').summernote('code', '');
             $('#id_attachments').val('');
@@ -660,10 +860,120 @@
             $('#id_department').val(null).trigger('change');
             $('#id_job_position').val(null).trigger('change');
             $('#id_disable_comments').prop('checked', false);
-
-            $('#createannouncementmodal').modal('hide');
         }
 
+        function editannouncement() {
+            $('#createannouncementmodal').modal('show');
+            clearannouncementfields();
+            $.ajax({
+                type: "POST",
+                url: 'dashboard.aspx/editannouncement',
+                data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    document.getElementById("createannouncementmodalLabel").innerText = "Edit Announcement.";
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    if (data.length > 0) {
+                        const announcement = data[0];
+
+                        $('#id_title').val(announcement.Heading);
+                        $('#id_description').summernote('code', announcement.announcement_description);
+
+                        if (announcement.comments == "True") {
+                            $('#id_disable_comments').prop('checked', true);
+                        }
+
+                        if (announcement.expire_date) {
+                            const dateParts = announcement.expire_date.split(' ')[0].split('-');
+                            const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                            $('#id_expire_date').val(formattedDate);
+                        }
+
+                        if (announcement.attachments) {
+                            const attachmentParts = announcement.attachments.split('/').pop().split('_');
+                            const originalFileName = attachmentParts.slice(2).join('_');
+                            document.getElementById('id_attachments_helper').style.display = 'block';
+                            document.getElementById('remove_attachment_btn').style.display = 'block';
+                            document.getElementById('id_attachments_helper').innerHTML = `<span style="font-weight:400">Existing File: ${originalFileName}</span>`;
+                            $('#id_attachments_helper_value').val(announcement.attachments);
+                            $('#id_attachments_hidden_value').val(announcement.attachments);
+                        }
+
+                        const departments = announcement.departments.split(',');
+                        populatecreateannouncementmodal('department', null, null, function () {
+                            $('#id_department').val(departments).trigger('change');
+
+                            populatecreateannouncementmodal('job_position', departments, departments, function () {
+                                const jobPositions = announcement.job_positions.split(',');
+                                $('#id_job_position').val(jobPositions).trigger('change');
+
+                                populatecreateannouncementmodal('employees', jobPositions, departments, function () {
+                                    const employees = announcement.viewable_by.split(',');
+                                    $('#id_employees').val(employees).trigger('change');
+                                });
+                            });
+                        });
+
+                        const publishButton = document.getElementById("publishOReditannouncementbtn");
+                        publishButton.textContent = "Edit";
+                        publishButton.onclick = function () {
+                            publishOReditannouncement(true);
+                        };
+
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        function deleteannouncement() {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to delete this announcement?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: 'dashboard.aspx/deleteannouncement',
+                        data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            let data = response.d;
+                            data = JSON.parse(data);
+
+                            if (data == "success") {
+                                $('#announcement_info_modal').modal('hide');
+                                populate_announncements();
+                                display_green_alert('Announcement delelted successfully.');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
         $('#commentButton').click(function () {
             document.getElementById("comment_alert").innerText = "Your comment was submitted.";

@@ -30,6 +30,11 @@
         background-color: transparent !important;
         outline: none !important;
     }
+
+    .dropdown-menu .dropdown-item:hover {
+        color: hsl(8, 77%, 56%);
+        background-color: transparent;
+    }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light">
@@ -59,7 +64,7 @@
                     <a class="dropdown-item" href="#">My Profile</a>
                     <a class="dropdown-item" href="#">Change Password</a>
                     <hr />
-                    <a class="dropdown-item" onclick="window.location.href='login.aspx';">Logout</a>
+                    <a class="dropdown-item" href="#" onclick="window.location.href='login.aspx';">Logout</a>
                 </div>
             </li>
         </ul>

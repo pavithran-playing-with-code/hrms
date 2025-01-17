@@ -1,0 +1,43 @@
+1)SELECT p.id AS scheduler_id,d.id,d.scheduler_data_id,t.id AS auto_id,j.id AS      job_id,t.device_data_id,j.jo_number,t.from_station,t.start_dt,
+t.start_completed_by,j.customer_name, j.so_number ,p.serial_no,j.job_type,t.scrap,t.start_notes,j.is_scheduled,j.is_completed
+FROM production_line.rework_transaction t 
+LEFT JOIN production_line.device_data d ON t.device_data_id = d.id
+LEFT JOIN production_line.scheduler_data p ON d.scheduler_data_id = p.id 
+LEFT JOIN production_line.job_data j ON j.id = p.job_data_id 
+WHERE end_dt IS NULL AND t.scrap = 'N' AND j.factory_id='" + factory_id + "';
+
+2)SELECT ss.current_station AS id, s.name FROM production_line.station_sequence ss
+LEFT JOIN production_line.station_seq_history ssh ON ssh.id = ss.station_sequence_history_id AND ssh.factory_id=5
+LEFT JOIN production_line.station s ON ss.current_station = s.id AND s.factory_id=5
+WHERE (ssh.active_end = '0000-00-00 00:00:00' OR ssh.active_end IS NULL) AND s.name IS NOT NULL
+UNION
+SELECT ss.next_station AS id, s.name FROM production_line.station_sequence ss
+LEFT JOIN production_line.station_seq_history ssh ON ssh.id = ss.station_sequence_history_id
+LEFT JOIN production_line.station s ON ss.next_station = s.id
+WHERE (ssh.active_end = '0000-00-00 00:00:00' OR ssh.active_end IS NULL) AND ssh.factory_id='5' AND s.factory_id='5' 
+AND s.name IS NOT NULL
+
+3)SELECT pt.value_stream_id, vs.value_stream_name, pt.work_center_id, wc.work_center_name, cs.date, cs.shift, COUNT(pt.sequence_no) AS 'seq_count'
+FROM (SELECT DISTINCT sequence_no, stage_completed, value_stream_id, work_center_id FROM production_tracker 
+WHERE value_stream_id = '4') pt 
+INNER JOIN calendar_shift cs ON pt.stage_completed BETWEEN cs.start_time AND cs.end_time 
+LEFT JOIN value_streams vs ON pt.value_stream_id = vs.value_stream_id
+LEFT JOIN work_centers wc ON pt.work_center_id = wc.work_center_id
+WHERE pt.stage_completed BETWEEN cs.start_time AND cs.end_time 
+AND cs.date BETWEEN '2022-02-16' AND '2022-02-23'
+GROUP BY pt.value_stream_id, pt.work_center_id, cs.date;
+
+4)SELECT d.iteration, sta.name AS start_station, st.name AS last_complete_station, DATE_FORMAT(d.created_time, '%m-%d-%Y %H:%i:%s')AS created_time,
+IFNULL(CONCAT(e.last_name, ', ', IFNULL(e.pref_name, e.first_name)), d.created_by)AS created_by,
+IFNULL(CONCAT(e1.last_name, ', ', IFNULL(e1.pref_name, e1.first_name)), d.updated_by)AS updated_by,
+DATE_FORMAT(d.updated_time, '%m-%d-%Y %H:%i:%s')AS updated_time, s.serial_no, s.is_completed,
+dr.display_name AS device_display_name, dr.name AS device_name, v.value AS device_value
+FROM production_line.device_data d
+LEFT JOIN production_line.device_val v ON (d.id = v.device_data_id AND v.is_deleted ='0')
+LEFT JOIN production_line.device_register dr ON (dr.id = v.device_register_id AND v.device_register_id = dr.id AND dr.factory_id = '{factory_id}' AND dr.is_deleted ='0')
+LEFT JOIN production_line.scheduler_data s ON (s.id = d.scheduler_data_id AND s.is_completed = 'N')
+LEFT JOIN sandc_care_system.employee e ON(d.created_by = e.emp_id)                              
+LEFT JOIN sandc_care_system.employee e1 ON(d.updated_by = e1.emp_id)
+LEFT JOIN production_line.station sta ON (sta.id = d.station_start_id)  
+LEFT JOIN production_line.station st ON (st.id = d.last_station_complete_id)
+WHERE st.factory_id = '{factory_id}' AND sta.factory_id = '{factory_id}'

@@ -13,6 +13,9 @@ using System.Configuration;
 using WebGrease;
 using System.Web.Services;
 using System.Security.Cryptography;
+using Google.Protobuf.WellKnownTypes;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace hrms
 {
@@ -94,7 +97,7 @@ namespace hrms
                     string profile_details_Query = $@"SELECT CONCAT(e.first_name, "" "", e.last_name) AS emp_name, CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters , p.profile_img, p.profile_color 
                                               FROM hrms.profile_picture p
                                               LEFT JOIN hrms.employee e ON (e.emp_id = p.emp_id) 
-                                              WHERE e.emp_id = '{HttpContext.Current.Session["emp_id"]}';";
+                                              WHERE e.emp_id = '{HttpContext.Current.Session["emp_id"]}' AND e.is_active = 'Y';";
                     var da = new MySqlDataAdapter(profile_details_Query, conn);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -152,7 +155,8 @@ namespace hrms
                                                             p.profile_img, p.profile_color, a.heading
                                                             FROM hrms.announcement a
                                                             LEFT JOIN hrms.employee e ON (e.emp_id = a.emp_id) 
-                                                            LEFT JOIN hrms.profile_picture p ON (p.emp_id = e.emp_id);";
+                                                            LEFT JOIN hrms.profile_picture p ON (p.emp_id = e.emp_id) 
+                                                            WHERE e.is_active = 'Y';";
                     var da = new MySqlDataAdapter(announncement_Query, conn);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -185,43 +189,104 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string PopulateCreateAnnouncementModal()
+        public static string PopulateCreateAnnouncementModal(string dropdowntype, string[] value, string[] departmentValues)
         {
-            var data = new
-            {
-                Employees = new List<string>(),
-                Departments = new List<object>()
-            };
+            var data = new List<object>();
 
             try
             {
                 string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
-
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    string employeeQuery = @"SELECT CONCAT(first_name, ' ', last_name) AS emp_name FROM hrms.employee;";
-                    var employeeCmd = new MySqlCommand(employeeQuery, conn);
-                    var employeeReader = employeeCmd.ExecuteReader();
-                    while (employeeReader.Read())
-                    {
-                        data.Employees.Add(employeeReader["emp_name"].ToString());
-                    }
-                    employeeReader.Close();
 
-                    string departmentQuery = @"SELECT department_name, job_position FROM hrms.department;";
-                    var departmentCmd = new MySqlCommand(departmentQuery, conn);
-                    var departmentReader = departmentCmd.ExecuteReader();
-                    while (departmentReader.Read())
+                    if (dropdowntype == "department")
                     {
-                        data.Departments.Add(new
+                        string departmentQuery = value != null && value.Length > 0
+                                            ? $@"SELECT department_id, department_name 
+                         FROM hrms.department 
+                         WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});"
+                                            : "SELECT department_id, department_name FROM hrms.department;";
+                        using (var departmentCmd = new MySqlCommand(departmentQuery, conn))
+                        using (var departmentReader = departmentCmd.ExecuteReader())
                         {
-                            DepartmentName = departmentReader["department_name"].ToString(),
-                            JobPosition = departmentReader["job_position"].ToString()
-                        });
+                            var departments = new List<object>();
+                            while (departmentReader.Read())
+                            {
+                                departments.Add(new
+                                {
+                                    id = departmentReader["department_id"].ToString(),
+                                    name = departmentReader["department_name"].ToString()
+                                });
+                            }
+                            if (departments.Count > 1)
+                            {
+                                data.Add(new { id = "All", name = "All" });
+                            }
+                            data.AddRange(departments);
+                        }
                     }
-                    departmentReader.Close();
-                    conn.Close();
+
+                    if (dropdowntype == "job_position")
+                    {
+                        string jobPositionQuery = value.Contains("All")
+                            ? "SELECT job_position_id, job_position_name FROM hrms.job_position;"
+                            : $@"SELECT job_position_id, job_position_name 
+                        FROM hrms.job_position WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});";
+
+                        using (var jobPositionCmd = new MySqlCommand(jobPositionQuery, conn))
+                        using (var jobPositionReader = jobPositionCmd.ExecuteReader())
+                        {
+                            var jobPositions = new List<object>();
+                            while (jobPositionReader.Read())
+                            {
+                                jobPositions.Add(new
+                                {
+                                    id = jobPositionReader["job_position_id"].ToString(),
+                                    name = jobPositionReader["job_position_name"].ToString()
+                                });
+                            }
+                            if (jobPositions.Count > 1)
+                            {
+                                data.Add(new { id = "All", name = "All" });
+                            }
+                            data.AddRange(jobPositions);
+                        }
+                    }
+
+                    if (dropdowntype == "employees")
+                    {
+                        string departmentCondition = departmentValues != null && !departmentValues.Contains("All")
+                            ? $"AND emp_dept_id IN ({string.Join(",", departmentValues.Select(v => $"'{v}'"))})"
+                            : "";
+
+                        string jobPositionCondition = value.Contains("All")
+                            ? ""
+                            : $"AND emp_job_position_id IN ({string.Join(",", value.Select(v => $"'{v}'"))})";
+
+                        string employeeQuery = $@"SELECT emp_id, CONCAT(first_name, ' ', last_name) AS emp_name 
+                                        FROM hrms.employee 
+                                        WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition};";
+
+                        using (var employeeCmd = new MySqlCommand(employeeQuery, conn))
+                        using (var employeeReader = employeeCmd.ExecuteReader())
+                        {
+                            var employees = new List<object>();
+                            while (employeeReader.Read())
+                            {
+                                employees.Add(new
+                                {
+                                    id = employeeReader["emp_id"].ToString(),
+                                    name = employeeReader["emp_name"].ToString()
+                                });
+                            }
+                            if (employees.Count > 1)
+                            {
+                                data.Add(new { id = "All", name = "All" });
+                            }
+                            data.AddRange(employees);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -233,15 +298,129 @@ namespace hrms
             return JsonConvert.SerializeObject(data);
         }
 
+        [WebMethod]
+        public static string UploadAttachment(string fileName, string fileData)
+        {
+            try
+            {
+                string folderPath = HttpContext.Current.Server.MapPath("~/UploadedFiles/");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                byte[] fileBytes = Convert.FromBase64String(fileData);
+                string empId = HttpContext.Current.Session["emp_id"].ToString();
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string uniqueFileName = $"{empId}_{timestamp}_{fileName}";
+
+                string filePath = Path.Combine(folderPath, uniqueFileName);
+                File.WriteAllBytes(filePath, fileBytes);
+
+                return $"/UploadedFiles/{uniqueFileName}";
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
+        }
+
+        [WebMethod]
+        public static string insertupdateannouncement(string title, string description, string attachments, string expireDate, string[] department, string[] jobPosition, string[] employees, string disableComments, bool isedit, string announcementId)
+        {
+            var data = "";
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string departmentCondition = department != null && !department.Contains("All")
+                        ? $"AND emp_dept_id IN ({string.Join(",", department.Select(v => $"'{v}'"))})"
+                        : "";
+
+                    string jobPositionCondition = jobPosition != null && !jobPosition.Contains("All")
+                        ? $"AND emp_job_position_id IN ({string.Join(",", jobPosition.Select(v => $"'{v}'"))})"
+                        : "";
+
+                    string employeesCondition = employees != null && !employees.Contains("All")
+                        ? $"AND emp_id IN ({string.Join(",", employees.Select(v => $"'{v}'"))})"
+                        : "";
+
+                    string employeeQuery = $@"
+                SELECT emp_id 
+                FROM hrms.employee 
+                WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition} {employeesCondition};";
+                    MySqlCommand cmd = new MySqlCommand(employeeQuery, conn);
+                    var reader = cmd.ExecuteReader();
+                    var viewableByList = new List<string>();
+
+                    while (reader.Read())
+                    {
+                        viewableByList.Add(reader["emp_id"].ToString());
+                    }
+                    reader.Close();
+
+                    string viewableBy = string.Join(",", viewableByList);
+                    if (string.IsNullOrEmpty(viewableBy))
+                    {
+                        return JsonConvert.SerializeObject("No employees matched the criteria.");
+                    }
+
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+
+                    if (isedit && !string.IsNullOrEmpty(announcementId))
+                    {
+                        // Update query
+                        string updateAnnouncementQuery = $@"
+                    UPDATE hrms.announcement 
+                    SET emp_id = '{emp_id}', 
+                        Heading = '{title}', 
+                        announcement_description = '{description}', 
+                        attachments = '{attachments}', 
+                        expire_date = '{expireDate}', 
+                        viewable_by = '{viewableBy}', 
+                        comments = '{disableComments}' 
+                    WHERE announcement_id = '{announcementId}';";
+
+                        cmd = new MySqlCommand(updateAnnouncementQuery, conn);
+                    }
+                    else
+                    {
+                        // Insert query
+                        string insertAnnouncementQuery = $@"
+                    INSERT INTO hrms.announcement 
+                    (emp_id, Heading, announcement_description, attachments, posted_on, expire_date, viewable_by, comments) 
+                    VALUES ('{emp_id}', '{title}', '{description}', '{attachments}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}', '{expireDate}', '{viewableBy}', '{disableComments}');";
+
+                        cmd = new MySqlCommand(insertAnnouncementQuery, conn);
+                    }
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    data = rowsAffected > 0 ? "success" : "failure";
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in insertannouncement: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
+            }
+
+            return JsonConvert.SerializeObject(data);
+        }
+
         public class announncement_details
         {
             public string heading { get; set; }
             public string announcement_description { get; set; }
+            public string attachments { get; set; }
             public string posted_date { get; set; }
             public string posted_time { get; set; }
             public string viewed_by { get; set; }
+            public string comments { get; set; }
         }
-
 
         [WebMethod]
         public static string openannouncementmodal(string announcement_id)
@@ -257,7 +436,7 @@ namespace hrms
                 {
                     conn.Open();
 
-                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.posted_on, a.viewed_by 
+                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.posted_on, a.viewed_by, a.comments  
                                                             FROM hrms.announcement a
                                                             WHERE a.announcement_id = '{announcement_id}';";
                     var announncement_details_da = new MySqlDataAdapter(announncement_details_Query, conn);
@@ -274,9 +453,11 @@ namespace hrms
                         {
                             heading = row["heading"].ToString(),
                             announcement_description = row["announcement_description"].ToString(),
+                            attachments = row["attachments"].ToString(),
                             posted_date = posted_date,
                             posted_time = posted_time,
-                            viewed_by = row["viewed_by"].ToString()
+                            viewed_by = row["viewed_by"].ToString(),
+                            comments = row["comments"].ToString()
                         });
                     }
                     conn.Close();
@@ -290,6 +471,164 @@ namespace hrms
             {
                 log.Error("Error in populate_announncements_details: " + ex.ToString());
                 data = "ExceptionMessage - " + ex.Message;
+            }
+
+            return JsonConvert.SerializeObject(data);
+        }
+
+        public class editannounncement
+        {
+            public string emp_id { get; set; }
+            public string Heading { get; set; }
+            public string announcement_description { get; set; }
+            public string attachments { get; set; }
+            public string expire_date { get; set; }
+            public string viewable_by { get; set; }
+            public string comments { get; set; }
+            public string departments { get; set; }
+            public string job_positions { get; set; }
+        }
+
+        [WebMethod]
+        public static string editannouncement(string announcement_id)
+        {
+            var data = "";
+            var List = new List<editannounncement>();
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string announncement_Query = $@"SELECT emp_id, Heading, announcement_description, attachments, expire_date, viewable_by, comments FROM hrms.announcement WHERE announcement_id = @announcement_id;";
+                    using (var cmd = new MySqlCommand(announncement_Query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
+                        var da = new MySqlDataAdapter(cmd);
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            var emp_ids = row["viewable_by"].ToString().Split(',');
+                            var departments = new List<string>();
+                            var jobPositions = new List<string>();
+
+                            foreach (var emp_id in emp_ids)
+                            {
+                                string emp_details_query = @"SELECT emp_dept_id, emp_job_position_id 
+                                                         FROM hrms.employee WHERE emp_id = @emp_id;";
+                                using (var empCmd = new MySqlCommand(emp_details_query, conn))
+                                {
+                                    empCmd.Parameters.AddWithValue("@emp_id", emp_id);
+                                    using (var reader = empCmd.ExecuteReader())
+                                    {
+                                        if (reader.Read())
+                                        {
+                                            departments.Add(reader["emp_dept_id"].ToString());
+                                            jobPositions.Add(reader["emp_job_position_id"].ToString());
+                                        }
+                                    }
+                                }
+                            }
+
+                            List.Add(new editannounncement
+                            {
+                                emp_id = row["emp_id"].ToString(),
+                                Heading = row["Heading"].ToString(),
+                                announcement_description = row["announcement_description"].ToString(),
+                                attachments = row["attachments"].ToString(),
+                                expire_date = row["expire_date"].ToString(),
+                                viewable_by = row["viewable_by"].ToString(),
+                                comments = row["comments"].ToString(),
+                                departments = string.Join(",", departments),
+                                job_positions = string.Join(",", jobPositions)
+                            });
+                        }
+
+                        conn.Close();
+
+                        var announncement_data = JsonConvert.SerializeObject(List);
+                        data = announncement_data;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in editannouncement: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
+            }
+
+            return JsonConvert.SerializeObject(data);
+        }
+
+        [WebMethod]
+        public static string deleteannouncement(string announcement_id)
+        {
+            var data = "";
+
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                string filePath = "";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    using (var transaction = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            string getFilePathQuery = "SELECT attachments FROM hrms.announcement WHERE announcement_id = @announcement_id;";
+                            using (var cmd = new MySqlCommand(getFilePathQuery, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
+                                using (var reader = cmd.ExecuteReader())
+                                {
+                                    if (reader.Read())
+                                    {
+                                        filePath = reader["attachments"].ToString();
+                                    }
+                                }
+                            }
+
+                            string deleteCommentsQuery = "DELETE FROM hrms.announcement_comments WHERE announcement_id = @announcement_id;";
+                            using (var cmd = new MySqlCommand(deleteCommentsQuery, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            string deleteAnnouncementQuery = "DELETE FROM hrms.announcement WHERE announcement_id = @announcement_id;";
+                            using (var cmd = new MySqlCommand(deleteAnnouncementQuery, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                            data = "success";
+                        }
+                        catch (Exception)
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+
+                if (data == "success" && !string.IsNullOrEmpty(filePath) && File.Exists(HttpContext.Current.Server.MapPath(filePath)))
+                {
+                    File.Delete(HttpContext.Current.Server.MapPath(filePath));
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in deleteannouncement: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
             }
 
             return JsonConvert.SerializeObject(data);
@@ -338,7 +677,7 @@ namespace hrms
                                                              FROM hrms.announcement_comments c 
                                                              LEFT JOIN hrms.employee e ON (e.emp_id = c.emp_id)	
                                                              LEFT JOIN hrms.profile_picture p ON (p.emp_id = e.emp_id)
-                                                             WHERE c.announcement_id = '{announcement_id}';";
+                                                             WHERE c.announcement_id = '{announcement_id}' AND e.is_active = 'Y';";
                         var announncement_comments_da = new MySqlDataAdapter(announncement_comments_Query, conn);
                         DataTable announncement_comments_dt = new DataTable();
                         announncement_comments_da.Fill(announncement_comments_dt);

@@ -36,7 +36,7 @@ namespace hrms
                 {
                     conn.Open();
 
-                    string login_info_Query = $@"SELECT emp_id FROM hrms.employee WHERE gmail = '{username}' AND account_password = '{password}';";
+                    string login_info_Query = $@"SELECT emp_id FROM hrms.employee WHERE gmail = '{username}' AND account_password = '{password}' AND is_active = 'Y';";
                     var cmd = new MySqlCommand(login_info_Query, conn);
                     var emp_id = cmd.ExecuteScalar();
                     if (emp_id != null && !string.IsNullOrEmpty(emp_id.ToString()))
