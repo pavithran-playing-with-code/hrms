@@ -170,7 +170,7 @@
                 </button>
                 <div class="text-center mt-3">
                     <small>
-                        <a href="#" class="link link-secondary" style="color: hsl(8,77%,56%);">Forgot password?</a>
+                        <a onclick="window.location.href = 'forgot-password.aspx'" class="link link-secondary" style="color: hsl(8,77%,56%);">Forgot password?</a>
                     </small>
                 </div>
             </div>

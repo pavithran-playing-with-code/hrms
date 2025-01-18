@@ -30,6 +30,31 @@ namespace hrms
             {
                 Response.Redirect("login.aspx");
             }
+
+            /* try
+             {
+                 string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                 using (var conn = new MySqlConnection(connectionString))
+                 {
+                     conn.Open();
+
+                     string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
+                     using (var cmd = new MySqlCommand(accessLevelQuery, conn))
+                     {
+                         cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                         var accessLevel = cmd.ExecuteScalar();
+
+                         if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
+                         {
+                             emp_access_lvl.Value = "true";
+                         }
+                     }
+                 }
+             }
+             catch (Exception ex)
+             {
+                 Response.Write($"Error: {ex.Message}");
+             }*/
         }
 
         [WebMethod]
@@ -135,10 +160,11 @@ namespace hrms
             public string profile_img { get; set; }
             public string profile_color { get; set; }
             public string heading { get; set; }
+            public string emp_access_lvl { get; set; }
         }
 
         [WebMethod]
-        public static string populate_announncements()
+        public static string populateannounncements()
         {
             var data = "";
             var List = new List<announncement>();
@@ -151,12 +177,28 @@ namespace hrms
                 {
                     conn.Open();
 
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+                    string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
+                    var emp_access_lvl = "";
+                    using (var cmd = new MySqlCommand(accessLevelQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        var accessLevel = cmd.ExecuteScalar();
+
+                        if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
+                        {
+                            emp_access_lvl = "true";
+                        }
+                    }
+
                     string announncement_Query = $@"SELECT a.announcement_id, CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters, 
                                                             p.profile_img, p.profile_color, a.heading
                                                             FROM hrms.announcement a
                                                             LEFT JOIN hrms.employee e ON (e.emp_id = a.emp_id) 
                                                             LEFT JOIN hrms.profile_picture p ON (p.emp_id = e.emp_id) 
-                                                            WHERE e.is_active = 'Y';";
+                                                            WHERE e.is_active = 'Y' AND a.deleted_by IS NULL AND a.expire_date >= CURDATE() 
+                                                            AND (FIND_IN_SET('{emp_id}', a.viewable_by) > 0 OR e.access_level = 'high') 
+                                                            ORDER BY a.posted_on DESC; ";
                     var da = new MySqlDataAdapter(announncement_Query, conn);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -169,7 +211,8 @@ namespace hrms
                             profile_letters = row["profile_letters"].ToString(),
                             profile_img = row["profile_img"].ToString(),
                             profile_color = row["profile_color"].ToString(),
-                            heading = row["heading"].ToString()
+                            heading = row["heading"].ToString(),
+                            emp_access_lvl = emp_access_lvl
                         });
                     }
                     conn.Close();
@@ -372,23 +415,15 @@ namespace hrms
 
                     if (isedit && !string.IsNullOrEmpty(announcementId))
                     {
-                        // Update query
-                        string updateAnnouncementQuery = $@"
-                    UPDATE hrms.announcement 
-                    SET emp_id = '{emp_id}', 
-                        Heading = '{title}', 
-                        announcement_description = '{description}', 
-                        attachments = '{attachments}', 
-                        expire_date = '{expireDate}', 
-                        viewable_by = '{viewableBy}', 
-                        comments = '{disableComments}' 
-                    WHERE announcement_id = '{announcementId}';";
+                        string updateAnnouncementQuery = $@"UPDATE hrms.announcement SET emp_id = '{emp_id}', 
+                        Heading = '{title}', announcement_description = '{description}', attachments = '{attachments}', expire_date = '{expireDate}', 
+                        viewable_by = '{viewableBy}', comments = '{disableComments}', edited_by = '{emp_id}', edited_time = NOW() 
+                        WHERE announcement_id = '{announcementId}';";
 
                         cmd = new MySqlCommand(updateAnnouncementQuery, conn);
                     }
                     else
                     {
-                        // Insert query
                         string insertAnnouncementQuery = $@"
                     INSERT INTO hrms.announcement 
                     (emp_id, Heading, announcement_description, attachments, posted_on, expire_date, viewable_by, comments) 
@@ -438,7 +473,7 @@ namespace hrms
 
                     string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.posted_on, a.viewed_by, a.comments  
                                                             FROM hrms.announcement a
-                                                            WHERE a.announcement_id = '{announcement_id}';";
+                                                            WHERE a.announcement_id = '{announcement_id}' AND a.deleted_by IS NULL;";
                     var announncement_details_da = new MySqlDataAdapter(announncement_details_Query, conn);
                     DataTable announncement_details_dt = new DataTable();
                     announncement_details_da.Fill(announncement_details_dt);
@@ -470,6 +505,82 @@ namespace hrms
             catch (Exception ex)
             {
                 log.Error("Error in populate_announncements_details: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+            }
+
+            return JsonConvert.SerializeObject(data);
+        }
+
+        [WebMethod]
+        public static string Republish(string announcement_id)
+        {
+            var data = "";
+
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.expire_date, a.viewable_by, a.comments 
+                                                            FROM hrms.announcement a
+                                                            WHERE a.announcement_id = '{announcement_id}' AND a.deleted_by IS NULL;";
+
+                    var announncement_details_da = new MySqlDataAdapter(announncement_details_Query, conn);
+                    DataTable announncement_details_dt = new DataTable();
+                    announncement_details_da.Fill(announncement_details_dt);
+
+                    if (announncement_details_dt.Rows.Count > 0)
+                    {
+                        var heading = announncement_details_dt.Rows[0]["heading"].ToString();
+                        var description = announncement_details_dt.Rows[0]["announcement_description"].ToString();
+                        var attachments = announncement_details_dt.Rows[0]["attachments"].ToString();
+                        var expireDate = Convert.ToDateTime(announncement_details_dt.Rows[0]["expire_date"]).ToString("yyyy-MM-dd");
+                        var viewableBy = announncement_details_dt.Rows[0]["viewable_by"].ToString();
+                        var comments = announncement_details_dt.Rows[0]["comments"].ToString();
+                        var emp_id = HttpContext.Current.Session["emp_id"];
+
+                        if (emp_id != null)
+                        {
+                            string insertAnnouncementQuery = $@"
+                        INSERT INTO hrms.announcement 
+                        (emp_id, Heading, announcement_description, attachments, posted_on, expire_date, viewable_by, comments) 
+                        VALUES 
+                        (@emp_id, @heading, @description, @attachments, NOW(), @expireDate, @viewableBy, @comments);";
+
+                            using (var cmd = new MySqlCommand(insertAnnouncementQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@emp_id", emp_id.ToString());
+                                cmd.Parameters.AddWithValue("@heading", heading);
+                                cmd.Parameters.AddWithValue("@description", description);
+                                cmd.Parameters.AddWithValue("@attachments", attachments);
+                                cmd.Parameters.AddWithValue("@expireDate", expireDate);
+                                cmd.Parameters.AddWithValue("@viewableBy", viewableBy);
+                                cmd.Parameters.AddWithValue("@comments", comments);
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            data = "success";
+                        }
+                        else
+                        {
+                            data = "Session expired or employee ID not found.";
+                        }
+                    }
+                    else
+                    {
+                        data = "Announcement not found.";
+                    }
+
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in Republish: " + ex.ToString());
                 data = "ExceptionMessage - " + ex.Message;
             }
 
@@ -594,16 +705,20 @@ namespace hrms
                                 }
                             }
 
-                            string deleteCommentsQuery = "DELETE FROM hrms.announcement_comments WHERE announcement_id = @announcement_id;";
-                            using (var cmd = new MySqlCommand(deleteCommentsQuery, conn, transaction))
+                            var emp_id = HttpContext.Current.Session["emp_id"];
+
+                            string updateCommentsQuery = "UPDATE hrms.announcement_comments SET deleted_by = @emp_id, deleted_time = NOW() WHERE announcement_id = @announcement_id;";
+                            using (var cmd = new MySqlCommand(updateCommentsQuery, conn, transaction))
                             {
+                                cmd.Parameters.AddWithValue("@emp_id", emp_id);
                                 cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
                                 cmd.ExecuteNonQuery();
                             }
 
-                            string deleteAnnouncementQuery = "DELETE FROM hrms.announcement WHERE announcement_id = @announcement_id;";
-                            using (var cmd = new MySqlCommand(deleteAnnouncementQuery, conn, transaction))
+                            string updateAnnouncementQuery = "UPDATE hrms.announcement SET deleted_by = @emp_id, deleted_time = NOW() WHERE announcement_id = @announcement_id;";
+                            using (var cmd = new MySqlCommand(updateAnnouncementQuery, conn, transaction))
                             {
+                                cmd.Parameters.AddWithValue("@emp_id", emp_id);
                                 cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
                                 cmd.ExecuteNonQuery();
                             }
@@ -677,7 +792,7 @@ namespace hrms
                                                              FROM hrms.announcement_comments c 
                                                              LEFT JOIN hrms.employee e ON (e.emp_id = c.emp_id)	
                                                              LEFT JOIN hrms.profile_picture p ON (p.emp_id = e.emp_id)
-                                                             WHERE c.announcement_id = '{announcement_id}' AND e.is_active = 'Y';";
+                                                             WHERE c.announcement_id = '{announcement_id}' AND c.deleted_by IS NULL AND e.is_active = 'Y';";
                         var announncement_comments_da = new MySqlDataAdapter(announncement_comments_Query, conn);
                         DataTable announncement_comments_dt = new DataTable();
                         announncement_comments_da.Fill(announncement_comments_dt);

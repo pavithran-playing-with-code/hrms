@@ -12,7 +12,7 @@
     }
 
     .sidebar-menu-icon i {
-        font-size: 20px; /* Increase icon size */
+        font-size: 20px; 
     }
 
     .sidebar-item a:hover .sidebar-menu-icon,

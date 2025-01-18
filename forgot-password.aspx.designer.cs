@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class WebForm2
+    public partial class forgot_password
     {
     }
 }

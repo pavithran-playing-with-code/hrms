@@ -217,8 +217,12 @@
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
 
+    <form id="form1" runat="server">
+        <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
+    </form>
     <input type="hidden" id="announcement_id" name="announcement_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
+
     <div class="container-fluid p-0">
         <div class="row no-gutters">
             <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
@@ -287,7 +291,7 @@
                                         <h6 class="card-title">Announcements</h6>
                                         <span class="mb-1">
                                             <button id="addAnnouncement" style="display: inline-block; padding: 0px; border-radius: 6px; display: flex; align-items: center; justify-content: center; width: 50px; height: 28px;"
-                                                class="btn btn-outline-custom ms-3" onclick="opencreateannouncementmodal()" title="Create Announcement">
+                                                class="btn btn-outline-custom ms-3 onlyhighaccesslvl" onclick="opencreateannouncementmodal()" title="Create Announcement">
                                                 <i class="fa fa-plus m-0"></i>
                                             </button>
                                         </span>
@@ -341,11 +345,12 @@
                                         <i class="fa-regular fa-eye" style="font-size: 0.9rem;"></i>
                                     </div>
                                 </div>
-                                <button style="cursor: pointer; background-color: transparent; border: none; outline: none" title="Action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button class="onlyhighaccesslvl" style="cursor: pointer; background-color: transparent; border: none; outline: none" title="Action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
                                 <div class="dropdown-menu" style="font-size: 15px;">
                                     <a class="dropdown-item" href="#" onclick="editannouncement()" style="color: black">Edit</a>
+                                    <a class="dropdown-item" href="#" onclick="Republish()" style="color: black">Publish</a>
                                     <a class="dropdown-item" href="#" onclick="deleteannouncement()" style="color: red">Delete</a>
                                 </div>
                             </div>
@@ -499,7 +504,7 @@
 
             populate_emp_details();
             populate_emp_details();
-            populate_announncements();
+            populateannounncements();
         });
 
         function opencreateannouncementmodal() {
@@ -548,10 +553,10 @@
             });
         }
 
-        function populate_announncements() {
+        function populateannounncements() {
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/populate_announncements',
+                url: 'dashboard.aspx/populateannounncements',
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -567,6 +572,13 @@
                             const profileLetters = announcement.profile_letters;
                             const profileColor = announcement.profile_color;
                             const heading = announcement.heading;
+                            const emp_access_lvl = announcement.emp_access_lvl;
+
+                            if (emp_access_lvl != "true") {
+                                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                                    element.style.display = 'none';
+                                });
+                            }
 
                             let profileHTML = '';
                             if (profileImage) {
@@ -861,6 +873,46 @@
             $('#id_job_position').val(null).trigger('change');
             $('#id_disable_comments').prop('checked', false);
         }
+
+        function Republish() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to republish this announcement?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Republish!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: 'dashboard.aspx/Republish',
+                        data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            let data = response.d;
+                            data = JSON.parse(data);
+                            if (data == "success") {
+                                $('#announcement_info_modal').modal('hide');
+                                populate_announncements();
+                                display_green_alert('Announcement created successfully.');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
 
         function editannouncement() {
             $('#createannouncementmodal').modal('show');
