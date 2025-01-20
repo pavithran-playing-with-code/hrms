@@ -217,9 +217,7 @@
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
 
-    <form id="form1" runat="server">
-        <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
-    </form>
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
     <input type="hidden" id="announcement_id" name="announcement_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
 
@@ -254,7 +252,6 @@
                     <uc:HeaderNavBar runat="server" ID="HeaderNavBarControl" />
                 </div>
                 <div class="mt-3">
-                    <%--code--%>
                     <div class="container-fluid">
                         <div class="row" id="dashboard" style="padding-bottom: 4.5rem;">
                             <div class="dashboard__left col-12 col-sm-12 col-md-12 col-lg-9">
@@ -466,8 +463,9 @@
                             <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
                         </div>
                         <div class="text-right">
-                            <button onclick="publishOReditannouncement()" id="publishOReditannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
-                            <button onclick="saveannouncement()" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Discord</button>
+                            <button onclick="publish_edit_save_announcement('publish')" id="publishannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
+                            <button onclick="publish_edit_save_announcement('edit')" id="editannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Edit</button>
+                            <button onclick="publish_edit_save_announcement('save')" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
                         </div>
                     </div>
                 </div>
@@ -506,14 +504,6 @@
             populate_emp_details();
             populateannounncements();
         });
-
-        function opencreateannouncementmodal() {
-            clearannouncementfields();
-            populatecreateannouncementmodal("department", null, null);
-            $('#createannouncementmodal').modal('show');
-            document.getElementById('createannouncementmodalLabel').innerText = "Create Announcement.";
-            document.getElementById('id_expire_date').value = new Date().toISOString().split('T')[0];
-        }
 
         function display_green_alert(message) {
             document.getElementById("greenAlert").style.display = 'flex';
@@ -561,6 +551,7 @@
                 dataType: 'json',
                 success: function (response) {
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
                     let announcementsHTML = '';
 
@@ -631,6 +622,7 @@
                 dataType: 'json',
                 success: function (response) {
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const announcementList = JSON.parse(cleanedResponse);
 
                     if (announcementList.length > 0) {
@@ -672,6 +664,20 @@
                     });
                 }
             });
+        }
+
+        function opencreateannouncementmodal() {
+            clearannouncementfields();
+            populatecreateannouncementmodal("department", null, null);
+            $("#announcement_id").val('');
+            $('#publishannouncementbtn').show();
+            $('#editannouncementbtn').hide();
+            $('#createannouncementmodal').modal('show');
+            document.getElementById('createannouncementmodalLabel').innerText = "Create Announcement.";
+
+            const today = new Date();
+            const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            document.getElementById('id_expire_date').value = localDate;
         }
 
         document.getElementById('remove_attachment_btn').addEventListener('click', function () {
@@ -777,7 +783,7 @@
             });
         }
 
-        async function publishOReditannouncement(isedit = false) {
+        async function publish_edit_save_announcement(action) {
             const title = $('#id_title').val();
             const description = $('#id_description').summernote('code');
             const expireDate = $('#id_expire_date').val();
@@ -787,9 +793,9 @@
             const disableComments = $('#id_disable_comments').is(':checked');
             const fileInput = document.getElementById('id_attachments');
             let attachments = '';
-            const announcementId = $("#announcement_id").val();
+            var announcementId = $("#announcement_id").val();
 
-            if (isedit == true && document.getElementById('id_attachments_helper').style.display == "block") {
+            if (action == "edit" && document.getElementById('id_attachments_helper').style.display == "block") {
                 attachments = $('#id_attachments_hidden_value').val();
             } else {
                 if (fileInput.files.length > 0) {
@@ -829,13 +835,13 @@
                 jobPosition: jobPosition,
                 employees: employees,
                 disableComments: disableComments,
-                isedit, isedit,
+                action, action,
                 announcementId, announcementId
             };
 
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/insertupdateannouncement',
+                url: 'dashboard.aspx/publish_edit_save_announcement',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 dataType: 'json',
@@ -845,11 +851,18 @@
                     if (data == "success") {
                         clearannouncementfields();
                         $('#createannouncementmodal').modal('hide');
-                        if (isedit) {
+                        populateannounncements();
+
+                        var alertMessage = "";
+                        if (action == "edit") {
                             $('#announcement_info_modal').modal('hide');
+                            alertMessage = "Announcement updated successfully.";
                         }
-                        populate_announncements();
-                        const alertMessage = isedit ? 'Announcement updated successfully.' : 'Announcement created successfully.';
+                        else if (action == "publish") {
+                            alertMessage = "Announcement updated successfully.";
+                        } else if (action == "save") {
+                            alertMessage = "Announcement saved successfully.";
+                        }
                         display_green_alert(alertMessage);
                     }
                 },
@@ -863,16 +876,7 @@
             });
         }
 
-        function clearannouncementfields() {
-            document.getElementById('id_attachments_helper').style.display = 'none';
-            $('#id_title').val('');
-            $('#id_description').summernote('code', '');
-            $('#id_attachments').val('');
-            $('#id_employees').val(null).trigger('change');
-            $('#id_department').val(null).trigger('change');
-            $('#id_job_position').val(null).trigger('change');
-            $('#id_disable_comments').prop('checked', false);
-        }
+
 
         function Republish() {
             Swal.fire({
@@ -897,7 +901,7 @@
                             data = JSON.parse(data);
                             if (data == "success") {
                                 $('#announcement_info_modal').modal('hide');
-                                populate_announncements();
+                                populateannounncements();
                                 display_green_alert('Announcement created successfully.');
                             }
                         },
@@ -913,8 +917,9 @@
             });
         }
 
-
         function editannouncement() {
+            $('#publishannouncementbtn').hide();
+            $('#editannouncementbtn').show();
             $('#createannouncementmodal').modal('show');
             clearannouncementfields();
             $.ajax({
@@ -926,6 +931,7 @@
                 success: function (response) {
                     document.getElementById("createannouncementmodalLabel").innerText = "Edit Announcement.";
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
 
                     if (data.length > 0) {
@@ -968,13 +974,6 @@
                                 });
                             });
                         });
-
-                        const publishButton = document.getElementById("publishOReditannouncementbtn");
-                        publishButton.textContent = "Edit";
-                        publishButton.onclick = function () {
-                            publishOReditannouncement(true);
-                        };
-
                     }
                 },
                 error: function (xhr, status, error) {
@@ -1011,7 +1010,7 @@
 
                             if (data == "success") {
                                 $('#announcement_info_modal').modal('hide');
-                                populate_announncements();
+                                populateannounncements();
                                 display_green_alert('Announcement delelted successfully.');
                             }
                         },
@@ -1025,6 +1024,17 @@
                     });
                 }
             });
+        }
+
+        function clearannouncementfields() {
+            document.getElementById('id_attachments_helper').style.display = 'none';
+            $('#id_title').val('');
+            $('#id_description').summernote('code', '');
+            $('#id_attachments').val('');
+            $('#id_employees').val(null).trigger('change');
+            $('#id_department').val(null).trigger('change');
+            $('#id_job_position').val(null).trigger('change');
+            $('#id_disable_comments').prop('checked', false);
         }
 
         $('#commentButton').click(function () {
@@ -1045,6 +1055,7 @@
                     $("#commentInput").val("");
 
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const commentsList = JSON.parse(cleanedResponse);
                     if (commentsList.length > 0) {
                         var commentsHtml = "";

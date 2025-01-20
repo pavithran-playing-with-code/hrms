@@ -1,7 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="header_navbar.ascx.cs" Inherits="hrms.header_navbar" %>
 
-
-
 <style>
     .navbar {
         background-color: #fff !important;
@@ -40,7 +38,7 @@
 <nav class="navbar navbar-expand-lg navbar-light">
 
     <div class="d-flex align-items-center">
-        <i class="fa fa-bars mr-2" id="toggleSidebar"></i>
+        <i class="fa fa-bars mr-2" id="toggleSidebar" onclick="sidebarToggle()"></i>
         <a class="navbar-brand" href="#">HRMS</a>
     </div>
 
@@ -74,12 +72,16 @@
 <script>
 
     $(document).ready(function () {
-        $('#toggleSidebar').click(function () {
-
-        });
-
         populate_profile_details();
     });
+
+    function sidebarToggle() {
+        var isToggled = false;
+        $(".sidebar").toggleClass("toggled");
+        isToggled = !isToggled;
+
+        document.cookie = "toggle=" + (isToggled ? "1" : "0") + "; path=/";
+    }
 
     function populate_profile_details() {
         $.ajax({
