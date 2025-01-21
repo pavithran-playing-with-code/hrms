@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -295,7 +297,7 @@
                                     </div>
                                     <hr />
                                     <div class="card-body">
-                                        <div class="announcement-body" id="announcementListCard" style="height: 300px; border: none;"></div>
+                                        <div class="announcement-body" id="announcementListCard" style="height: 300px; overflow-y: auto; border: none;"></div>
                                     </div>
                                 </div>
                                 <div class="card p-3 mb-3 mt-3 mr-3">
@@ -458,9 +460,21 @@
                             <label for="id_employees">Employees:</label>
                             <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
                         </div>
-                        <div class="form-group">
-                            <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
-                            <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                        <div class="form-group d-flex align-items-center">
+                            <label class="mr-3">Notify:</label>
+                            <div class="custom-control custom-switch mr-3">
+                                <input type="checkbox" class="custom-control-input" id="toggle_notify_email" />
+                                <label class="custom-control-label" for="toggle_notify_email">Email</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="toggle_notify_phone" />
+                                <label class="custom-control-label" for="toggle_notify_phone">Phone</label>
+                            </div>
+
+                            <div class="ml-auto" style="padding-right: 20px;">
+                                <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
+                                <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                            </div>
                         </div>
                         <div class="text-right">
                             <button onclick="publish_edit_save_announcement('publish')" id="publishannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
@@ -612,49 +626,66 @@
         }
 
         function openannouncementmodal(announcement_id) {
-            $('#announcement_info_modal').modal('show');
-
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/openannouncementmodal',
+                url: 'dashboard.aspx/add_viewed_by',
                 data: JSON.stringify({ announcement_id: announcement_id }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
-                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
-                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
-                    const announcementList = JSON.parse(cleanedResponse);
+                    $('#announcement_info_modal').modal('show');
 
-                    if (announcementList.length > 0) {
-                        const announcement = announcementList[0];
-                        $("#announcement_id").val(announcement_id);
-                        document.getElementById("heading").innerText = announcement.heading;
-                        document.getElementById("viewed_by").innerText = announcement.viewed_by;
-                        document.getElementById("posted_date").innerText = announcement.posted_date;
-                        document.getElementById("posted_time").innerText = announcement.posted_time;
-                        document.getElementById("announcement_description").innerHTML = announcement.announcement_description;
-                        document.getElementById("comments_header").innerText = announcement.heading + " comments";
+                    $.ajax({
+                        type: "POST",
+                        url: 'dashboard.aspx/openannouncementmodal',
+                        data: JSON.stringify({ announcement_id: announcement_id }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                            cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                            const announcementList = JSON.parse(cleanedResponse);
 
-                        if (announcement.attachments != "") {
-                            const attachmentLink = document.getElementById("attachment_link");
-                            attachmentLink.href = announcement.attachments;
-                            const attachmentParts = announcement.attachments.split('/').pop().split('_');
-                            const originalFileName = attachmentParts.slice(2).join('_');
-                            attachmentLink.innerText = originalFileName;
-                            document.getElementById("attachment_container").style.display = "block";
-                        } else {
-                            const attachmentLink = document.getElementById("attachment_link");
-                            attachmentLink.href = "";
-                            attachmentLink.innerText = "";
-                            document.getElementById("attachment_container").style.display = "none";
+                            if (announcementList.length > 0) {
+                                const announcement = announcementList[0];
+                                $("#announcement_id").val(announcement_id);
+                                document.getElementById("heading").innerText = announcement.heading;
+                                document.getElementById("viewed_by").innerText = announcement.viewed_by;
+                                document.getElementById("posted_date").innerText = announcement.posted_date;
+                                document.getElementById("posted_time").innerText = announcement.posted_time;
+                                document.getElementById("announcement_description").innerHTML = announcement.announcement_description;
+                                document.getElementById("comments_header").innerText = announcement.heading + " comments";
+
+                                if (announcement.attachments != "") {
+                                    const attachmentLink = document.getElementById("attachment_link");
+                                    attachmentLink.href = announcement.attachments;
+                                    const attachmentParts = announcement.attachments.split('/').pop().split('_');
+                                    const originalFileName = attachmentParts.slice(2).join('_');
+                                    attachmentLink.innerText = originalFileName;
+                                    document.getElementById("attachment_container").style.display = "block";
+                                } else {
+                                    const attachmentLink = document.getElementById("attachment_link");
+                                    attachmentLink.href = "";
+                                    attachmentLink.innerText = "";
+                                    document.getElementById("attachment_container").style.display = "none";
+                                }
+                                if (announcement.comments == "False") {
+                                    document.querySelector(".comment-button").style.display = 'none';
+                                } else {
+                                    document.querySelector(".comment-button").style.display = 'flex';
+                                    populatecomments();
+                                }
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                icon: "error"
+                            });
                         }
-                        if (announcement.comments == "False") {
-                            document.querySelector(".comment-button").style.display = 'none';
-                        } else {
-                            document.querySelector(".comment-button").style.display = 'flex';
-                            populatecomments();
-                        }
-                    }
+                    });
+
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -784,6 +815,7 @@
         }
 
         async function publish_edit_save_announcement(action) {
+            var announcementId = $("#announcement_id").val();
             const title = $('#id_title').val();
             const description = $('#id_description').summernote('code');
             const expireDate = $('#id_expire_date').val();
@@ -791,10 +823,15 @@
             const department = $('#id_department').val();
             const jobPosition = $('#id_job_position').val();
             const disableComments = $('#id_disable_comments').is(':checked');
-            const fileInput = document.getElementById('id_attachments');
+            const notifyEmail = $('#toggle_notify_email').is(':checked');
+            const notifyPhone = $('#toggle_notify_phone').is(':checked');
             let attachments = '';
-            var announcementId = $("#announcement_id").val();
+            let notify = [];
 
+            if (notifyEmail) notify.push('email');
+            if (notifyPhone) notify.push('phone');
+
+            const fileInput = document.getElementById('id_attachments');
             if (action == "edit" && document.getElementById('id_attachments_helper').style.display == "block") {
                 attachments = $('#id_attachments_hidden_value').val();
             } else {
@@ -834,6 +871,7 @@
                 department: department,
                 jobPosition: jobPosition,
                 employees: employees,
+                notify: notify,
                 disableComments: disableComments,
                 action, action,
                 announcementId, announcementId
@@ -859,7 +897,7 @@
                             alertMessage = "Announcement updated successfully.";
                         }
                         else if (action == "publish") {
-                            alertMessage = "Announcement updated successfully.";
+                            alertMessage = "Announcement published successfully.";
                         } else if (action == "save") {
                             alertMessage = "Announcement saved successfully.";
                         }
@@ -974,6 +1012,20 @@
                                 });
                             });
                         });
+
+                        const notifyValues = announcement.notify.split(',');
+
+                        if (notifyValues.includes("email")) {
+                            $('#toggle_notify_email').prop('checked', true);
+                        } else {
+                            $('#toggle_notify_email').prop('checked', false);
+                        }
+
+                        if (notifyValues.includes("phone")) {
+                            $('#toggle_notify_phone').prop('checked', true);
+                        } else {
+                            $('#toggle_notify_phone').prop('checked', false);
+                        }
                     }
                 },
                 error: function (xhr, status, error) {
@@ -1035,6 +1087,8 @@
             $('#id_department').val(null).trigger('change');
             $('#id_job_position').val(null).trigger('change');
             $('#id_disable_comments').prop('checked', false);
+            $('#toggle_notify_email').prop('checked', false);
+            $('#toggle_notify_phone').prop('checked', false);
         }
 
         $('#commentButton').click(function () {

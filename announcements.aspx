@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -165,6 +168,8 @@
 </head>
 <body style="background-color: #f8f9fa">
     <input type="hidden" id="announcement_id" name="announcement_id" />
+    <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
+
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
@@ -289,9 +294,21 @@
                             <label for="id_employees">Employees:</label>
                             <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
                         </div>
-                        <div class="form-group">
-                            <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
-                            <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                        <div class="form-group d-flex align-items-center">
+                            <label class="mr-3">Notify:</label>
+                            <div class="custom-control custom-switch mr-3">
+                                <input type="checkbox" class="custom-control-input" id="toggle_notify_email" />
+                                <label class="custom-control-label" for="toggle_notify_email">Email</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="toggle_notify_phone" />
+                                <label class="custom-control-label" for="toggle_notify_phone">Phone</label>
+                            </div>
+
+                            <div class="ml-auto" style="padding-right: 20px;">
+                                <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
+                                <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                            </div>
                         </div>
                         <div class="text-right">
                             <button onclick="publish_edit_save_announcement('publish')" id="publishannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
@@ -307,6 +324,26 @@
     <script>
         $(document).ready(function () {
             populateannounncements();
+
+            $('#id_description').summernote({
+                height: 60,
+                minHeight: null,
+                maxHeight: null,
+                focus: true,
+                toolbar: [
+                    ['font', ['fontname']],
+                    ['style', ['style']],
+                    ['fontsize', ['fontsize']],
+                    ['style', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
+                    ['color', ['color', 'backcolor']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']],
+                    ['history', ['undo', 'redo']]
+                ]
+            });
         });
 
         function display_green_alert(message) {
@@ -552,6 +589,7 @@
                     department: [],
                     jobPosition: [],
                     employees: [],
+                    notify: [],
                     disableComments: false,
                     action: action,
                     announcementId: announcementId
@@ -565,8 +603,15 @@
                 const department = $('#id_department').val();
                 const jobPosition = $('#id_job_position').val();
                 const disableComments = $('#id_disable_comments').is(':checked');
-                const fileInput = document.getElementById('id_attachments');
+                const notifyEmail = $('#toggle_notify_email').is(':checked');
+                const notifyPhone = $('#toggle_notify_phone').is(':checked');
                 let attachments = '';
+                let notify = [];
+
+                if (notifyEmail) notify.push('email');
+                if (notifyPhone) notify.push('phone');
+
+                const fileInput = document.getElementById('id_attachments');
 
                 if (action == "edit" && document.getElementById('id_attachments_helper').style.display == "block") {
                     attachments = $('#id_attachments_hidden_value').val();
@@ -607,6 +652,7 @@
                     department: department,
                     jobPosition: jobPosition,
                     employees: employees,
+                    notify: notify,
                     disableComments: disableComments,
                     action, action,
                     announcementId, announcementId
@@ -633,7 +679,7 @@
                             alertMessage = "Announcement updated successfully.";
                         }
                         else if (action == "publish") {
-                            alertMessage = "Announcement updated successfully.";
+                            alertMessage = "Announcement published successfully.";
                         } else if (action == "save") {
                             alertMessage = "Announcement saved successfully.";
                         }
@@ -765,6 +811,20 @@
                                 });
                             });
                         });
+
+                        const notifyValues = announcement.notify.split(',');
+
+                        if (notifyValues.includes("email")) {
+                            $('#toggle_notify_email').prop('checked', true);
+                        } else {
+                            $('#toggle_notify_email').prop('checked', false);
+                        }
+
+                        if (notifyValues.includes("phone")) {
+                            $('#toggle_notify_phone').prop('checked', true);
+                        } else {
+                            $('#toggle_notify_phone').prop('checked', false);
+                        }
                     }
                 },
                 error: function (xhr, status, error) {

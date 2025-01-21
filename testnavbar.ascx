@@ -80,7 +80,7 @@
                     <img src="\asset\hrms_icon.jpg" class="rounded-circle" style="width: 36px; height: 34px; object-fit: cover;">
                 </div>
                 <div class="sidebar-brand-text ml-2 mt-1" style="line-height: 0.7;">
-                    <span>HRMS.</span><br />
+                    <span>TEST.</span><br />
                     <span style="font-size: 10px; color: rgba(255,255,255,0.7)">My company</span>
                 </div>
             </a>
@@ -90,58 +90,42 @@
         <div class="flex-grow-1 sidebar-nav mt-1" data-simplebar="">
             <ul class="navbar-nav text-light" id="accordionSidebar">
                 <li class="nav-item">
-                    <a class="nav-link" href="../tpm_dashboard.aspx" id="tpm_dashboard_left_nav" runat="server">
+                    <a class="nav-link" href="../dashboard.aspx" id="dashboard_left_nav" runat="server">
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../admin_supervisor_view.aspx" id="supervisor_view_left_nav" runat="server">
+                    <a class="nav-link" href="../announcements.aspx" id="announcements_left_nav" runat="server">
                         <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
                         <span>Announcements</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../assesment_form.aspx" id="assessment_form_left_navbar" runat="server">
+                    <a class="nav-link" runat="server">
                         <i class="fab fa-wpforms" style="font-size: 1.25rem;"></i>
                         <span>Assessment Form</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../assessment_print.aspx" id="assessment_print_left_nav" runat="server">
+                    <a class="nav-link" runat="server">
                         <i class="fas fa-print" style="font-size: 1.25rem;"></i>
                         <span>Leave</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../configuration.aspx" id="tpm_config_left_navbar" runat="server">
+                    <a class="nav-link" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Perrformance</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../assessment_configuration.aspx" id="assessment_config_left_nav" runat="server">
+                    <a class="nav-link" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Configuration</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" onclick="sidebarToggle()" runat="server">
-                        <i class="fa fa-bars mr-2" id="toggleSidebar" onclick="sidebarToggle()"></i>
-                        <span>toggle</span>
                     </a>
                 </li>
             </ul>
         </div>
     </div>
-
-    <script>
-        function sidebarToggle() {
-            var isToggled = false;
-            $(".sidebar").toggleClass("toggled");
-            isToggled = !isToggled;
-
-            document.cookie = "toggle=" + (isToggled ? "1" : "0") + "; path=/";
-        }
-    </script>
 </nav>

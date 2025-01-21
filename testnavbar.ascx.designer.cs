@@ -24,57 +24,21 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlAnchor mom_redirect_url;
 
         /// <summary>
-        /// tpm_dashboard_left_nav control.
+        /// dashboard_left_nav control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor tpm_dashboard_left_nav;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor dashboard_left_nav;
 
         /// <summary>
-        /// supervisor_view_left_nav control.
+        /// announcements_left_nav control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor supervisor_view_left_nav;
-
-        /// <summary>
-        /// assessment_form_left_navbar control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor assessment_form_left_navbar;
-
-        /// <summary>
-        /// assessment_print_left_nav control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor assessment_print_left_nav;
-
-        /// <summary>
-        /// tpm_config_left_navbar control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor tpm_config_left_navbar;
-
-        /// <summary>
-        /// assessment_config_left_nav control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor assessment_config_left_nav;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor announcements_left_nav;
     }
 }

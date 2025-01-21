@@ -17,6 +17,8 @@ using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Antlr.Runtime.Misc;
+using System.Net.Mail;
+using Twilio;
 
 namespace hrms
 {
@@ -232,6 +234,106 @@ namespace hrms
             return JsonConvert.SerializeObject(data);
         }
 
+
+        public class announncement_details
+        {
+            public string heading { get; set; }
+            public string announcement_description { get; set; }
+            public string attachments { get; set; }
+            public string posted_date { get; set; }
+            public string posted_time { get; set; }
+            public string viewed_by { get; set; }
+            public string comments { get; set; }
+        }
+
+        [WebMethod]
+        public static string openannouncementmodal(string announcement_id)
+        {
+            var data = "";
+            var List = new List<announncement_details>();
+
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.posted_on, a.viewed_by, a.comments  
+                                                            FROM hrms.announcement a
+                                                            WHERE a.announcement_id = '{announcement_id}' AND a.deleted_by IS NULL;";
+                    var announncement_details_da = new MySqlDataAdapter(announncement_details_Query, conn);
+                    DataTable announncement_details_dt = new DataTable();
+                    announncement_details_da.Fill(announncement_details_dt);
+
+                    foreach (DataRow row in announncement_details_dt.Rows)
+                    {
+                        var posted_on = row["posted_on"].ToString();
+                        var posted_date = DateTime.Parse(posted_on).ToString("MMM. dd, yyyy");
+                        var posted_time = DateTime.Parse(posted_on).ToString("hh:mm tt");
+
+                        List.Add(new announncement_details
+                        {
+                            heading = row["heading"].ToString(),
+                            announcement_description = row["announcement_description"].ToString(),
+                            attachments = row["attachments"].ToString(),
+                            posted_date = posted_date,
+                            posted_time = posted_time,
+                            viewed_by = row["viewed_by"].ToString(),
+                            comments = row["comments"].ToString()
+                        });
+                    }
+                    conn.Close();
+
+                    var announncement_details_data = JsonConvert.SerializeObject(List);
+                    data = announncement_details_data;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in populate_announncements_details: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+            }
+
+            return JsonConvert.SerializeObject(data);
+        }
+
+        [WebMethod]
+        public static string add_viewed_by(string announcement_id)
+        {
+            var data = "";
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+                    int rowsAffected = 0;
+                    if (!string.IsNullOrEmpty(announcement_id))
+                    {
+                        string updatequery = $@"UPDATE announcement SET viewed_by = CONCAT(viewed_by, ',', {emp_id}) 
+                                                WHERE announcement_id = '{announcement_id}' AND (viewed_by IS NULL OR viewed_by = '' OR NOT FIND_IN_SET({emp_id}, viewed_by));";
+                        MySqlCommand updatecmd = new MySqlCommand(updatequery, conn);
+                        rowsAffected = updatecmd.ExecuteNonQuery();
+
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in add_viewed_by: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
+            }
+
+            return data;
+        }
+
         [WebMethod]
         public static string PopulateCreateAnnouncementModal(string dropdowntype, string[] value, string[] departmentValues)
         {
@@ -342,6 +444,132 @@ namespace hrms
             return JsonConvert.SerializeObject(data);
         }
 
+        public static void notifyemployee(string announcement_id)
+        {
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+                    if (!string.IsNullOrEmpty(announcement_id))
+                    {
+                        string getAnnouncementInfoQuery = $@"SELECT CONCAT(e.first_name, "" "", e.last_name) AS emp_name, a.Heading, a.announcement_description, a.attachments, 
+												     a.posted_on, a.viewable_by, a.notify 
+                                                     FROM hrms.announcement a 
+                                                     LEFT JOIN hrms.employee e ON (e.emp_id = a.posted_by)
+                                                     WHERE a.announcement_id = '{announcement_id}';";
+                        MySqlCommand getAnnouncementInfoCmd = new MySqlCommand(getAnnouncementInfoQuery, conn);
+                        MySqlDataReader reader = getAnnouncementInfoCmd.ExecuteReader();
+
+                        if (reader.Read())
+                        {
+                            string emp_name = reader["emp_name"].ToString();
+                            string title = reader["Heading"].ToString();
+                            string description = reader["announcement_description"].ToString();
+                            string attachments = reader["attachments"].ToString();
+                            string posted_on = reader["posted_on"].ToString();
+                            string viewable_by = reader["viewable_by"].ToString();
+                            string notify = reader["notify"].ToString();
+
+                            reader.Close();
+
+                            if (!string.IsNullOrEmpty(posted_on))
+                            {
+                                string getEmpInfoQuery = $@"SELECT email, phone_number FROM hrms.employee WHERE is_active = 'Y' AND emp_id IN ({viewable_by});";
+                                MySqlCommand getEmpInfoCmd = new MySqlCommand(getEmpInfoQuery, conn);
+                                MySqlDataReader empReader = getEmpInfoCmd.ExecuteReader();
+
+                                var notifyByList = new List<(string Email, string PhoneNumber)>();
+
+                                while (empReader.Read())
+                                {
+                                    string email = empReader["email"].ToString();
+                                    string phone = empReader["phone_number"].ToString();
+                                    notifyByList.Add((email, phone));
+                                }
+
+                                empReader.Close();
+
+                                if (!string.IsNullOrEmpty(notify))
+                                {
+                                    string[] notifyArray = notify.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                    foreach (var (email, phone) in notifyByList)
+                                    {
+                                        if (notifyArray.Contains("email"))
+                                        {
+                                            MailMessage mailMessage = new MailMessage();
+                                            mailMessage.From = new MailAddress("vv.pavithran12@gmail.com");
+                                            mailMessage.To.Add(email);
+                                            mailMessage.Subject = title;
+                                            mailMessage.Body = description;
+                                            mailMessage.IsBodyHtml = true;
+
+                                            string folderPath = HttpContext.Current.Server.MapPath("~/UploadedFiles/");
+                                            string absoluteAttachmentPath = Path.Combine(folderPath, Path.GetFileName(attachments));
+
+                                            if (!string.IsNullOrEmpty(attachments) && File.Exists(absoluteAttachmentPath))
+                                            {
+                                                mailMessage.Attachments.Add(new Attachment(absoluteAttachmentPath));
+                                            }
+
+                                            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
+                                            smtpClient.UseDefaultCredentials = false;
+                                            smtpClient.Credentials = new System.Net.NetworkCredential("vv.pavithran12@gmail.com", "aajuyoahcuszqrey");
+                                            smtpClient.EnableSsl = true;
+
+                                            try
+                                            {
+                                                smtpClient.Send(mailMessage);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                log.Error("Error sending email: " + ex.ToString());
+                                            }
+                                        }
+
+                                        if (notifyArray.Contains("phone"))
+                                        {
+                                            try
+                                            {
+                                                const string accountSid = "USf76f6161a139c7f3bcf1c01a137273d6";
+                                                const string authToken = "4RQCHBS2G5W294QXRYZ48XL2";
+                                                const string twilioPhoneNumber = "6381273139";
+
+                                                TwilioClient.Init(accountSid, authToken);
+
+                                                var messageBody = $"Hello Team,\n\nA new announcement has been posted:\n\"{title}\"\n\nPlease check your Dashboard for details.\n\nThank you,\n{emp_name}";
+
+                                                var message = Twilio.Rest.Api.V2010.Account.MessageResource.Create(
+                                                    body: messageBody,
+                                                    from: new Twilio.Types.PhoneNumber(twilioPhoneNumber),
+                                                    to: new Twilio.Types.PhoneNumber(phone)
+                                                );
+
+                                                Console.WriteLine($"SMS sent to {phone}: {message.Sid}");
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                log.Error("Error sending SMS: " + ex.ToString());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in check: " + ex.ToString());
+            }
+        }
+
         [WebMethod]
         public static string UploadAttachment(string fileName, string fileData)
         {
@@ -370,7 +598,7 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string publish_edit_save_announcement(string title, string description, string attachments, string expireDate, string[] department, string[] jobPosition, string[] employees, string disableComments, string action, string announcementId)
+        public static string publish_edit_save_announcement(string title, string description, string attachments, string expireDate, string[] department, string[] jobPosition, string[] employees, string[] notify, string disableComments, string action, string announcementId)
         {
             var data = "";
             try
@@ -405,16 +633,18 @@ namespace hrms
                             : "";
 
                         string employeeQuery = $@"
-                SELECT emp_id 
+                SELECT emp_id , email, phone_number
                 FROM hrms.employee 
                 WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition} {employeesCondition};";
                         cmd = new MySqlCommand(employeeQuery, conn);
                         var reader = cmd.ExecuteReader();
                         var viewableByList = new List<string>();
+                        var notifyby = new List<(string Email, string PhoneNumber)>();
 
                         while (reader.Read())
                         {
                             viewableByList.Add(reader["emp_id"].ToString());
+                            notifyby.Add((reader["email"].ToString(), reader["phone_number"].ToString()));
                         }
                         reader.Close();
 
@@ -424,11 +654,21 @@ namespace hrms
                             return JsonConvert.SerializeObject("No employees matched the criteria.");
                         }
 
+                        string notifyValue;
+                        if (notify != null && notify.Length > 0)
+                        {
+                            notifyValue = "'" + string.Join(",", notify) + "'";
+                        }
+                        else
+                        {
+                            notifyValue = "''";
+                        }
+
                         if (action == "edit" && !string.IsNullOrEmpty(announcementId))
                         {
                             string updateAnnouncementQuery = $@"UPDATE hrms.announcement SET 
                         Heading = '{title}', announcement_description = '{description}', attachments = '{attachments}', expire_date = '{expireDate}', 
-                        viewable_by = '{viewableBy}', comments = '{disableComments}', edited_by = '{emp_id}', edited_time = NOW() 
+                        viewable_by = '{viewableBy}', notify = {notifyValue}, comments = '{disableComments}', edited_by = '{emp_id}', edited_time = NOW() 
                         WHERE announcement_id = '{announcementId}';";
 
                             cmd = new MySqlCommand(updateAnnouncementQuery, conn);
@@ -436,18 +676,16 @@ namespace hrms
                         else if (action == "publish")
                         {
                             string insertAnnouncementQuery = $@"INSERT INTO hrms.announcement 
-                    (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, comments, created_by, created_time) 
-                    VALUES ('{title}', '{description}', '{attachments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}', '{expireDate}', '{viewableBy}', '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
-
+                    (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, notify, comments, created_by, created_time) 
+                    VALUES ('{title}', '{description}', '{attachments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}', '{expireDate}', '{viewableBy}', {notifyValue}, '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
 
                             cmd = new MySqlCommand(insertAnnouncementQuery, conn);
                         }
                         else if (action == "save")
                         {
                             string saveAnnouncementQuery = $@"INSERT INTO hrms.announcement 
-                    (Heading, announcement_description, attachments, expire_date, viewable_by, comments, created_by, created_time) 
-                    VALUES ('{title}', '{description}', '{attachments}', '{expireDate}', '{viewableBy}', '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
-
+                    (Heading, announcement_description, attachments, expire_date, viewable_by, notify, comments, created_by, created_time) 
+                    VALUES ('{title}', '{description}', '{attachments}', '{expireDate}', '{viewableBy}', {notifyValue}, '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
 
                             cmd = new MySqlCommand(saveAnnouncementQuery, conn);
                         }
@@ -456,6 +694,26 @@ namespace hrms
 
                     int rowsAffected = cmd.ExecuteNonQuery();
                     data = rowsAffected > 0 ? "success" : "failure";
+
+                    if (action == "publish")
+                    {
+                        var lastinsertidcmd = new MySqlCommand("SELECT LAST_INSERT_ID();", conn);
+                        var insertedAnnouncementId = lastinsertidcmd.ExecuteScalar()?.ToString();
+
+                        if (!string.IsNullOrEmpty(insertedAnnouncementId))
+                        {
+                            notifyemployee(insertedAnnouncementId);
+                        }
+
+                        data = "success";
+                    }
+                    else
+                    {
+                        if (data == "success")
+                        {
+                            notifyemployee(announcementId);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -463,71 +721,6 @@ namespace hrms
                 log.Error("Error in insertannouncement: " + ex.ToString());
                 data = "ExceptionMessage - " + ex.Message;
                 HttpContext.Current.Response.StatusCode = 500;
-            }
-
-            return JsonConvert.SerializeObject(data);
-        }
-
-        public class announncement_details
-        {
-            public string heading { get; set; }
-            public string announcement_description { get; set; }
-            public string attachments { get; set; }
-            public string posted_date { get; set; }
-            public string posted_time { get; set; }
-            public string viewed_by { get; set; }
-            public string comments { get; set; }
-        }
-
-        [WebMethod]
-        public static string openannouncementmodal(string announcement_id)
-        {
-            var data = "";
-            var List = new List<announncement_details>();
-
-            try
-            {
-                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
-
-                using (var conn = new MySqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.posted_on, a.viewed_by, a.comments  
-                                                            FROM hrms.announcement a
-                                                            WHERE a.announcement_id = '{announcement_id}' AND a.deleted_by IS NULL;";
-                    var announncement_details_da = new MySqlDataAdapter(announncement_details_Query, conn);
-                    DataTable announncement_details_dt = new DataTable();
-                    announncement_details_da.Fill(announncement_details_dt);
-
-                    foreach (DataRow row in announncement_details_dt.Rows)
-                    {
-                        var posted_on = row["posted_on"].ToString();
-                        var posted_date = DateTime.Parse(posted_on).ToString("MMM. dd, yyyy");
-                        var posted_time = DateTime.Parse(posted_on).ToString("hh:mm tt");
-
-                        List.Add(new announncement_details
-                        {
-                            heading = row["heading"].ToString(),
-                            announcement_description = row["announcement_description"].ToString(),
-                            attachments = row["attachments"].ToString(),
-                            posted_date = posted_date,
-                            posted_time = posted_time,
-                            viewed_by = row["viewed_by"].ToString(),
-                            comments = row["comments"].ToString()
-                        });
-                    }
-                    conn.Close();
-
-                    var announncement_details_data = JsonConvert.SerializeObject(List);
-                    data = announncement_details_data;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error in populate_announncements_details: " + ex.ToString());
-                data = "ExceptionMessage - " + ex.Message;
             }
 
             return JsonConvert.SerializeObject(data);
@@ -546,7 +739,7 @@ namespace hrms
                 {
                     conn.Open();
 
-                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.expire_date, a.viewable_by, a.comments 
+                    string announncement_details_Query = $@"SELECT a.heading, a.announcement_description, a.attachments, a.expire_date, a.viewable_by, a.notify, a.comments 
                                                             FROM hrms.announcement a
                                                             WHERE a.announcement_id = '{announcement_id}' AND a.deleted_by IS NULL;";
 
@@ -561,6 +754,7 @@ namespace hrms
                         var attachments = announncement_details_dt.Rows[0]["attachments"].ToString();
                         var expireDate = Convert.ToDateTime(announncement_details_dt.Rows[0]["expire_date"]).ToString("yyyy-MM-dd");
                         var viewableBy = announncement_details_dt.Rows[0]["viewable_by"].ToString();
+                        var notify = announncement_details_dt.Rows[0]["notify"].ToString();
                         var comments = announncement_details_dt.Rows[0]["comments"].ToString();
                         var emp_id = HttpContext.Current.Session["emp_id"];
 
@@ -568,9 +762,9 @@ namespace hrms
                         {
                             string insertAnnouncementQuery = $@"
                         INSERT INTO hrms.announcement 
-                        (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, comments, created_by, created_time) 
+                        (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, notify, comments, created_by, created_time) 
                         VALUES 
-                        (@heading, @description, @attachments, @posted_by, NOW(), @expireDate, @viewableBy, @comments, @created_by, NOW());";
+                        (@heading, @description, @attachments, @posted_by, NOW(), @expireDate, @viewableBy, @notify, @comments, @created_by, NOW());";
 
                             using (var cmd = new MySqlCommand(insertAnnouncementQuery, conn))
                             {
@@ -580,10 +774,29 @@ namespace hrms
                                 cmd.Parameters.AddWithValue("@posted_by", emp_id.ToString());
                                 cmd.Parameters.AddWithValue("@expireDate", expireDate);
                                 cmd.Parameters.AddWithValue("@viewableBy", viewableBy);
+                                cmd.Parameters.AddWithValue("@notify", notify);
                                 cmd.Parameters.AddWithValue("@comments", comments);
                                 cmd.Parameters.AddWithValue("@created_by", emp_id.ToString());
 
                                 cmd.ExecuteNonQuery();
+                            }
+
+                            if (notify != null && notify.Length > 0)
+                            {
+                                string employeeQuery = $@"
+                SELECT email, phone_number
+                FROM hrms.employee 
+                WHERE is_active = 'Y' AND emp_id IN ({viewableBy});";
+                                var cmd = new MySqlCommand(employeeQuery, conn);
+                                var reader = cmd.ExecuteReader();
+                                var notifyby = new List<(string Email, string PhoneNumber)>();
+
+                                while (reader.Read())
+                                {
+                                    notifyby.Add((reader["email"].ToString(), reader["phone_number"].ToString()));
+                                }
+                                reader.Close();
+
                             }
 
                             data = "success";
@@ -596,6 +809,11 @@ namespace hrms
                     else
                     {
                         data = "Announcement not found.";
+                    }
+
+                    if (data == "success")
+                    {
+                        notifyemployee(announcement_id);
                     }
 
                     conn.Close();
@@ -618,6 +836,7 @@ namespace hrms
             public string attachments { get; set; }
             public string expire_date { get; set; }
             public string viewable_by { get; set; }
+            public string notify { get; set; }
             public string comments { get; set; }
             public string departments { get; set; }
             public string job_positions { get; set; }
@@ -635,7 +854,7 @@ namespace hrms
                 {
                     conn.Open();
 
-                    string announncement_Query = $@"SELECT posted_by, Heading, announcement_description, attachments, expire_date, viewable_by, comments FROM hrms.announcement WHERE announcement_id = @announcement_id;";
+                    string announncement_Query = $@"SELECT posted_by, Heading, announcement_description, attachments, expire_date, viewable_by, notify, comments FROM hrms.announcement WHERE announcement_id = @announcement_id;";
                     using (var cmd = new MySqlCommand(announncement_Query, conn))
                     {
                         cmd.Parameters.AddWithValue("@announcement_id", announcement_id);
@@ -675,6 +894,7 @@ namespace hrms
                                 attachments = row["attachments"].ToString(),
                                 expire_date = row["expire_date"].ToString(),
                                 viewable_by = row["viewable_by"].ToString(),
+                                notify = row["notify"].ToString(),
                                 comments = row["comments"].ToString(),
                                 departments = string.Join(",", departments),
                                 job_positions = string.Join(",", jobPositions)
