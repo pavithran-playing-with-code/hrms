@@ -1,77 +1,66 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="testnavbar.ascx.cs" Inherits="hrms.testnavbar" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="quick_action.ascx.cs" Inherits="hrms.quick_action" %>
 
 <nav id="quickaction-navbar" style="background-color: transparent !important;" class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-primary p-0">
     <div class="inner-icons">
         <div class="icon-items-container">
-            <div id="icon-item9" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Dashboard Charts">
+            <div id="icon-item9" class="icon-item round" data-tooltip="Dashboard Charts">
                 <a class="text-light" data-toggle="oh-modal-toggle" data-target="#objectDetailsModal">
                     <i class="fas fa-chart-line"></i>
                 </a>
             </div>
 
-            <div id="icon-item8" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Ticket">
+            <div id="icon-item8" class="icon-item round" data-tooltip="Create Ticket">
                 <a class="text-light">
                     <i class="fas fa-ticket-alt"></i>
                 </a>
             </div>
 
-            <div id="icon-item7" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Asset Request">
+            <div id="icon-item7" class="icon-item round" data-tooltip="Create Asset Request">
                 <a class="text-light">
                     <i class="fas fa-laptop"></i>
                 </a>
             </div>
 
-            <div id="icon-item6" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Reimbursement">
+            <div id="icon-item6" class="icon-item round" data-tooltip="Create Reimbursement">
                 <a class="text-light">
                     <i class="fas fa-money-check-alt"></i>
                 </a>
             </div>
 
-            <div id="icon-item5" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Work Type Request">
+            <div id="icon-item5" class="icon-item round" data-tooltip="Create Work Type Request">
                 <a class="text-light">
                     <i class="fas fa-briefcase"></i>
                 </a>
             </div>
 
-            <div id="icon-item4" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Shift Request">
+            <div id="icon-item4" class="icon-item round" data-tooltip="Create Shift Request">
                 <a class="text-light">
                     <i class="fas fa-history"></i>
                 </a>
             </div>
 
-            <div id="icon-item3" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Leave Request">
+            <div id="icon-item3" class="icon-item round" data-tooltip="Create Leave Request">
                 <a class="text-light">
                     <i class="fas fa-calendar-plus"></i>
                 </a>
             </div>
 
-            <div id="icon-item2" class="icon-item round" data-toggle="tooltip" data-placement="right" title="Create Attendance Request">
+            <div id="icon-item2" class="icon-item round" data-tooltip="Create Attendance Request">
                 <a class="text-light">
                     <i class="fas fa-user-check"></i>
                 </a>
             </div>
         </div>
-        <div id="icon-item1" class="icon-item round quick-action mt-1" data-toggle="tooltip" data-placement="right" title="Quick Action" onclick="toggleIcons()">
+        <div id="icon-item1" class="icon-item round quick-action mt-1" data-tooltip="Quick Action" onclick="toggleIcons()">
             <i id="quick-action-icon" class="fas fa-plus" style="font-size: 1.25rem;"></i>
         </div>
     </div>
 </nav>
 
 <style>
-    .tooltip-inner {
-        background-color: hsl(0, 0%, 13%) !important;
-        color: white !important;
-        font-size: 0.85rem;
-        border-radius: 5px;
-    }
-
-    .tooltip.bs-tooltip-left .arrow::before {
-        display: none !important;
-    }
-
     .icon-item {
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        height: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -87,13 +76,13 @@
         }
 
         .icon-item i {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: white;
         }
 
     .quick-action {
-        width: 40px;
-        height: 40px;
+        width: 55px;
+        height: 55px;
         position: relative;
         z-index: 2;
     }
@@ -136,10 +125,6 @@
 </style>
 
 <script>
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip(); // Initialize Bootstrap tooltips
-    });
-
     function toggleIcons() {
         const container = document.querySelector('.icon-items-container');
         const quickActionButton = document.querySelector('.quick-action');

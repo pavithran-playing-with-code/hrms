@@ -2,6 +2,7 @@
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
+<%@ Register Src="~/quick_action.ascx" TagName="Quick_action" TagPrefix="uc" %>
 
 <!DOCTYPE html>
 
@@ -33,8 +34,16 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>Announcements</title>
+    <title>Announcement</title>
     <style>
+        #testnavbar-container {
+            display: flex;
+            position: fixed;
+            right: -10px;
+            bottom: 10px;
+            user-select: none;
+        }
+
         .card-body {
             overflow-x: auto;
             padding: 0;
@@ -70,13 +79,10 @@
             scrollbar-width: thin;
         }
 
-        #addAnnouncement:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
         .createannouncementfields label {
             font-size: 14px;
+            padding-bottom: 5px !important;
+            display: block;
         }
 
         .form-control.select2-hidden-accessible + .select2-container {
@@ -124,15 +130,6 @@
             margin-bottom: .25rem !important;
         }
 
-        .attachment-link {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-            .attachment-link:hover {
-                text-decoration: underline;
-            }
-
         @keyframes slideInFromRight {
             from {
                 transform: translateX(100%);
@@ -176,23 +173,24 @@
     <div class="container-fluid p-0">
         <div class="row no-gutters">
             <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
-                <uc:LeftNavBar runat="server" ID="LeftNavBarControl" />
+                <uc:LeftNavBar runat="server" />
             </div>
             <div class="col-md-9 col-lg-10">
                 <div>
-                    <uc:HeaderNavBar runat="server" ID="HeaderNavBarControl" />
+                    <uc:HeaderNavBar runat="server" />
+                </div>
+                <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+                    <h1 style="font-size: 2rem; font-weight: 650 !important;" class="m-0">Announcements</h1>
+                    <button id="createAnnouncement" class="btn btn-outline-custom"
+                        style="border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                        onclick="opencreateannouncementmodal()" title="Create Announcement">
+                        <i class="fa fa-plus"></i>&nbsp;Create
+               
+                    </button>
                 </div>
                 <div class="mt-4">
                     <div class="container-fluid">
-                        <div class="card">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0">Announcements List</h4>
-                                <button id="addAnnouncement" class="btn btn-outline-custom ms-auto"
-                                    style="border: 1px solid hsl(8, 77%, 56%); background-color: transparent; color: hsl(8, 77%, 56%); padding: 0; width: 50px; height: 28px;"
-                                    onclick="opencreateannouncementmodal()" title="Create Announcement">
-                                    <i class="fa fa-plus m-0"></i>
-                                </button>
-                            </div>
+                        <div class="card ml-3 mr-3">
                             <div class="card-body p-3">
                                 <table id="announcementsTable" class="table table-striped table-bordered" style="width: 100%">
                                     <thead>
@@ -217,6 +215,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div id="testnavbar-container">
+                    <uc:Quick_action runat="server" />
                 </div>
             </div>
         </div>
@@ -304,10 +305,13 @@
                                 <input type="checkbox" class="custom-control-input" id="toggle_notify_phone" />
                                 <label class="custom-control-label" for="toggle_notify_phone">Phone</label>
                             </div>
-
-                            <div class="ml-auto" style="padding-right: 20px;">
-                                <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
-                                <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                            <div class="row" style="margin-left: 40%">
+                                <div>
+                                    <label for="id_disable_comments" class="form-check-label ml-4">Disable Comments:</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="disable_comments" class="form-check-input ml-3" id="id_diefwefsable_comments" />
+                                </div>
                             </div>
                         </div>
                         <div class="text-right">
@@ -369,6 +373,7 @@
 
                     $('#announcementsTable').DataTable({
                         data: data,
+                        "ordering": false,
                         order: [[9, 'desc']],
                         columns: [
                             { data: 'announcement_id', visible: false },
@@ -399,7 +404,7 @@
                                     }
                                     else {
                                         const dateParts = data.split(' ')[0].split('-');
-                                        const postedDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                        const postedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
                                         return `<span style="color: green; font-weight: bold;">${postedDate}</span>`;
                                     }
                                 }
@@ -412,7 +417,7 @@
                                     const currentFormattedDate = currentDate.toISOString().split('T')[0];
                                     const dateParts = data.split(' ')[0].split('-');
                                     const expireFormattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                                    const expireDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    const expireDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
 
                                     if (expireFormattedDate < currentFormattedDate) {
                                         return `<span style="color: red; font-weight: bold;">${expireDate}</span>`;
@@ -449,7 +454,19 @@
                                 }
                             }
 
-                        ]
+                        ],
+                        headerCallback: function (thead, data, start, end, display) {
+                            $('th', thead).addClass('text-center');
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $('td', row).addClass('text-center');
+                        },
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+                         <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+                         <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+                                         </div>`
+                        }
                     });
 
                     $('#announcementsTable').on('click', '.description-link', function (e) {
@@ -550,14 +567,14 @@
             }
         });
 
-        function uploadAttachment(file) {
+        function UploadFiles(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function () {
                     const base64File = reader.result.split(',')[1];
 
                     $.ajax({
-                        url: 'dashboard.aspx/UploadAttachment',
+                        url: 'dashboard.aspx/UploadFiles',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({ fileName: file.name, fileData: base64File }),
@@ -618,7 +635,7 @@
                 } else {
                     if (fileInput.files.length > 0) {
                         try {
-                            attachments = await uploadAttachment(fileInput.files[0]);
+                            attachments = await UploadFiles(fileInput.files[0]);
                         } catch (error) {
                             Swal.fire({
                                 title: "Error!",

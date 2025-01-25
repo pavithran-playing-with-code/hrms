@@ -237,6 +237,8 @@
     <Content Include="left_navbar.ascx" />
     <Content Include="login.aspx" />
     <Content Include="modals.aspx" />
+    <Content Include="my_leave_requests.aspx" />
+    <Content Include="quick_action.ascx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -296,23 +298,23 @@
     <Content Include="Site.Master" />
     <Content Include="testing.aspx" />
     <Content Include="testnavbar.ascx" />
-    <Content Include="UploadedFiles\1_20250116135733_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250116135741_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250116140451_Example 1 query.txt" />
-    <Content Include="UploadedFiles\1_20250116141058_Example 2 Query.txt" />
-    <Content Include="UploadedFiles\1_20250116141213_Example 2 Query.txt" />
-    <Content Include="UploadedFiles\1_20250116141417_Example 2 Query.txt" />
-    <Content Include="UploadedFiles\1_20250116141539_Example 2 Query.txt" />
-    <Content Include="UploadedFiles\1_20250117131331_Example query.txt" />
-    <Content Include="UploadedFiles\1_20250117132005_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250117152912_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250117160342_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250119180706_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250120042254_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250120042349_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250121181611_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250121181940_no-announcements.png" />
-    <Content Include="UploadedFiles\1_20250121212826_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116135733_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116135741_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116140451_Example 1 query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116141058_Example 2 Query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116141213_Example 2 Query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116141417_Example 2 Query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116141539_Example 2 Query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250117131331_Example query.txt" />
+    <Content Include="UploadedAnnouncementFiles\1_20250117132005_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250117152912_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250117160342_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250119180706_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250120042254_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250120042349_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250121181611_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250121181940_no-announcements.png" />
+    <Content Include="UploadedAnnouncementFiles\1_20250121212826_no-announcements.png" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
@@ -387,7 +389,21 @@
     <Compile Include="modals.aspx.designer.cs">
       <DependentUpon>modals.aspx</DependentUpon>
     </Compile>
+    <Compile Include="my_leave_requests.aspx.cs">
+      <DependentUpon>my_leave_requests.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="my_leave_requests.aspx.designer.cs">
+      <DependentUpon>my_leave_requests.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="quick_action.ascx.cs">
+      <DependentUpon>quick_action.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="quick_action.ascx.designer.cs">
+      <DependentUpon>quick_action.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -433,14 +449,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="UploadedLeaveFiles\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
-    <Content Include="UploadedFiles\1_20250116140116_Category 1%28Trainee%29.xlsx" />
-    <Content Include="UploadedFiles\1_20250116140123_Category 1%28Trainee%29.xlsx" />
-    <Content Include="UploadedFiles\1_20250116140156_Category 1%28Trainee%29.xlsx" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116140116_Category 1%28Trainee%29.xlsx" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116140123_Category 1%28Trainee%29.xlsx" />
+    <Content Include="UploadedAnnouncementFiles\1_20250116140156_Category 1%28Trainee%29.xlsx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

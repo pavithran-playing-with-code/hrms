@@ -79,7 +79,11 @@
         var isToggled = false;
         $(".sidebar").toggleClass("toggled");
         isToggled = !isToggled;
-
+        if (isToggled) {
+            $("#leaveSubMenu").collapse('hide'); 
+        } else {
+            $("#leaveSubMenu").collapse('show'); 
+        }
         document.cookie = "toggle=" + (isToggled ? "1" : "0") + "; path=/";
     }
 

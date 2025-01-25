@@ -19,6 +19,9 @@ using System.IO;
 using Antlr.Runtime.Misc;
 using System.Net.Mail;
 using Twilio;
+using System.Net;
+using Twilio.TwiML.Voice;
+using System.Net.Http;
 
 namespace hrms
 {
@@ -445,7 +448,7 @@ namespace hrms
         }
 
         public static void notifyemployee(string announcement_id)
-        {
+        {/*
             try
             {
                 string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
@@ -533,28 +536,36 @@ namespace hrms
 
                                         if (notifyArray.Contains("phone"))
                                         {
+
                                             try
                                             {
-                                                const string accountSid = "USf76f6161a139c7f3bcf1c01a137273d6";
-                                                const string authToken = "4RQCHBS2G5W294QXRYZ48XL2";
-                                                const string twilioPhoneNumber = "6381273139";
+                                                string toPhoneNumber = "6381273139";  
+                                                string carrierGateway = "airtelmail.com";  //  Email-to-SMS carrier gateway
 
-                                                TwilioClient.Init(accountSid, authToken);
+                                                var smtpClient = new SmtpClient("smtp.gmail.com")
+                                                {
+                                                    Port = 587,
+                                                    Credentials = new NetworkCredential("vv.pavithran12@gmail.com", "aajuyoahcuszqrey"),
+                                                    EnableSsl = true,
+                                                };
 
-                                                var messageBody = $"Hello Team,\n\nA new announcement has been posted:\n\"{title}\"\n\nPlease check your Dashboard for details.\n\nThank you,\n{emp_name}";
+                                                var mailMessage = new MailMessage
+                                                {
+                                                    From = new MailAddress("vv.pavithran12@gmail.com"),
+                                                    Subject = "",
+                                                    Body = $"Hello Team,\n\nA new announcement has been posted:\n\"{title}\"\n\nPlease check your Dashboard for details.\n\nThank you,\n{emp_name}",
+                                                    IsBodyHtml = false,
+                                                };
 
-                                                var message = Twilio.Rest.Api.V2010.Account.MessageResource.Create(
-                                                    body: messageBody,
-                                                    from: new Twilio.Types.PhoneNumber(twilioPhoneNumber),
-                                                    to: new Twilio.Types.PhoneNumber(phone)
-                                                );
+                                                mailMessage.To.Add($"{toPhoneNumber}@{carrierGateway}");
 
-                                                Console.WriteLine($"SMS sent to {phone}: {message.Sid}");
+                                                smtpClient.Send(mailMessage);
                                             }
                                             catch (Exception ex)
                                             {
-                                                log.Error("Error sending SMS: " + ex.ToString());
+                                                log.Error($"Error sending SMS: {ex.Message}");
                                             }
+
                                         }
                                     }
                                 }
@@ -567,18 +578,22 @@ namespace hrms
             catch (Exception ex)
             {
                 log.Error("Error in check: " + ex.ToString());
-            }
+            }*/
         }
 
         [WebMethod]
-        public static string UploadAttachment(string fileName, string fileData)
+        public static string UploadFiles(string fileName, string fileData, string where)
         {
             try
             {
-                string folderPath = HttpContext.Current.Server.MapPath("~/UploadedFiles/");
-                if (!Directory.Exists(folderPath))
+                string folderPath = "";
+                if (where == "announcement")
                 {
-                    Directory.CreateDirectory(folderPath);
+                    folderPath = HttpContext.Current.Server.MapPath("~/UploadedAnnouncementFiles/");
+                }
+                else if (where == "leave")
+                {
+                    folderPath = HttpContext.Current.Server.MapPath("~/UploadedLeaveFiles/");
                 }
 
                 byte[] fileBytes = Convert.FromBase64String(fileData);
@@ -589,7 +604,15 @@ namespace hrms
                 string filePath = Path.Combine(folderPath, uniqueFileName);
                 File.WriteAllBytes(filePath, fileBytes);
 
-                return $"/UploadedFiles/{uniqueFileName}";
+                if (where == "announcement")
+                {
+                    return $"/UploadedAnnouncementFiles/{uniqueFileName}";
+                }
+                else if (where == "leave")
+                {
+                    return $"/UploadedLeaveFiles/{uniqueFileName}";
+                }
+                return "";
             }
             catch (Exception ex)
             {

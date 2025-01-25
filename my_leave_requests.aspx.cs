@@ -13,9 +13,9 @@ using System.Web.UI.WebControls;
 
 namespace hrms
 {
-    public partial class testing : System.Web.UI.Page
+    public partial class my_leave_requests : System.Web.UI.Page
     {
-        private static readonly ILog log = log4net.LogManager.GetLogger(typeof(testing));
+        private static readonly ILog log = log4net.LogManager.GetLogger(typeof(my_leave_requests));
 
         protected void Page_Load(object sender, EventArgs e)
         {

@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class announcements
+    public partial class my_leave_requests
     {
     }
 }

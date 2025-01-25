@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="testing.aspx.cs" Inherits="hrms.testing" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="my_leave_requests.aspx.cs" Inherits="hrms.my_leave_requests" %>
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
@@ -34,7 +34,7 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>Testing</title>
+    <title>My Leave Request</title>
     <style>
         #testnavbar-container {
             display: flex;
@@ -135,7 +135,7 @@
                     <uc:HeaderNavBar runat="server" />
                 </div>
                 <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
-                    <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave</h1>
+                    <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
                     <button id="createLeave" class="btn btn-outline-custom"
                         style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
                         onclick="$('#createLeavemodal').modal('show');" title="Create Leave">
@@ -311,7 +311,7 @@
         function populateleaves() {
             $.ajax({
                 type: "POST",
-                url: 'testing.aspx/populateleaves',
+                url: 'my_leave_requests.aspx/populateleaves',
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -514,7 +514,7 @@
 
             $.ajax({
                 type: "POST",
-                url: 'testing.aspx/save_Leave',
+                url: 'my_leave_requests.aspx/save_Leave',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 dataType: 'json',
@@ -574,7 +574,7 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: 'testing.aspx/cancelleave',
+                        url: 'my_leave_requests.aspx/cancelleave',
                         data: JSON.stringify({ leave_requests_id: leave_id }),
                         contentType: 'application/json',
                         dataType: 'json',

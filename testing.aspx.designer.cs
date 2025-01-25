@@ -13,41 +13,5 @@ namespace hrms
 
     public partial class testing
     {
-
-        /// <summary>
-        /// emp_id control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputHidden emp_id;
-
-        /// <summary>
-        /// redirect_mom control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputHidden redirect_mom;
-
-        /// <summary>
-        /// LeftNavBarControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::hrms.left_navbar LeftNavBarControl;
-
-        /// <summary>
-        /// HeaderNavBarControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::hrms.header_navbar HeaderNavBarControl;
     }
 }

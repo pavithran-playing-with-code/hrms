@@ -2,6 +2,7 @@
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
+<%@ Register Src="~/quick_action.ascx" TagName="Quick_action" TagPrefix="uc" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -36,6 +37,14 @@
     <title>HRMS</title>
 
     <style>
+        #testnavbar-container {
+            display: flex;
+            position: fixed;
+            right: -10px;
+            bottom: 10px;
+            user-select: none;
+        }
+
         * {
             scrollbar-width: thin;
         }
@@ -226,7 +235,7 @@
     <div class="container-fluid p-0">
         <div class="row no-gutters">
             <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
-                <uc:LeftNavBar runat="server" ID="LeftNavBarControl" />
+                <uc:LeftNavBar runat="server" />
             </div>
             <div class="col-md-9 col-lg-10">
                 <div id="banner_container" style="position: relative; z-index: 1050;">
@@ -251,13 +260,13 @@
                     </div>
                 </div>
                 <div>
-                    <uc:HeaderNavBar runat="server" ID="HeaderNavBarControl" />
+                    <uc:HeaderNavBar runat="server" />
                 </div>
                 <div class="mt-3">
-                    <div class="container-fluid">
+                    <div class="wrapper" style="margin-left: 35px; margin-top: 30px; margin-right: 65px">
                         <div class="row" id="dashboard" style="padding-bottom: 4.5rem;">
                             <div class="dashboard__left col-12 col-sm-12 col-md-12 col-lg-9">
-                                <div class="row p-3">
+                                <div class="row">
                                     <div class="col-12 col-sm-12 col-md-6 col-lg-4">
                                         <div class="card hovercards">
                                             <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%);">
@@ -285,7 +294,7 @@
                                 </div>
                             </div>
                             <div class="dashboard__right col-12 col-sm-12 col-md-12 col-lg-3">
-                                <div class="card p-3 mb-3 mt-3 mr-3">
+                                <div class="card p-3 mb-4">
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
                                         <h6 class="card-title">Announcements</h6>
                                         <span class="mb-1">
@@ -300,7 +309,7 @@
                                         <div class="announcement-body" id="announcementListCard" style="height: 300px; overflow-y: auto; border: none;"></div>
                                     </div>
                                 </div>
-                                <div class="card p-3 mb-3 mt-3 mr-3">
+                                <div class="card p-3 mb-3">
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
                                         <h6 class="card-title">On Leave</h6>
                                     </div>
@@ -316,6 +325,9 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div id="testnavbar-container">
+                                <uc:Quick_action runat="server" />
                             </div>
                         </div>
                     </div>
@@ -788,17 +800,17 @@
             }
         });
 
-        function uploadAttachment(file) {
+        function UploadFiles(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function () {
                     const base64File = reader.result.split(',')[1];
 
                     $.ajax({
-                        url: 'dashboard.aspx/UploadAttachment',
+                        url: 'dashboard.aspx/UploadFiles',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify({ fileName: file.name, fileData: base64File }),
+                        data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "announcement" }),
                         success: function (response) {
                             resolve(response.d);
                         },
@@ -837,7 +849,7 @@
             } else {
                 if (fileInput.files.length > 0) {
                     try {
-                        attachments = await uploadAttachment(fileInput.files[0]);
+                        attachments = await UploadFiles(fileInput.files[0]);
                     } catch (error) {
                         Swal.fire({
                             title: "Error!",

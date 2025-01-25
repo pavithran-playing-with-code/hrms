@@ -13,32 +13,5 @@ namespace hrms
 
     public partial class testnavbar
     {
-
-        /// <summary>
-        /// mom_redirect_url control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor mom_redirect_url;
-
-        /// <summary>
-        /// dashboard_left_nav control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor dashboard_left_nav;
-
-        /// <summary>
-        /// announcements_left_nav control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor announcements_left_nav;
     }
 }
