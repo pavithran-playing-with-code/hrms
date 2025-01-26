@@ -71,14 +71,14 @@
             color: gray !important;
         }
 
-    #leaveSubMenu .navbar-nav .nav-link {
-        color: rgba(255, 255, 255, 0.7) !important;
-        padding: 5px 25px;
+    #leaveSubMenu .navbar-nav .nav-link:hover {
+        color: white !important;
     }
 
-        #leaveSubMenu .navbar-nav .nav-link:hover {
-            color: white !important;
-        }
+    .active-page {
+        font-weight: bold;
+        color: white !important;
+    }
 </style>
 
 <nav id="left-navbar" class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-primary p-0">
@@ -97,64 +97,68 @@
         <hr class="sidebar-divider my-2" style="color: rgba(255,255,255,0.7)">
 
         <div class="flex-grow-1 sidebar-nav mt-1" data-simplebar="">
-            <ul class="navbar-nav text-light" id="accordionSidebar">
+            <ul class="navbar-nav text-light" id="accordionSidebar" runat="server">
                 <li class="nav-item">
                     <a class="nav-link" href="../dashboard.aspx" id="dashboard_left_nav" runat="server">
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="../announcements.aspx" id="announcements_left_nav" runat="server">
                         <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
                         <span>Announcements</span>
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" runat="server">
+                    <a class="nav-link" href="../assessment_form.aspx" id="assessmentFormNavLink" runat="server">
                         <i class="fab fa-wpforms" style="font-size: 1.25rem;"></i>
                         <span>Assessment Form</span>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#leaveSubMenu" data-toggle="collapse" aria-expanded="false" aria-controls="leaveSubMenu">
                         <i class="fas fa-print" style="font-size: 1.25rem;"></i>
                         <span>Leave</span>
                     </a>
-                    <div id="leaveSubMenu" class="collapse">
+                    <div id="leaveSubMenu" runat="server" clientidmode="Static" class="collapse">
                         <ul class="navbar-nav text-light">
                             <li class="nav-item">
-                                <a class="nav-link" href="../ltest.aspx" runat="server">
+                                <a id="ltestNavLink" class="nav-link" href="../ltest.aspx" runat="server">
                                     <span>Dashboard</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="../testing.aspx" runat="server">
+                                <a id="testingNavLink" class="nav-link" href="../testing.aspx" runat="server">
                                     <span>Leave Requests</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="../my_leave_requests.aspx" runat="server">
+                                <a id="myLeaveRequestsNavLink" class="nav-link" href="../my_leave_requests.aspx" runat="server">
                                     <span>My Leave Requests</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="../leave-type.aspx" runat="server">
+                                <a id="leaveTypeNavLink" class="nav-link" href="../leave-type.aspx" runat="server">
                                     <span>Leave Type</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
-
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" href="../testing.aspx" runat="server">
+                    <a class="nav-link" href="../testing.aspx" id="A1" runat="server">
                         <i class="fa-solid fa-gamepad" style="font-size: 1.25rem;"></i>
                         <span>Testing</span>
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" runat="server">
+                    <a class="nav-link" href="../configuration.aspx" id="configurationNavLink" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Configuration</span>
                     </a>

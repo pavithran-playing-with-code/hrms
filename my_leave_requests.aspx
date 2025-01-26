@@ -36,12 +36,32 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <title>My Leave Request</title>
     <style>
-        #testnavbar-container {
+        #Quickaction-container {
             display: flex;
             position: fixed;
             right: -10px;
             bottom: 10px;
             user-select: none;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .left-navbar {
+            width: 15%;
+        }
+
+            .left-navbar.toggled {
+                width: 70px;
+            }
+
+        .content-container {
+            flex-grow: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
         }
 
         .card-body {
@@ -125,54 +145,52 @@
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
-    <div class="container-fluid p-0">
-        <div class="row no-gutters">
-            <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
-                <uc:LeftNavBar runat="server" />
+    <div class="main-container">
+        <div id="sidebarContainer" class="left-navbar">
+            <uc:LeftNavBar runat="server" />
+        </div>
+        <div id="content-container" class="content-container">
+            <div class="header-container">
+                <uc:HeaderNavBar runat="server" />
             </div>
-            <div class="col-md-9 col-lg-10">
-                <div>
-                    <uc:HeaderNavBar runat="server" />
-                </div>
-                <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
-                    <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
-                    <button id="createLeave" class="btn btn-outline-custom"
-                        style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
-                        onclick="$('#createLeavemodal').modal('show');" title="Create Leave">
-                        <i class="fa fa-plus"></i>&nbsp;Create
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <div class="container-fluid">
-                        <div class="card ml-3 mr-3">
-                            <div class="card-body p-3">
-                                <table id="leaveTable" class="table table-striped table-bordered" style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th>Leave ID</th>
-                                            <th>Employee</th>
-                                            <th>Leave Type</th>
-                                            <th>Start Date</th>
-                                            <th>Start Day Breakdown</th>
-                                            <th>End Date</th>
-                                            <th>End Day Breakdown</th>
-                                            <th>Request Days</th>
-                                            <th>Reason</th>
-                                            <th>Attachment</th>
-                                            <th>Status</th>
-                                            <th>Approval</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+                <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
+                <button id="createLeave" class="btn btn-outline-custom"
+                    style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                    onclick="$('#createLeavemodal').modal('show');" title="Create Leave">
+                    <i class="fa fa-plus"></i>&nbsp;Create
+                </button>
+            </div>
+            <div class="mt-3">
+                <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
+                    <div class="card ml-3 mr-3">
+                        <div class="card-body p-3">
+                            <table id="leaveTable" class="table table-striped table-bordered" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Leave ID</th>
+                                        <th>Employee</th>
+                                        <th>Leave Type</th>
+                                        <th>Start Date</th>
+                                        <th>Start Day Breakdown</th>
+                                        <th>End Date</th>
+                                        <th>End Day Breakdown</th>
+                                        <th>Request Days</th>
+                                        <th>Reason</th>
+                                        <th>Attachment</th>
+                                        <th>Status</th>
+                                        <th>Approval</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div id="testnavbar-container">
-                    <uc:Quick_action runat="server" />
-                </div>
+            </div>
+            <div id="Quickaction-container">
+                <uc:Quick_action runat="server" />
             </div>
         </div>
     </div>

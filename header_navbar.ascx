@@ -76,15 +76,21 @@
     });
 
     function sidebarToggle() {
-        var isToggled = false;
+        var isToggled = $(".sidebar").hasClass("toggled");
+        var hasActivePage = $("#leaveSubMenu .nav-link").hasClass("active-page");
+
+        $("#sidebarContainer").toggleClass("toggled");
         $(".sidebar").toggleClass("toggled");
-        isToggled = !isToggled;
-        if (isToggled) {
-            $("#leaveSubMenu").collapse('hide'); 
+
+        if (!isToggled) {
+            if (hasActivePage) {
+                $("#leaveSubMenu").collapse('hide');
+            }
         } else {
-            $("#leaveSubMenu").collapse('show'); 
+            $("#leaveSubMenu").collapse('show');
         }
-        document.cookie = "toggle=" + (isToggled ? "1" : "0") + "; path=/";
+
+        document.cookie = "toggle=" + (!isToggled ? "1" : "0") + "; path=/";
     }
 
     function populate_profile_details() {

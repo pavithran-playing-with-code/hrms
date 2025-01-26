@@ -37,7 +37,27 @@
     <title>HRMS</title>
 
     <style>
-        #testnavbar-container {
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .left-navbar {
+            width: 15%;
+        }
+
+            .left-navbar.toggled {
+                width: 70px;
+            }
+
+        .content-container {
+            flex-grow: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        #Quickaction-container {
             display: flex;
             position: fixed;
             right: -10px;
@@ -232,103 +252,97 @@
     <input type="hidden" id="announcement_id" name="announcement_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
 
-    <div class="container-fluid p-0">
-        <div class="row no-gutters">
-            <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
-                <uc:LeftNavBar runat="server" />
-            </div>
-            <div class="col-md-9 col-lg-10">
-                <div id="banner_container" style="position: relative; z-index: 1050;">
-                    <div id="ad-banner" class="w-100 position-relative"
-                        style="background-color: hsl(8, 77%, 56%); height: 40px; opacity: 1; transition: opacity 0.5s ease, height 0.5s ease; overflow: hidden;">
-                        <div class="d-flex h-100 justify-content-center align-items-center gap-4">
-                            <p class="text-white mb-0 mr-3">
-                                Having any issues, feedback, or suggestions? We’d love to hear from you!
-                   
-                            </p>
-                            <a class="btn btn-outline contact-now-btn" href="https://www.horilla.com/customer-feedback/" target="_blank"
-                                style="font-size: 12px; padding: 0.4rem 0.6rem; border-radius: 10px; color: #E8E8E8; background-color: #e54f38; border: 2px solid #E8E8E8">Contact Now
-                    </a>
-                        </div>
-                        <div class="btn btn-outline" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
-                            <button class="d-flex justify-content-center align-items-center"
-                                style="outline: none; border-radius: 50%; background-color: transparent; color: #fff; width: 34px; height: 34px; border: none; box-shadow: none;"
-                                onclick="document.getElementById('banner_container').style.display = 'none';">
-                                <i class="fa-light fa-x" style="cursor: pointer; font-size: 14px"></i>
-                            </button>
-                        </div>
+    <div class="main-container">
+        <div id="sidebarContainer" class="left-navbar">
+            <uc:LeftNavBar runat="server" />
+        </div>
+        <div id="content-container" class="content-container">
+            <div id="banner_container" style="position: relative; z-index: 1050;">
+                <div id="ad-banner" class="w-100 position-relative"
+                    style="background-color: hsl(8, 77%, 56%); height: 40px; opacity: 1; transition: opacity 0.5s ease, height 0.5s ease; overflow: hidden;">
+                    <div class="d-flex h-100 justify-content-center align-items-center gap-4">
+                        <p class="text-white mb-0 mr-3">Having any issues, feedback, or suggestions? We’d love to hear from you!</p>
+                        <a class="btn btn-outline contact-now-btn" href="https://www.horilla.com/customer-feedback/" target="_blank"
+                            style="font-size: 12px; padding: 0.4rem 0.6rem; border-radius: 10px; color: #E8E8E8; background-color: #e54f38; border: 2px solid #E8E8E8">Contact Now</a>
+                    </div>
+                    <div class="btn btn-outline" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
+                        <button class="d-flex justify-content-center align-items-center"
+                            style="outline: none; border-radius: 50%; background-color: transparent; color: #fff; width: 34px; height: 34px; border: none; box-shadow: none;"
+                            onclick="document.getElementById('banner_container').style.display = 'none';">
+                            <i class="fa-light fa-x" style="cursor: pointer; font-size: 14px"></i>
+                        </button>
                     </div>
                 </div>
-                <div>
-                    <uc:HeaderNavBar runat="server" />
-                </div>
-                <div class="mt-3">
-                    <div class="wrapper" style="margin-left: 35px; margin-top: 30px; margin-right: 65px">
-                        <div class="row" id="dashboard" style="padding-bottom: 4.5rem;">
-                            <div class="dashboard__left col-12 col-sm-12 col-md-12 col-lg-9">
-                                <div class="row">
-                                    <div class="col-12 col-sm-12 col-md-6 col-lg-4">
-                                        <div class="card hovercards">
-                                            <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%);">
-                                                <h6 class="card-title">New Joining Today</h6>
-                                                <h1 class="card-text" id="new_joining_today"></h1>
-                                            </div>
+            </div>
+            <div class="header-container">
+                <uc:HeaderNavBar runat="server" />
+            </div>
+            <div class="mt-3">
+                <div class="wrapper" style="margin-left: 35px; margin-top: 30px; margin-right: 65px">
+                    <div class="row" id="dashboard" style="padding-bottom: 4.5rem;">
+                        <div class="dashboard__left col-12 col-sm-12 col-md-12 col-lg-9">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-4">
+                                    <div class="card hovercards">
+                                        <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%);">
+                                            <h6 class="card-title">New Joining Today</h6>
+                                            <h1 class="card-text" id="new_joining_today"></h1>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div class="card hovercards">
-                                            <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%);">
-                                                <h6 class="card-title">New Joining This Week</h6>
-                                                <h1 class="card-text" id="new_joining_this_week"></h1>
-                                            </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="card hovercards">
+                                        <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%);">
+                                            <h6 class="card-title">New Joining This Week</h6>
+                                            <h1 class="card-text" id="new_joining_this_week"></h1>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div class="card hovercards">
-                                            <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%);">
-                                                <h6 class="card-title">Total Strength</h6>
-                                                <h1 class="card-text" id="total_emp"></h1>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="card hovercards">
+                                        <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%);">
+                                            <h6 class="card-title">Total Strength</h6>
+                                            <h1 class="card-text" id="total_emp"></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard__right col-12 col-sm-12 col-md-12 col-lg-3">
+                            <div class="card p-3 mb-4">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
+                                    <h6 class="card-title">Announcements</h6>
+                                    <span class="mb-1">
+                                        <button id="addAnnouncement" style="display: inline-block; padding: 0px; border-radius: 6px; display: flex; align-items: center; justify-content: center; width: 50px; height: 28px;"
+                                            class="btn btn-outline-custom ms-3 onlyhighaccesslvl" onclick="opencreateannouncementmodal()" title="Create Announcement">
+                                            <i class="fa fa-plus m-0"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <hr />
+                                <div class="card-body">
+                                    <div class="announcement-body" id="announcementListCard" style="height: 300px; overflow-y: auto; border: none;"></div>
+                                </div>
+                            </div>
+                            <div class="card p-3 mb-3">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
+                                    <h6 class="card-title">On Leave</h6>
+                                </div>
+                                <hr />
+                                <div class="card-body">
+                                    <div class="onleave-body" id="onleaveListCard" style="height: 300px; border: none;">
+                                        <div id="empty_leave" style="padding-top: 20%">
+                                            <div class="empty_message">
+                                                <img style="display: block; width: 70px; margin: 20px auto;" src="\asset\attendance.png" />
+                                                <h5 style="color: hsl(0,0%,45%); text-align: center;">No employees have taken leave today.</h5>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="dashboard__right col-12 col-sm-12 col-md-12 col-lg-3">
-                                <div class="card p-3 mb-4">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
-                                        <h6 class="card-title">Announcements</h6>
-                                        <span class="mb-1">
-                                            <button id="addAnnouncement" style="display: inline-block; padding: 0px; border-radius: 6px; display: flex; align-items: center; justify-content: center; width: 50px; height: 28px;"
-                                                class="btn btn-outline-custom ms-3 onlyhighaccesslvl" onclick="opencreateannouncementmodal()" title="Create Announcement">
-                                                <i class="fa fa-plus m-0"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <hr />
-                                    <div class="card-body">
-                                        <div class="announcement-body" id="announcementListCard" style="height: 300px; overflow-y: auto; border: none;"></div>
-                                    </div>
-                                </div>
-                                <div class="card p-3 mb-3">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
-                                        <h6 class="card-title">On Leave</h6>
-                                    </div>
-                                    <hr />
-                                    <div class="card-body">
-                                        <div class="onleave-body" id="onleaveListCard" style="height: 300px; border: none;">
-                                            <div id="empty_leave" style="padding-top: 20%">
-                                                <div class="empty_message">
-                                                    <img style="display: block; width: 70px; margin: 20px auto;" src="\asset\attendance.png" />
-                                                    <h5 style="color: hsl(0,0%,45%); text-align: center;">No employees have taken leave today.</h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="testnavbar-container">
-                                <uc:Quick_action runat="server" />
-                            </div>
+                        </div>
+                        <div id="Quickaction-container">
+                            <uc:Quick_action runat="server" />
                         </div>
                     </div>
                 </div>

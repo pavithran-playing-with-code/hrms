@@ -36,7 +36,27 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <title>Announcement</title>
     <style>
-        #testnavbar-container {
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .left-navbar {
+            width: 20%;
+        }
+
+            .left-navbar.toggled {
+                width: 70px;
+            }
+
+        .content-container {
+            flex-grow: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        #Quickaction-container {
             display: flex;
             position: fixed;
             right: -10px;
@@ -170,58 +190,55 @@
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
-    <div class="container-fluid p-0">
-        <div class="row no-gutters">
-            <div class="col-md-3 col-lg-2 bg-light" style="min-height: 100vh;">
-                <uc:LeftNavBar runat="server" />
+    <div class="main-container">
+        <div id="sidebarContainer" class="left-navbar">
+            <uc:LeftNavBar runat="server" />
+        </div>
+        <div class="header-container">
+            <div>
+                <uc:HeaderNavBar runat="server" />
             </div>
-            <div class="col-md-9 col-lg-10">
-                <div>
-                    <uc:HeaderNavBar runat="server" />
-                </div>
-                <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
-                    <h1 style="font-size: 2rem; font-weight: 650 !important;" class="m-0">Announcements</h1>
-                    <button id="createAnnouncement" class="btn btn-outline-custom"
-                        style="border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
-                        onclick="opencreateannouncementmodal()" title="Create Announcement">
-                        <i class="fa fa-plus"></i>&nbsp;Create
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+                <h1 style="font-size: 2rem; font-weight: 650 !important;" class="m-0">Announcements</h1>
+                <button id="createAnnouncement" class="btn btn-outline-custom"
+                    style="border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                    onclick="opencreateannouncementmodal()" title="Create Announcement">
+                    <i class="fa fa-plus"></i>&nbsp;Create
                
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <div class="container-fluid">
-                        <div class="card ml-3 mr-3">
-                            <div class="card-body p-3">
-                                <table id="announcementsTable" class="table table-striped table-bordered" style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th>Announcement ID</th>
-                                            <th>Employee ID</th>
-                                            <th>Employee Name</th>
-                                            <th>Department</th>
-                                            <th>Job Position</th>
-                                            <th>Heading</th>
-                                            <th>Description</th>
-                                            <th>Attachments</th>
-                                            <th>Posted On</th>
-                                            <th>Expire Date</th>
-                                            <th>Comments</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                </button>
+            </div>
+            <div class="mt-1">
+                <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
+                    <div class="card-body p-3">
+                        <table id="announcementsTable" class="table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th>Announcement ID</th>
+                                    <th>Employee ID</th>
+                                    <th>Employee Name</th>
+                                    <th>Department</th>
+                                    <th>Job Position</th>
+                                    <th>Heading</th>
+                                    <th>Description</th>
+                                    <th>Attachments</th>
+                                    <th>Posted On</th>
+                                    <th>Expire Date</th>
+                                    <th>Comments</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div id="testnavbar-container">
-                    <uc:Quick_action runat="server" />
-                </div>
+            </div>
+            <div id="Quickaction-container">
+                <uc:Quick_action runat="server" />
             </div>
         </div>
     </div>
+
 
     <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
