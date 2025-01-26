@@ -81,13 +81,13 @@
 
         $("#sidebarContainer").toggleClass("toggled");
         $(".sidebar").toggleClass("toggled");
-
+        
         if (!isToggled) {
-            if (hasActivePage) {
-                $("#leaveSubMenu").collapse('hide');
-            }
+            $("#leaveSubMenu").collapse('hide');
         } else {
-            $("#leaveSubMenu").collapse('show');
+            if (hasActivePage) {
+                $("#leaveSubMenu").collapse('show');
+            }
         }
 
         document.cookie = "toggle=" + (!isToggled ? "1" : "0") + "; path=/";

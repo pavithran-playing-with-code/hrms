@@ -132,7 +132,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a id="testingNavLink" class="nav-link" href="../testing.aspx" runat="server">
+                                <a id="testingNavLink" class="nav-link" href="../sdv.aspx" runat="server">
                                     <span>Leave Requests</span>
                                 </a>
                             </li>
