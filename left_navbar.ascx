@@ -99,14 +99,14 @@
         <div class="flex-grow-1 sidebar-nav mt-1" data-simplebar="">
             <ul class="navbar-nav text-light" id="accordionSidebar" runat="server">
                 <li class="nav-item">
-                    <a class="nav-link" href="../dashboard.aspx" id="dashboard_left_nav" runat="server">
+                    <a id="DashboardNavLink" class="nav-link" href="../dashboard.aspx" runat="server">
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="../announcements.aspx" id="announcements_left_nav" runat="server">
+                    <a id="AnnouncementsNavLink" class="nav-link" href="../announcements.aspx" runat="server">
                         <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
                         <span>Announcements</span>
                     </a>
@@ -127,12 +127,12 @@
                     <div id="leaveSubMenu" runat="server" clientidmode="Static" class="collapse">
                         <ul class="navbar-nav text-light">
                             <li class="nav-item">
-                                <a id="ltestNavLink" class="nav-link" href="../ltest.aspx" runat="server">
+                                <a id="LeaveDashboardNavLink" class="nav-link" href="../leave_dashboard.aspx" runat="server">
                                     <span>Dashboard</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a id="testingNavLink" class="nav-link" href="../sdv.aspx" runat="server">
+                                <a id="AllemployeeLeaveRequestNavLink" class="nav-link" href="../all_emp_leave_request.aspx" runat="server">
                                     <span>Leave Requests</span>
                                 </a>
                             </li>
@@ -142,8 +142,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a id="leaveTypeNavLink" class="nav-link" href="../leave-type.aspx" runat="server">
-                                    <span>Leave Type</span>
+                                <a id="leaveConfigurationNavLink" class="nav-link" href="../leave_configuration.aspx" runat="server">
+                                    <span>Leave Configuration</span>
                                 </a>
                             </li>
                         </ul>
@@ -151,7 +151,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="../testing.aspx" id="A1" runat="server">
+                    <a id="TeastingNavLink" class="nav-link" href="../testing.aspx" runat="server">
                         <i class="fa-solid fa-gamepad" style="font-size: 1.25rem;"></i>
                         <span>Testing</span>
                     </a>

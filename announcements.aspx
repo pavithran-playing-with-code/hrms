@@ -199,7 +199,7 @@
                 <uc:HeaderNavBar runat="server" />
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
-                <h1 style="font-size: 2rem; font-weight: 650 !important;" class="m-0">Announcements</h1>
+                <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Announcements</h1>
                 <button id="createAnnouncement" class="btn btn-outline-custom"
                     style="border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
                     onclick="opencreateannouncementmodal()" title="Create Announcement">

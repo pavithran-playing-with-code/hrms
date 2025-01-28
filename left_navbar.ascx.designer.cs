@@ -33,22 +33,22 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl accordionSidebar;
 
         /// <summary>
-        /// dashboard_left_nav control.
+        /// DashboardNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor dashboard_left_nav;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor DashboardNavLink;
 
         /// <summary>
-        /// announcements_left_nav control.
+        /// AnnouncementsNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor announcements_left_nav;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor AnnouncementsNavLink;
 
         /// <summary>
         /// assessmentFormNavLink control.
@@ -69,22 +69,22 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl leaveSubMenu;
 
         /// <summary>
-        /// ltestNavLink control.
+        /// LeaveDashboardNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor ltestNavLink;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor LeaveDashboardNavLink;
 
         /// <summary>
-        /// testingNavLink control.
+        /// AllemployeeLeaveRequestNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor testingNavLink;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor AllemployeeLeaveRequestNavLink;
 
         /// <summary>
         /// myLeaveRequestsNavLink control.
@@ -96,22 +96,22 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlAnchor myLeaveRequestsNavLink;
 
         /// <summary>
-        /// leaveTypeNavLink control.
+        /// leaveConfigurationNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor leaveTypeNavLink;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor leaveConfigurationNavLink;
 
         /// <summary>
-        /// A1 control.
+        /// TeastingNavLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor A1;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor TeastingNavLink;
 
         /// <summary>
         /// configurationNavLink control.

@@ -515,6 +515,12 @@
 
     <script>
         $(document).ready(function () {
+            if ($("#emp_access_lvl").val() != "true") {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.style.display = 'none';
+                });
+            }
+
             if (sessionStorage.getItem('showAlert') === 'true') {
                 display_green_alert('Login successful.');
                 sessionStorage.removeItem('showAlert');
@@ -603,13 +609,6 @@
                             const profileLetters = announcement.profile_letters;
                             const profileColor = announcement.profile_color;
                             const heading = announcement.heading;
-                            const emp_access_lvl = announcement.emp_access_lvl;
-
-                            if (emp_access_lvl != "true") {
-                                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
-                                    element.style.display = 'none';
-                                });
-                            }
 
                             let profileHTML = '';
                             if (profileImage) {

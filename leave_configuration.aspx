@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="testing.aspx.cs" Inherits="hrms.testing" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="leave_configuration.aspx.cs" Inherits="hrms.leave_configuration" %>
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
@@ -116,7 +116,7 @@
             font-size: 0.95rem;
             color: #555;
         }
- 
+
         #leavePriorityTable td, #leavePriorityTable th {
             padding: 20px 150px;
             max-width: 150px;
@@ -158,6 +158,30 @@
             transform: scale(1.2);
         }
 
+        .editable.editing {
+            outline: 2px dashed burlywood;
+            background-color: lightcyan;
+            animation: growShrink 0.5s ease-in-out;
+            transition: transform 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes growShrink {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         @keyframes slideInFromRight {
             from {
                 transform: translateX(100%);
@@ -189,34 +213,10 @@
             opacity: 0;
             transition: opacity 2s ease-in-out;
         }
-
-        .editable.editing {
-            outline: 2px dashed burlywood;
-            background-color: lightcyan;
-            animation: growShrink 0.5s ease-in-out;
-            transition: transform 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @keyframes growShrink {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
     </style>
 </head>
 <body style="background-color: #f8f9fa">
-    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" value="false" />
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
 
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>

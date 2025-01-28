@@ -37,30 +37,30 @@ namespace hrms
                 Response.Redirect("login.aspx");
             }
 
-            /* try
-             {
-                 string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
-                 using (var conn = new MySqlConnection(connectionString))
-                 {
-                     conn.Open();
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
 
-                     string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
-                     using (var cmd = new MySqlCommand(accessLevelQuery, conn))
-                     {
-                         cmd.Parameters.AddWithValue("@emp_id", emp_id);
-                         var accessLevel = cmd.ExecuteScalar();
+                    string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
+                    using (var cmd = new MySqlCommand(accessLevelQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        var accessLevel = cmd.ExecuteScalar();
 
-                         if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
-                         {
-                             emp_access_lvl.Value = "true";
-                         }
-                     }
-                 }
-             }
-             catch (Exception ex)
-             {
-                 Response.Write($"Error: {ex.Message}");
-             }*/
+                        if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
+                        {
+                            emp_access_lvl.Value = "true";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Write($"Error: {ex.Message}");
+            }
         }
 
         [WebMethod]
@@ -166,7 +166,6 @@ namespace hrms
             public string profile_img { get; set; }
             public string profile_color { get; set; }
             public string heading { get; set; }
-            public string emp_access_lvl { get; set; }
         }
 
         [WebMethod]
@@ -184,18 +183,6 @@ namespace hrms
                     conn.Open();
 
                     var emp_id = HttpContext.Current.Session["emp_id"];
-                    string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
-                    var emp_access_lvl = "";
-                    using (var cmd = new MySqlCommand(accessLevelQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
-                        var accessLevel = cmd.ExecuteScalar();
-
-                        if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
-                        {
-                            emp_access_lvl = "true";
-                        }
-                    }
 
                     string announncement_Query = $@"SELECT a.announcement_id, CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters, 
                                                             p.profile_img, p.profile_color, a.heading
@@ -217,8 +204,7 @@ namespace hrms
                             profile_letters = row["profile_letters"].ToString(),
                             profile_img = row["profile_img"].ToString(),
                             profile_color = row["profile_color"].ToString(),
-                            heading = row["heading"].ToString(),
-                            emp_access_lvl = emp_access_lvl
+                            heading = row["heading"].ToString()
                         });
                     }
                     conn.Close();
