@@ -43,7 +43,9 @@
         }
 
         .left-navbar {
-            width: 20%;
+            width: 15%;
+            flex-shrink: 0;
+            transition: all 0.3s ease-in-out;
         }
 
             .left-navbar.toggled {
@@ -53,7 +55,14 @@
         .content-container {
             flex-grow: 1;
             margin-left: 0;
+            overflow: auto;
             transition: margin-left 0.3s ease;
+        }
+
+        .wrapper {
+            overflow: auto;
+            margin-left: 20px;
+            margin-right: 20px;
         }
 
         #Quickaction-container {
@@ -77,6 +86,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            vertical-align: middle;
         }
 
             #announcementsTable td button {

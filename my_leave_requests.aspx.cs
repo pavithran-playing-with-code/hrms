@@ -51,11 +51,13 @@ namespace hrms
                 {
                     conn.Open();
 
+                    var emp_id = HttpContext.Current.Session["emp_id"];
                     string leave_Query = $@"SELECT l.leave_requests_id AS leave_id, l.emp_id, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, 
 lt.leave_type, l.start_date, l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, l.leave_status 
 FROM hrms.leave_requests l 
-LEFT JOIN hrms.employee e ON e.emp_id = l.emp_id
-LEFT JOIN hrms.leave_type lt ON lt.leave_type_id = l.leave_type_id;";
+LEFT JOIN hrms.employee e ON (e.emp_id = l.emp_id)
+LEFT JOIN hrms.leave_type lt ON (lt.leave_type_id = l.leave_type_id)
+WHERE l.emp_id = '{emp_id}';";
                     var da = new MySqlDataAdapter(leave_Query, conn);
                     DataTable dt = new DataTable();
                     da.Fill(dt);

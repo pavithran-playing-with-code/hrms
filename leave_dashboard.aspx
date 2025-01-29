@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="my_leave_requests.aspx.cs" Inherits="hrms.my_leave_requests" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="leave_dashboard.aspx.cs" Inherits="hrms.leave_dashboard" %>
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
@@ -34,7 +34,7 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>My Leave Request</title>
+    <title>Leave Dashboard</title>
     <style>
         #Quickaction-container {
             display: flex;
@@ -163,13 +163,8 @@
             <div class="header-container">
                 <uc:HeaderNavBar runat="server" />
             </div>
-            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-4">
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
                 <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
-                <button id="createLeave" class="btn btn-outline-custom"
-                    style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
-                    onclick="$('#createLeavemodal').modal('show');" title="Create Leave">
-                    <i class="fa fa-plus"></i>&nbsp;Create
-                </button>
             </div>
             <div class="mt-3">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
@@ -182,12 +177,9 @@
                                         <th>Employee</th>
                                         <th>Leave Type</th>
                                         <th>Start Date</th>
-                                        <th>Start Day Breakdown</th>
                                         <th>End Date</th>
-                                        <th>End Day Breakdown</th>
                                         <th>Request Days</th>
-                                        <th>Reason</th>
-                                        <th>Attachment</th>
+                                        <th>Leave Clash</th>
                                         <th>Status</th>
                                         <th>Approval</th>
                                     </tr>
@@ -272,6 +264,28 @@
         </div>
     </div>
 
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div id="leaveCarousel" class="carousel slide" data-interval="false">
+                    <div class="carousel-inner" id="carouselContent">
+                    </div>
+                    <a class="carousel-control-prev" href="#leaveCarousel" role="button" data-slide="prev" style="position: absolute; left: -90px;">
+                        <span style="color: #333; font-size: 0.6rem;" class="carousel-control-prev-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3" style="color: white;" aria-hidden="true">
+                            <i class="fa-solid fa-less-than"></i>
+                        </span>
+                    </a>
+                    <a class="carousel-control-next" href="#leaveCarousel" role="button" data-slide="next" style="position: absolute; right: -90px;">
+                        <span style="color: #333; font-size: 0.6rem;" class="carousel-control-next-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3" aria-hidden="true">
+                            <i class="fa-solid fa-greater-than"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -303,60 +317,59 @@
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var today = new Date().toISOString().split('T')[0];
-
-            document.getElementById('id_start_date').setAttribute('min', today);
-            document.getElementById('id_end_date').setAttribute('min', today);
-        });
-
-        document.getElementById('id_start_day_breakdown').addEventListener('change', function () {
-            var startDate = document.getElementById('id_start_date').value;
-            if (!startDate) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please select a start date first.',
-                });
-                document.getElementById('id_start_day_breakdown').value = 'Full';
-                return;
-            }
-        });
-
-        document.getElementById('id_end_day_breakdown').addEventListener('change', function () {
-            var endDate = document.getElementById('id_end_date').value;
-            if (!endDate) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please select a end date first.',
-                });
-                document.getElementById('id_end_day_breakdown').value = 'Full';
-                return;
-            }
-        });
+        let leaveData = []; // Array to store all leave requests
 
         function populateleaves() {
             $.ajax({
                 type: "POST",
-                url: 'my_leave_requests.aspx/populateleaves',
+                url: 'leave_dashboard.aspx/populateleaves',
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
-                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
-                    const data = JSON.parse(cleanedResponse);
+                    cleanedResponse = cleanedResponse.replace(/\r\n|\r|\n/g, '');
+                    leaveData = JSON.parse(cleanedResponse);
 
                     if ($.fn.DataTable.isDataTable('#LeavesTable')) {
                         $('#LeavesTable').DataTable().clear().destroy();
                     }
 
                     $('#LeavesTable').DataTable({
-                        data: data,
+                        data: leaveData,
                         "ordering": false,
                         columns: [
                             { data: 'leave_id', visible: false },
-                            { data: 'emp_name' },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    var profileHTML;
+                                    var profileImg = data.profile_img;
+                                    var profileColor = data.profile_color;
+                                    var profileLetters = data.profile_letters;
+                                    var empName = data.emp_name;
+
+                                    if (profileImg != "") {
+                                        profileHTML = `<div style='display: flex; align-items: center;'>
+    <img src='${profileImg}' alt='Profile Picture' class='rounded-circle' style='width: 40px; height: 40px;'>
+    <div style='margin-left: 15px;'>
+        <div>${empName}</div>
+        <div>${data.department_name} / ${data.job_position_name}</div>
+    </div>
+</div>`;
+                                    } else {
+                                        profileHTML = `<div style='display: flex; align-items: center;'>
+    <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 40px; height: 40px; background-color: ${profileColor}; color: white; font-weight: bold;'>
+    ${profileLetters}</span>
+    <div style='margin-left: 15px;'>
+        <div>${empName}</div>
+        <div>${data.department_name} / ${data.job_position_name}</div>
+    </div>
+</div>`;
+                                    }
+
+                                    return profileHTML;
+                                }
+                            },
                             { data: 'leave_type' },
                             {
                                 data: 'start_date',
@@ -366,7 +379,6 @@
                                     return `<span>${start_date}</span>`;
                                 }
                             },
-                            { data: 'start_date_breakdown' },
                             {
                                 data: 'end_date',
                                 render: function (data) {
@@ -375,7 +387,6 @@
                                     return `<span>${end_date}</span>`;
                                 }
                             },
-                            { data: 'end_date_breakdown' },
                             {
                                 data: 'requested_days',
                                 render: function (data) {
@@ -383,17 +394,9 @@
                                 }
                             },
                             {
-                                data: 'leave_description',
+                                data: null,
                                 render: function (data) {
-                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
-                                }
-                            },
-                            {
-                                data: 'attachment',
-                                render: function (data) {
-                                    const attachmentParts = data.split('/').pop().split('_');
-                                    const originalFileName = attachmentParts.slice(2).join('_');
-                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
+                                    return `<span>need to work</span>`;
                                 }
                             },
                             {
@@ -417,214 +420,150 @@
                                         return "";
                                     }
                                     return `
-            <div class="btn-group" role="group">
-                <button class="btn btn-danger btn-sm delete-btn" style="width:80px" onclick="cancelleave(${row.leave_id})">Cancel</button>
-            </div>`;
+<div class="btn-group" role="group">
+    <button class="btn btn-success btn-sm approve-btn p-1" style="width:80px; border-radius:0;" onclick="approveleave(${row.leave_id})">
+    <i class="fas fa-check-circle"></i> Approve</button>
+    <button class="btn btn-danger btn-sm remove-btn p-1" style="width:80px; border-radius:0;" onclick="rejectleave(${row.leave_id})">
+    <i class="fas fa-times-circle"></i> Reject</button>
+</div>`;
                                 }
                             }
-
                         ],
                         headerCallback: function (thead, data, start, end, display) {
                             $('th', thead).addClass('text-center');
                         },
                         createdRow: function (row, data, dataIndex) {
                             $('td', row).addClass('text-center');
+                            $(row).find("td:nth-child(1)").removeClass('text-center');
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
-                        <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
-                        <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
-                     </div>`
+            <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+            <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+         </div>`
                         }
                     });
 
-                    $('#LeavesTable').on('click', '.description-link', function (e) {
-                        e.preventDefault();
-                        const description = $(this).data('description');
-                        const heading = $(this).closest('tr').find('td').eq(1).text();
-                        $('#descriptionModalLabel').text(heading);
-                        $('#fullDescriptionContent').html(description);
-                        $('#descriptionModal').modal('show');
-                    });
-
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
                 }
             });
         }
 
-        function UploadFiles(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const base64File = reader.result.split(',')[1];
+        $('#LeavesTable').on('click', 'tr', function () {
+            const table = $('#LeavesTable').DataTable();
+            const rowData = table.row(this).data();
+            if (!rowData) return;
 
-                    $.ajax({
-                        url: 'dashboard.aspx/UploadFiles',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "leave" }),
-                        success: function (response) {
-                            resolve(response.d);
-                        },
-                        error: function (xhr, status, error) {
-                            reject(error);
-                        }
-                    });
-                };
-                reader.onerror = function () {
-                    reject("Error reading file.");
-                };
-                reader.readAsDataURL(file);
+            const rows = table.rows().data().toArray();
+            let carouselItems = '';
+
+            rows.forEach((data, index) => {
+                const activeClass = data.leave_id === rowData.leave_id ? 'active' : '';
+
+                const profileHTML = data.profile_img
+                    ? `<div style='display: flex; align-items: center;'>
+         <img src='${data.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 60px; height: 60px;'> 
+         <div style='margin-left: 20px;'>
+             <div style="font-weight: bold; font-size: 1.2rem;">${data.emp_name}</div>
+             <div style="font-size: 1rem;">${data.department_name} / ${data.job_position_name}</div>
+         </div>
+     </div>`
+                    : `<div style='display: flex; align-items: center;'>
+         <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 60px; height: 60px; background-color: ${data.profile_color}; color: white; font-weight: bold; font-size: 1.5rem;'> 
+         ${data.profile_letters}</span>
+         <div style='margin-left: 20px;'>
+             <div style="font-weight: bold; font-size: 1.5rem;">${data.emp_name}</div>
+             <div style="font-size: 1.2rem;color:#4d4a4a">${data.department_name} / ${data.job_position_name}</div>
+         </div>
+     </div>`;
+
+                carouselItems += `
+     <div class="carousel-item ${activeClass}">
+         <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
+             <h5 class="modal-title">Details</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+             </button>
+         </div>
+         <div class="modal-body">
+             <div class="d-flex justify-content-center align-items-center mb-3">
+                 ${profileHTML}  
+             </div>
+              <div class="leave_details" style="margin-left:12%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%;">
+                 <div class="row" style="width: 100%; justify-content: flex-start;">
+                     <div class="col-sm-6 style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Leave Type:</span><br>
+                         <span style="font-size: 1rem;">${data.leave_type}</span>
+                     </div>
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Requested Days:</span><br> 
+                         <span style="font-size: 1rem;">${data.requested_days}</span>
+                     </div>
+                 </div>
+                 <div class="row" style="width: 100%; justify-content: flex-start;">
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Start Date:</span><br> 
+                         <span style="font-size: 1rem;">${data.start_date}</span>
+                     </div>
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Start Date Breakdown:</span><br> 
+                         <span style="font-size: 1rem;">${data.start_date_breakdown}</span>
+                     </div>
+                 </div>
+                 <div class="row" style="width: 100%; justify-content: flex-start;">
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">End Date:</span><br> 
+                         <span style="font-size: 1rem;">${data.end_date}</span>
+                     </div>
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">End Date Breakdown:</span><br> 
+                         <span style="font-size: 1rem;">${data.end_date_breakdown}</span>
+                     </div>
+                 </div>
+                 <div class="row mt-3" style="width: 100%; justify-content: flex-start;">
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Created Date:</span><br> 
+                         <span style="font-size: 1rem;">${data.created_time}</span>
+                     </div>
+                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                         <span style="color: gray; font-size: 1rem;">Created By:</span><br> 
+                         <span style="font-size: 1rem;">${data.emp_name}</span>
+                     </div>
+                 </div>
+                 <div class="mt-3 ml-4" style="text-align: center;">
+                     <button class="btn btn-link description-link" data-description="${data.leave_description}" data-leave-type="${data.leave_type}">
+                         View Description
+                     </button>
+                     <button class="btn btn-link attachment-link" onclick="window.open('${data.attachment}', '_blank')">
+                         View Attachment
+                     </button>
+                 </div>
+             </div>
+         </div>
+         <div class="modal-footer justify-content-center" style="border:none">
+            <button style="width:100px; height:40px; border-radius:0;" class="btn btn-success btn-sm" onclick="approveleave(${data.leave_id})">
+                <i class="fas fa-check-circle"></i> Approve
+            </button>
+            <button style="width:100px; height:40px; border-radius:0;" class="btn btn-danger btn-sm" onclick="rejectleave(${data.leave_id})">
+                <i class="fas fa-times-circle"></i> Reject
+            </button>
+        </div>
+     </div>
+
+ `;
             });
-        }
 
-        async function save_Leave() {
-            const leaveType = $('#id_leave_type').val();
-            const startDate = $('#id_start_date').val();
-            const startDayBreakdown = $('#id_start_day_breakdown').val();
-            const endDate = $('#id_end_date').val();
-            const endDayBreakdown = $('#id_end_day_breakdown').val();
-            const description = $('#id_description').val();
-            let attachment = '';
+            $('#carouselContent').html(carouselItems);
+            $('#detailsModal').modal('show');
+        });
 
-            if (!startDate ||
-                !endDate ||
-                (startDate > endDate) ||
-                (startDate === endDate && startDayBreakdown === "Second Half" && (endDayBreakdown === "Full" || endDayBreakdown === "First Half")) ||
-                (startDate < endDate && endDayBreakdown === "Second Half")) {
-                Swal.fire({
-                    title: "Invalid Dates or Breakdown",
-                    text: "Please ensure the start and end dates, along with the breakdown, are valid. End date cannot be 'Second Half' if it spans multiple days.",
-                    icon: "warning"
-                });
-                return;
-            }
-
-
-            if (!leaveType || !startDate || !startDayBreakdown || !endDate || !endDayBreakdown || !description) {
-                Swal.fire({
-                    title: "Missing Fields",
-                    text: "Please fill in all the required fields before proceeding.",
-                    icon: "warning"
-                });
-                return;
-            }
-
-            const fileInput = document.getElementById('id_attachments');
-            if (fileInput.files.length > 0) {
-                try {
-                    attachment = await UploadFiles(fileInput.files[0]);
-                } catch (error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Failed to upload the attachment. Please try again.",
-                        icon: "error"
-                    });
-                    return;
-                }
-            }
-
-            const data = {
-                leaveType: leaveType,
-                startDate: startDate,
-                startDayBreakdown: startDayBreakdown,
-                endDate: endDate,
-                endDayBreakdown: endDayBreakdown,
-                description: description,
-                attachment: attachment
-            };
-
-            $.ajax({
-                type: "POST",
-                url: 'my_leave_requests.aspx/save_Leave',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    let data = response.d;
-                    data = JSON.parse(data);
-                    if (data === "success") {
-                        $('#createLeavemodal').modal('hide');
-                        clearLeaveRequestFields();
-                        populateleaves();
-                        display_green_alert("The leave request has been saved successfully.");
-                    } else if (data === "duplicate") {
-                        Swal.fire({
-                            title: "Duplicate Request!",
-                            text: "A leave request for the selected dates and breakdown already exists.",
-                            icon: "warning"
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "Failure!",
-                            text: "The leave request could not be saved. Please try again.",
-                            icon: "error"
-                        });
-                    }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function clearLeaveRequestFields() {
-            $('#id_leave_type').val(null).trigger('change');
-            $('#id_start_date').val('');
-            $('#id_start_day_breakdown').val('full');
-            $('#id_end_date').val('');
-            $('#id_end_day_breakdown').val('full');
-            $('#id_description').val('');
-            $('#id_attachments').val('');
-        }
-
-        function cancelleave(leave_id) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to cancel this leave request?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "POST",
-                        url: 'my_leave_requests.aspx/cancelleave',
-                        data: JSON.stringify({ leave_requests_id: leave_id }),
-                        contentType: 'application/json',
-                        dataType: 'json',
-                        success: function (response) {
-                            if (JSON.parse(response.d) == "success") {
-                                display_green_alert("The leave request has been canceled successfully.");
-                                populateleaves();
-                            } else {
-                                Swal.fire("issue while canceling leave request");
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.fire({
-                                title: "Error!",
-                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                                icon: "error"
-                            });
-                        }
-                    });
-                }
-            });
-        }
+        $(document).on('click', '.description-link', function (e) {
+            e.preventDefault();
+            const heading = $(this).data('leave-type');
+            const description = $(this).data('description');
+            $('#descriptionModalLabel').text(heading);
+            $('#fullDescriptionContent').html(description);
+            $('#descriptionModal').modal('show');
+        });
 
     </script>
 </body>

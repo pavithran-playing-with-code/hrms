@@ -45,6 +45,8 @@
 
         .left-navbar {
             width: 15%;
+            flex-shrink: 0;
+            transition: all 0.3s ease-in-out;
         }
 
             .left-navbar.toggled {
@@ -54,7 +56,14 @@
         .content-container {
             flex-grow: 1;
             margin-left: 0;
+            overflow: auto;
             transition: margin-left 0.3s ease;
+        }
+
+        .wrapper {
+            overflow: auto;
+            margin-left: 20px;
+            margin-right: 20px;
         }
 
         #Quickaction-container {

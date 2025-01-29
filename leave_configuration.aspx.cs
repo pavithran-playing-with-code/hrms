@@ -63,9 +63,9 @@ namespace hrms
                        CONCAT(e.first_name, ' ', e.last_name, ' (', j.job_position_name, ')') AS employee_name,
                        la.level_1, la.level_2, la.level_3
                 FROM hrms.department d
-                LEFT JOIN hrms.employee e ON d.department_id = e.emp_dept_id AND e.is_active = 'Y'
-                LEFT JOIN hrms.job_position j ON j.job_position_id = e.emp_job_position_id
-                LEFT JOIN hrms.leave_approval la ON d.department_id = la.department_id
+                LEFT JOIN hrms.employee e ON (d.department_id = e.emp_dept_id AND e.is_active = 'Y')
+                LEFT JOIN hrms.job_position j ON (j.job_position_id = e.emp_job_position_id)
+                LEFT JOIN hrms.leave_approval la ON (d.department_id = la.department_id)
                 ORDER BY d.department_id, e.emp_id;";
 
                     var departments = new Dictionary<string, dynamic>();
