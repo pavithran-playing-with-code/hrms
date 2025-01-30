@@ -637,7 +637,7 @@
                 const activeClass = data.leave_id === rowData.leave_id ? 'active' : '';
 
                 var clashLeaveIds = data.clashLeaveIds;
-                let clashCount = clashLeaveIds.split(',').length;
+                let clashCount = clashLeaveIds.trim() === "" ? 0 : clashLeaveIds.split(',').filter(id => id.trim() !== "").length;
 
                 const profileHTML = data.profile_img
                     ? `<div style='display: flex; align-items: center;'>
