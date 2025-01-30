@@ -91,6 +91,20 @@
             border-color: white !important;
         }
 
+        #announcementsTable_length select {
+            border: 1px solid #aaa;
+            background-color: transparent;
+            padding: 4px;
+        }
+
+        #announcementsTable_filter input {
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 5px;
+            background-color: transparent;
+            margin-left: 3px;
+        }
+
         #announcementsTable th {
             white-space: nowrap;
         }
@@ -224,8 +238,9 @@
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
                 <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Announcements</h1>
+                <div id="dataTableControls" class="d-flex align-items-center ml-auto mr-4 mt-2" style="gap: 20px;"></div>
                 <button id="createAnnouncement" class="btn btn-outline-custom"
-                    style="border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                    style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
                     onclick="opencreateannouncementmodal()" title="Create Announcement">
                     <i class="fa fa-plus"></i>&nbsp;Create
                
@@ -428,6 +443,11 @@
                         fixedColumns: {
                             rightColumns: 1
                         },
+                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
+                        initComplete: function () {
+                            $('#announcementsTable_length').detach().appendTo('#dataTableControls');
+                            $('#announcementsTable_filter').detach().appendTo('#dataTableControls');
+                        },
                         order: [[6, 'desc']],
                         columns: [
                             { data: 'announcement_id', visible: false },
@@ -475,6 +495,9 @@
                             {
                                 data: 'attachments',
                                 render: function (data) {
+                                    if (!data || data.trim() === "") {
+                                        return "<span style='color:gray'>No attachments</span>";
+                                    }
                                     const attachmentParts = data.split('/').pop().split('_');
                                     const originalFileName = attachmentParts.slice(2).join('_');
                                     return `<a href="${data}" target="_blank">${originalFileName}</a>`;

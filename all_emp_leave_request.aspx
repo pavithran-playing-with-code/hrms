@@ -109,6 +109,20 @@
                 white-space: nowrap;
             }
 
+        #LeavesTable_length select {
+            border: 1px solid #aaa;
+            background-color: transparent;
+            padding: 4px;
+        }
+
+        #LeavesTable_filter input {
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 5px;
+            background-color: transparent;
+            margin-left: 3px;
+        }
+
         .createLeavefields input, select {
             border-radius: 0px !important;
         }
@@ -178,9 +192,10 @@
                 <uc:HeaderNavBar runat="server" />
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
-                <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
+                <h1 style="font-size: 2rem; font-weight: 700 !important;" class="ml-1">Leave Requests</h1>
+                <div id="dataTableControls" class="d-flex align-items-center mr-2" style="gap: 20px;"></div>
             </div>
-            <div class="mt-3">
+            <div class="mt-2">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
                     <div class="card ml-3 mr-3">
                         <div class="card-body p-3">
@@ -188,6 +203,8 @@
                                 <thead>
                                     <tr>
                                         <th>Leave ID</th>
+                                        <th>
+                                            <input type="checkbox" id="selectAll" /></th>
                                         <th>Employee</th>
                                         <th>Leave Type</th>
                                         <th>Start Date</th>
@@ -326,7 +343,6 @@
             <div class="modal-content">
                 <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none; flex-direction: column; align-items: flex-start;">
                     <span id="clashLeaveModalHeader"></span>
-                    <%--<h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">Leave Clash Due to <span style="color: black; font-size: 1.2rem;">Overlapping Job Positions</span></h4>--%>
                     <button type="button" style="margin-top: 3px; margin-right: 5px; border: none; outline: none; position: absolute; top: 10px; right: 10px;" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -379,8 +395,22 @@
                         fixedColumns: {
                             rightColumns: 1
                         },
+                        columnDefs: [
+                            { orderable: false, targets: 1 }
+                        ],
+                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp", 
+                        initComplete: function () {
+                            $('#LeavesTable_length').detach().appendTo('#dataTableControls');
+                            $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
+                        },
                         columns: [
                             { data: 'leave_id', visible: false },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return `<input type="checkbox" class="leave-checkbox" value="${data.leave_id}" onclick="toggleBulkActions()">`;
+                                }
+                            },
                             {
                                 data: null,
                                 render: function (data, type, row) {
@@ -392,21 +422,21 @@
 
                                     if (profileImg != "") {
                                         profileHTML = `<div style='display: flex; align-items: center;'>
-                                                            <img src='${profileImg}' alt='Profile Picture' class='rounded-circle' style='width: 40px; height: 40px;'>
-                                                            <div style='margin-left: 15px;'>
-                                                                <div>${empName}</div>
-                                                                <div>${data.department_name} / ${data.job_position_name}</div>
-                                                            </div>
-                                                        </div>`;
+                                                    <img src='${profileImg}' alt='Profile Picture' class='rounded-circle' style='width: 40px; height: 40px;'>
+                                                    <div style='margin-left: 15px;'>
+                                                        <div>${empName}</div>
+                                                        <div>${data.department_name} / ${data.job_position_name}</div>
+                                                    </div>
+                                                </div>`;
                                     } else {
                                         profileHTML = `<div style='display: flex; align-items: center;'>
-                                                            <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 40px; height: 40px; background-color: ${profileColor}; color: white; font-weight: bold;'>
-                                                            ${profileLetters}</span>
-                                                            <div style='margin-left: 15px;'>
-                                                                <div>${empName}</div>
-                                                                <div>${data.department_name} / ${data.job_position_name}</div>
-                                                            </div>
-                                                        </div>`;
+                                                    <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 40px; height: 40px; background-color: ${profileColor}; color: white; font-weight: bold;'>
+                                                    ${profileLetters}</span>
+                                                    <div style='margin-left: 15px;'>
+                                                        <div>${empName}</div>
+                                                        <div>${data.department_name} / ${data.job_position_name}</div>
+                                                    </div>
+                                                </div>`;
                                     }
 
                                     return profileHTML;
@@ -440,11 +470,11 @@
                                 render: function (data) {
                                     let clashCount = data.trim() === "" ? 0 : data.split(',').filter(id => id.trim() !== "").length;
                                     return `<div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                        <i class="fa-solid fa-users" style="font-size: 30px;"></i> 
-                                        <div style="margin-top:-25px; margin-right:-20px; width: 20px; height: 20px; border-radius: 50%; background-color: hsl(8,61%,50%); color: white; font-size: 12px; font-weight: bold;">
-                                           ${clashCount}
-                                        </div>
-                                    </div>`;
+                                <i class="fa-solid fa-users" style="font-size: 30px;"></i> 
+                                <div style="margin-top:-25px; margin-right:-20px; width: 20px; height: 20px; border-radius: 50%; background-color: hsl(8,61%,50%); color: white; font-size: 12px; font-weight: bold;">
+                                   ${clashCount}
+                                </div>
+                            </div>`;
                                 }
                             },
                             {
@@ -456,7 +486,7 @@
                                     else if (data == "Canceled") {
                                         return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
                                     }
-                                    return data === "True"
+                                    return data === "Approved"
                                         ? `<span style="color: green;font-weight: bold;">Approved</span>`
                                         : `<span style="color: red;font-weight: bold;">Rejected</span>`;
                                 }
@@ -470,6 +500,9 @@
                             {
                                 data: 'attachment',
                                 render: function (data) {
+                                    if (!data || data.trim() === "") {
+                                        return "<span style='color:gray'>No attachments</span>"; 
+                                    }
                                     const attachmentParts = data.split('/').pop().split('_');
                                     const originalFileName = attachmentParts.slice(2).join('_');
                                     return `<a href="${data}" target="_blank">${originalFileName}</a>`;
@@ -481,19 +514,21 @@
                                     if (row.leave_status === "Canceled") {
                                         return "";
                                     }
+                                    let approveBtnDisabled = row.leave_status === "Approved" ? 'disabled' : '';
+                                    let rejectBtnDisabled = row.leave_status === "Rejected" ? 'disabled' : '';
                                     return `
-<div class="btn-group" role="group">
-    <button class="btn btn-success btn-sm approve-btn p-1" style="width:80px; border-radius:0;" onclick="approveleave(${row.leave_id})">
-    <i class="fas fa-check-circle"></i> Approve</button>
-    <button class="btn btn-danger btn-sm remove-btn p-1" style="width:80px; border-radius:0;" onclick="rejectleave(${row.leave_id})">
-    <i class="fas fa-times-circle"></i> Reject</button>
-</div>`;
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success btn-sm approve-btn p-1" style="width:80px; border-radius:0;" onclick="approveleave(${row.leave_id})" ${approveBtnDisabled}>
+                                <i class="fas fa-check-circle"></i> Approve</button>
+                                <button class="btn btn-danger btn-sm remove-btn p-1" style="width:80px; border-radius:0;" onclick="rejectleave(${row.leave_id})" ${rejectBtnDisabled}>
+                                <i class="fas fa-times-circle"></i> Reject</button>
+                            </div>`;
                                 }
                             }
                         ],
                         createdRow: function (row, data, dataIndex) {
                             $('td', row).addClass('text-center');
-                            $(row).find("td:nth-child(1)").removeClass('text-center');
+                            $(row).find("td:nth-child(2)").removeClass('text-center');
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
@@ -513,7 +548,7 @@
             });
         }
 
-        $('#LeavesTable').on('click', 'td:nth-child(6)', function () {
+        $('#LeavesTable').on('click', 'td:nth-child(7)', function () {
             var table = $('#LeavesTable').DataTable();
             var rowData = table.row(this).data();
             var clashLeaveIds = rowData.clashLeaveIds.split(',');
@@ -625,7 +660,7 @@
 
 
 
-        $('#LeavesTable').on('click', 'td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(7)', function () {
+        $('#LeavesTable').on('click', 'td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(8)', function () {
             const table = $('#LeavesTable').DataTable();
             const rowData = table.row(this).data();
             if (!rowData) return;
@@ -744,6 +779,102 @@
             $('#fullDescriptionContent').html(description);
             $('#descriptionModal').modal('show');
         });
+
+        function approveleave(leaveId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you really want to approve this leave request?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, approve it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: 'all_emp_leave_request.aspx/approveLeave',
+                        data: JSON.stringify({ leaveId: leaveId }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.d === "Success") {
+                                display_green_alert("The leave request has been approved successfully..");
+                                populateleaves();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function rejectleave(leaveId) {
+            Swal.fire({
+                title: 'Reason to reject',
+                input: 'textarea',
+                inputPlaceholder: 'Enter rejection reason...',
+                showCancelButton: true,
+                confirmButtonText: 'Reject',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#FF6F61',
+                preConfirm: function (reason) {
+                    if (!reason) {
+                        Swal.showValidationMessage('Please enter a rejection reason');
+                    } else {
+                        return reason;
+                    }
+                }
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    const rejectionReason = result.value;
+
+                    $.ajax({
+                        type: "POST",
+                        url: 'all_emp_leave_request.aspx/rejectLeave',
+                        data: JSON.stringify({ leaveId: leaveId, rejectionReason: rejectionReason }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.d === "Success") {
+                                display_green_alert("The leave request has been rejected successfully..");
+                                populateleaves();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
     </script>
 </body>

@@ -91,6 +91,20 @@
             border-color: white !important;
         }
 
+        #LeavesTable_length select {
+            border: 1px solid #aaa;
+            background-color: transparent;
+            padding: 4px;
+        }
+
+        #LeavesTable_filter input {
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 5px;
+            background-color: transparent;
+            margin-left: 3px;
+        }
+
         #LeavesTable th {
             white-space: nowrap;
         }
@@ -163,9 +177,6 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
-    <input type="hidden" id="Leave_id" name="Leave_id" />
-    <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
-
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
@@ -179,6 +190,7 @@
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-4">
                 <h1 style="font-size: 2rem; font-weight: 700 !important;" class="m-0">Leave Requests</h1>
+                <div id="dataTableControls" class="d-flex align-items-center ml-auto mr-4 mt-2" style="gap: 20px;"></div>
                 <button id="createLeave" class="btn btn-outline-custom"
                     style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
                     onclick="$('#createLeavemodal').modal('show');" title="Create Leave">
@@ -381,6 +393,11 @@
                         fixedColumns: {
                             rightColumns: 1
                         },
+                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
+                        initComplete: function () {
+                            $('#LeavesTable_length').detach().appendTo('#dataTableControls');
+                            $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
+                        },
                         columns: [
                             { data: 'leave_id', visible: false },
                             { data: 'emp_name' },
@@ -432,6 +449,9 @@
                             {
                                 data: 'attachment',
                                 render: function (data) {
+                                    if (!data || data.trim() === "") {
+                                        return "<span style='color:gray'>No attachments</span>";
+                                    }
                                     const attachmentParts = data.split('/').pop().split('_');
                                     const originalFileName = attachmentParts.slice(2).join('_');
                                     return `<a href="${data}" target="_blank">${originalFileName}</a>`;

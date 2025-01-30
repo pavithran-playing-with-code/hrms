@@ -213,5 +213,70 @@ namespace hrms
             return clashLeaveIds;
         }
 
+        [WebMethod]
+        public static string approveLeave(int leaveId)
+        {
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = @"UPDATE hrms.leave_requests 
+                             SET leave_status = 'Approved', status_updated_by = @emp_id, 
+                                 status_updated_time = NOW(), status_updated_reason = null 
+                             WHERE leave_requests_id = @leaveId AND (leave_status IS NULL OR leave_status != 'Canceled')";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@leaveId", leaveId);
+                    cmd.Parameters.AddWithValue("@emp_id", HttpContext.Current.Session["emp_id"]);
+                    cmd.ExecuteNonQuery();
+
+                    conn.Close();
+                }
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in approveLeave: " + ex.ToString());
+                return "ExceptionMessage - " + ex.Message;
+            }
+        }
+
+        [WebMethod]
+        public static string rejectLeave(int leaveId, string rejectionReason)
+        {
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = @"UPDATE hrms.leave_requests 
+                             SET leave_status = 'Rejected', status_updated_by = @emp_id, 
+                                 status_updated_time = NOW(), status_updated_reason = @reason 
+                             WHERE leave_requests_id = @leaveId AND (leave_status IS NULL OR leave_status != 'Canceled')";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@leaveId", leaveId);
+                    cmd.Parameters.AddWithValue("@emp_id", HttpContext.Current.Session["emp_id"]);
+                    cmd.Parameters.AddWithValue("@reason", rejectionReason);
+                    cmd.ExecuteNonQuery();
+
+                    conn.Close();
+                }
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in rejectLeave: " + ex.ToString());
+                return "ExceptionMessage - " + ex.Message;
+            }
+        }
+
     }
 }
