@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="leave_dashboard.aspx.cs" Inherits="hrms.leave_dashboard" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="all_emp_leave_request.aspx.cs" Inherits="hrms.all_emp_leave_request" %>
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
@@ -8,6 +8,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <title>All Employees Leave Requests</title>
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
@@ -18,6 +20,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -34,7 +37,8 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>Leave Dashboard</title>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
     <style>
         #Quickaction-container {
             display: flex;
@@ -78,6 +82,15 @@
             padding: 0;
         }
 
+        .table.table-striped.table-bordered th,
+        .table.table-striped.table-bordered td {
+            border-color: white !important;
+        }
+
+        .table.table-striped.table-bordered {
+            border-color: white !important;
+        }
+
         #LeavesTable th {
             white-space: nowrap;
         }
@@ -87,6 +100,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            background-color: #f8f9fa !important;
         }
 
             #LeavesTable td button {
@@ -181,6 +195,8 @@
                                         <th>Request Days</th>
                                         <th>Leave Clash</th>
                                         <th>Status</th>
+                                        <th>Reason</th>
+                                        <th>Attachment</th>
                                         <th>Approval</th>
                                     </tr>
                                 </thead>
@@ -309,8 +325,8 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none; flex-direction: column; align-items: flex-start;">
-                    <h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">Leave Clash Due to <span style="color: black; font-size: 1.2rem;">Overlapping Job Positions</span>
-                    </h4>
+                    <span id="clashLeaveModalHeader"></span>
+                    <%--<h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">Leave Clash Due to <span style="color: black; font-size: 1.2rem;">Overlapping Job Positions</span></h4>--%>
                     <button type="button" style="margin-top: 3px; margin-right: 5px; border: none; outline: none; position: absolute; top: 10px; right: 10px;" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -335,7 +351,7 @@
         function populateleaves() {
             $.ajax({
                 type: "POST",
-                url: 'leave_dashboard.aspx/populateleaves',
+                url: 'all_emp_leave_request.aspx/populateleaves',
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -358,7 +374,11 @@
 
                     $('#LeavesTable').DataTable({
                         data: leaveData,
-                        "ordering": false,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
                         columns: [
                             { data: 'leave_id', visible: false },
                             {
@@ -418,7 +438,7 @@
                             {
                                 data: 'clashLeaveIds',
                                 render: function (data) {
-                                    let clashCount = data.split(',').length;
+                                    let clashCount = data.trim() === "" ? 0 : data.split(',').filter(id => id.trim() !== "").length;
                                     return `<div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                         <i class="fa-solid fa-users" style="font-size: 30px;"></i> 
                                         <div style="margin-top:-25px; margin-right:-20px; width: 20px; height: 20px; border-radius: 50%; background-color: hsl(8,61%,50%); color: white; font-size: 12px; font-weight: bold;">
@@ -442,6 +462,20 @@
                                 }
                             },
                             {
+                                data: 'leave_description',
+                                render: function (data) {
+                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
+                                }
+                            },
+                            {
+                                data: 'attachment',
+                                render: function (data) {
+                                    const attachmentParts = data.split('/').pop().split('_');
+                                    const originalFileName = attachmentParts.slice(2).join('_');
+                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
+                                }
+                            },
+                            {
                                 data: null,
                                 render: function (data, type, row) {
                                     if (row.leave_status === "Canceled") {
@@ -457,9 +491,6 @@
                                 }
                             }
                         ],
-                        headerCallback: function (thead, data, start, end, display) {
-                            $('th', thead).addClass('text-center');
-                        },
                         createdRow: function (row, data, dataIndex) {
                             $('td', row).addClass('text-center');
                             $(row).find("td:nth-child(1)").removeClass('text-center');
@@ -487,12 +518,30 @@
             var rowData = table.row(this).data();
             var clashLeaveIds = rowData.clashLeaveIds.split(',');
 
+            var clashLeaveModalHeader = "";
+            if (!rowData.clashLeaveIds || rowData.clashLeaveIds.trim() === '') {
+                const noDataHTML = `<div style="text-align: center;">
+                                        <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+                                        <p style="font-size: 16px; color: #555; margin-top: 10px;">No Leave Clashes Found</p>
+                                    </div>`;
+                clashLeaveModalHeader = `<h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">No Leave Clashes Found</h4>`;
+
+                $('#clashLeaveModalHeader').html(clashLeaveModalHeader);
+                $('#clashLeaveModal .modal-body').html(noDataHTML);
+                $('#clashLeaveModal').modal('show');
+                return;
+            }
+
             if (clashLeaveIds.length > 0) {
                 var clashRows = clashLeaveIds.map(function (leaveId) {
                     return table.rows().data().toArray().filter(function (row) {
                         return row.leave_id === leaveId;
                     })[0];
                 });
+
+                clashLeaveModalHeader = `<h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">
+                                          Leave Clash Due to <span style="color: black; font-size: 1.2rem;">Overlapping Job Positions</span></h4>`;
+                $('#clashLeaveModalHeader').html(clashLeaveModalHeader);
 
                 var profileHTML = rowData.profile_img
                     ? `<div style='display: flex; align-items: center;'>
@@ -587,6 +636,9 @@
             rows.forEach((data, index) => {
                 const activeClass = data.leave_id === rowData.leave_id ? 'active' : '';
 
+                var clashLeaveIds = data.clashLeaveIds;
+                let clashCount = clashLeaveIds.split(',').length;
+
                 const profileHTML = data.profile_img
                     ? `<div style='display: flex; align-items: center;'>
             <img src='${data.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 60px; height: 60px;'> 
@@ -653,8 +705,8 @@
                             <span style="font-size: 1rem;">${data.created_time}</span>
                         </div>
                         <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                            <span style="color: gray; font-size: 1rem;">Created By:</span><br /> 
-                            <span style="font-size: 1rem;">${data.emp_name}</span>
+                            <span style="color: gray; font-size: 1rem;">Leave Clash Count:</span><br /> 
+                            <span style="font-size: 1rem;">${clashCount}</span>
                         </div>
                     </div>
                     <div class="mt-3 ml-4" style="text-align: center;">

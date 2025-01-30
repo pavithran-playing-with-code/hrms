@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class leave_dashboard
+    public partial class all_emp_leave_request
     {
     }
 }

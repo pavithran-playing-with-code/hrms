@@ -238,7 +238,7 @@
     <Content Include="forgot-password.aspx" />
     <Content Include="Global.asax" />
     <Content Include="header_navbar.ascx" />
-    <Content Include="leave_dashboard.aspx" />
+    <Content Include="all_emp_leave_request.aspx" />
     <Content Include="leave_configuration.aspx" />
     <Content Include="left_navbar.ascx" />
     <Content Include="login.aspx" />
@@ -374,12 +374,12 @@
     <Compile Include="header_navbar.ascx.designer.cs">
       <DependentUpon>header_navbar.ascx</DependentUpon>
     </Compile>
-    <Compile Include="leave_dashboard.aspx.cs">
-      <DependentUpon>leave_dashboard.aspx</DependentUpon>
+    <Compile Include="all_emp_leave_request.aspx.cs">
+      <DependentUpon>all_emp_leave_request.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="leave_dashboard.aspx.designer.cs">
-      <DependentUpon>leave_dashboard.aspx</DependentUpon>
+    <Compile Include="all_emp_leave_request.aspx.designer.cs">
+      <DependentUpon>all_emp_leave_request.aspx</DependentUpon>
     </Compile>
     <Compile Include="leave_configuration.aspx.cs">
       <DependentUpon>leave_configuration.aspx</DependentUpon>

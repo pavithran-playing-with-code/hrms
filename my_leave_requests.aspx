@@ -8,6 +8,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <title>My Leave Request</title>
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
@@ -18,6 +20,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -34,7 +37,8 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>My Leave Request</title>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
     <style>
         #Quickaction-container {
             display: flex;
@@ -78,6 +82,15 @@
             padding: 0;
         }
 
+        .table.table-striped.table-bordered th,
+        .table.table-striped.table-bordered td {
+            border-color: white !important;
+        }
+
+        .table.table-striped.table-bordered {
+            border-color: white !important;
+        }
+
         #LeavesTable th {
             white-space: nowrap;
         }
@@ -87,6 +100,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            background-color: #f8f9fa !important;
         }
 
             #LeavesTable td button {
@@ -186,9 +200,9 @@
                                         <th>End Date</th>
                                         <th>End Day Breakdown</th>
                                         <th>Request Days</th>
+                                        <th>Status</th>
                                         <th>Reason</th>
                                         <th>Attachment</th>
-                                        <th>Status</th>
                                         <th>Approval</th>
                                     </tr>
                                 </thead>
@@ -362,7 +376,11 @@
 
                     $('#LeavesTable').DataTable({
                         data: data,
-                        "ordering": false,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
                         columns: [
                             { data: 'leave_id', visible: false },
                             { data: 'emp_name' },
@@ -392,20 +410,6 @@
                                 }
                             },
                             {
-                                data: 'leave_description',
-                                render: function (data) {
-                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
-                                }
-                            },
-                            {
-                                data: 'attachment',
-                                render: function (data) {
-                                    const attachmentParts = data.split('/').pop().split('_');
-                                    const originalFileName = attachmentParts.slice(2).join('_');
-                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
-                                }
-                            },
-                            {
                                 data: 'leave_status',
                                 render: function (data) {
                                     if (!data) {
@@ -417,6 +421,20 @@
                                     return data === "True"
                                         ? `<span style="color: green;font-weight: bold;">Approved</span>`
                                         : `<span style="color: red;font-weight: bold;">Rejected</span>`;
+                                }
+                            },
+                            {
+                                data: 'leave_description',
+                                render: function (data) {
+                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
+                                }
+                            },
+                            {
+                                data: 'attachment',
+                                render: function (data) {
+                                    const attachmentParts = data.split('/').pop().split('_');
+                                    const originalFileName = attachmentParts.slice(2).join('_');
+                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
                                 }
                             },
                             {

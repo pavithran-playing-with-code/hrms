@@ -57,7 +57,7 @@ namespace hrms
                 }
             }
 
-            if (currentPage == "leave_dashboard.aspx" || currentPage == "all_employee_Leave_RequestNavLink.aspx" || currentPage == "my_leave_requests.aspx" || currentPage == "leave_configuration.aspx")
+            if (currentPage == "leave_dashboard.aspx" || currentPage == "all_emp_leave_request.aspx" || currentPage == "my_leave_requests.aspx" || currentPage == "leave_configuration.aspx")
             {
                 leaveSubMenu.Attributes["class"] = "collapse show";
 
@@ -66,7 +66,7 @@ namespace hrms
                     case "leave_dashboard.aspx":
                         LeaveDashboardNavLink.Attributes["class"] += " active-page";
                         break;
-                    case "all_employee_Leave_RequestNavLink.aspx":
+                    case "all_emp_leave_request.aspx":
                         AllemployeeLeaveRequestNavLink.Attributes["class"] += " active-page";
                         break;
                     case "my_leave_requests.aspx":

@@ -8,6 +8,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <title>Announcement</title>
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
@@ -18,6 +20,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -34,7 +37,8 @@
     <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-    <title>Announcement</title>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
     <style>
         #Quickaction-container {
             display: flex;
@@ -78,6 +82,15 @@
             padding: 0;
         }
 
+        .table.table-striped.table-bordered th,
+        .table.table-striped.table-bordered td {
+            border-color: white !important;
+        }
+
+        .table.table-striped.table-bordered {
+            border-color: white !important;
+        }
+
         #announcementsTable th {
             white-space: nowrap;
         }
@@ -87,6 +100,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            background-color: #f8f9fa !important;
         }
 
             #announcementsTable td button {
@@ -229,10 +243,10 @@
                                     <th>Department</th>
                                     <th>Job Position</th>
                                     <th>Heading</th>
-                                    <th>Description</th>
-                                    <th>Attachments</th>
                                     <th>Posted On</th>
                                     <th>Expire Date</th>
+                                    <th>Description</th>
+                                    <th>Attachments</th>
                                     <th>Comments</th>
                                     <th>Action</th>
                                 </tr>
@@ -409,8 +423,12 @@
 
                     $('#announcementsTable').DataTable({
                         data: data,
-                        "ordering": false,
-                        order: [[9, 'desc']],
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
+                        order: [[6, 'desc']],
                         columns: [
                             { data: 'announcement_id', visible: false },
                             { data: 'emp_id', visible: false },
@@ -418,20 +436,6 @@
                             { data: 'department_name' },
                             { data: 'job_position_name' },
                             { data: 'Heading' },
-                            {
-                                data: 'announcement_description',
-                                render: function (data) {
-                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
-                                }
-                            },
-                            {
-                                data: 'attachments',
-                                render: function (data) {
-                                    const attachmentParts = data.split('/').pop().split('_');
-                                    const originalFileName = attachmentParts.slice(2).join('_');
-                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
-                                }
-                            },
                             {
                                 data: 'posted_on',
                                 render: function (data) {
@@ -460,6 +464,20 @@
                                     } else {
                                         return `<span >${expireDate}</span>`;
                                     }
+                                }
+                            },
+                            {
+                                data: 'announcement_description',
+                                render: function (data) {
+                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
+                                }
+                            },
+                            {
+                                data: 'attachments',
+                                render: function (data) {
+                                    const attachmentParts = data.split('/').pop().split('_');
+                                    const originalFileName = attachmentParts.slice(2).join('_');
+                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
                                 }
                             },
                             {

@@ -12,9 +12,9 @@ using System.Web.UI.WebControls;
 
 namespace hrms
 {
-    public partial class leave_dashboard : System.Web.UI.Page
+    public partial class all_emp_leave_request : System.Web.UI.Page
     {
-        private static readonly ILog log = log4net.LogManager.GetLogger(typeof(leave_dashboard));
+        private static readonly ILog log = log4net.LogManager.GetLogger(typeof(all_emp_leave_request));
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -186,7 +186,8 @@ namespace hrms
             SELECT l.leave_requests_id 
             FROM hrms.leave_requests l
             LEFT JOIN hrms.employee e ON e.emp_id = l.emp_id
-            WHERE  l.leave_requests_id != '{currentLeaveId}'
+            WHERE e.emp_job_position_id = '{jobPositionId}' 
+            AND l.leave_requests_id != '{currentLeaveId}'
             AND ((l.start_date BETWEEN '{startDate.ToString("yyyy-MM-dd")}' AND '{endDate.ToString("yyyy-MM-dd")}')
             OR (l.end_date BETWEEN '{startDate.ToString("yyyy-MM-dd")}' AND '{endDate.ToString("yyyy-MM-dd")}'))
             AND (l.leave_status IS NULL OR l.leave_status != 'Canceled')";
