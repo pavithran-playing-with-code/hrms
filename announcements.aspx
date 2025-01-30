@@ -36,6 +36,14 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <title>Announcement</title>
     <style>
+        #Quickaction-container {
+            display: flex;
+            position: fixed;
+            right: -10px;
+            bottom: 10px;
+            user-select: none;
+        }
+
         .main-container {
             display: flex;
             min-height: 100vh;
@@ -63,14 +71,6 @@
             overflow: auto;
             margin-left: 20px;
             margin-right: 20px;
-        }
-
-        #Quickaction-container {
-            display: flex;
-            position: fixed;
-            right: -10px;
-            bottom: 10px;
-            user-select: none;
         }
 
         .card-body {
@@ -204,8 +204,8 @@
         <div id="sidebarContainer" class="left-navbar">
             <uc:LeftNavBar runat="server" />
         </div>
-        <div class="header-container">
-            <div>
+        <div id="content-container" class="content-container">
+            <div class="header-container">
                 <uc:HeaderNavBar runat="server" />
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
@@ -217,7 +217,7 @@
                
                 </button>
             </div>
-            <div class="mt-1">
+            <div class="mt-3">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
                     <div class="card-body p-3">
                         <table id="announcementsTable" class="table table-striped table-bordered" style="width: 100%">
@@ -390,6 +390,15 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
@@ -490,7 +499,7 @@
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
-                         <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+                         <img src="/asset/img/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
                          <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
                                          </div>`
                         }

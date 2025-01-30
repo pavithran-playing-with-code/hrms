@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Leave Configuration</title>
+    <title>Testing</title>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
@@ -116,7 +116,7 @@
             font-size: 0.95rem;
             color: #555;
         }
- 
+
         #leavePriorityTable td, #leavePriorityTable th {
             padding: 20px 150px;
             max-width: 150px;
@@ -302,6 +302,60 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="clashLeaveModal" tabindex="-1" aria-labelledby="clashLeaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none;">
+                    <h5 class="modal-title ml-2" id="clashLeaveModalLabel">Clashing Leave Due to same job position</h5>
+                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="clash_leave_details_Sick Leave" style="display: flex; justify-content: space-between; flex-wrap: nowrap; gap: 10px; padding: 5px;">
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">Employee</span><br>
+                            <span style="font-size: 0.8rem;">
+                                <div style="display: flex; align-items: center;">
+                                    <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width: 20px; height: 20px; background-color: purple; color: white;">k1</span>
+                                    <div style="margin-left: 20px;">
+                                        <div>kevin 11</div>
+                                        <div style="color: gray">Support / Data Management</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">Leave</span><br>
+                            <span style="font-size: 0.8rem;">Sick Leave</span>
+                        </div>
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">Start Date:</span><br>
+                            <span style="font-size: 0.8rem;">01-30-2025</span>
+                        </div>
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">Start Date Breakdown:</span><br>
+                            <span style="font-size: 0.8rem;">Full</span>
+                        </div>
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">End Date:</span><br>
+                            <span style="font-size: 0.8rem;">01-30-2025</span>
+                        </div>
+                        <div class="col" style="padding: 5px; text-align: left; white-space: nowrap; flex-grow: 1; flex-basis: 0;">
+                            <span style="color: gray; font-size: 0.8rem;">End Date Breakdown:</span><br>
+                            <span style="font-size: 0.8rem;">Full</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
     <script>
         $(document).ready(function () {
             if ($("#emp_access_lvl").val() != "true") {
@@ -309,6 +363,7 @@
                     element.style.display = 'none';
                 });
             }
+            $('#clashLeaveModal').modal('show');
 
             getDepartmentsAndLeaveApprovals();
             populateLeaveTypes();

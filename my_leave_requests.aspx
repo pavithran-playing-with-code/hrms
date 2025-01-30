@@ -343,6 +343,15 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
@@ -432,9 +441,9 @@
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
-                        <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
-                        <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
-                     </div>`
+   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+</div>`
                         }
                     });
 

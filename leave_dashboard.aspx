@@ -285,7 +285,6 @@
         </div>
     </div>
 
-
     <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -306,6 +305,22 @@
         </div>
     </div>
 
+    <div class="modal fade" id="clashLeaveModal" tabindex="-1" aria-labelledby="clashLeaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none; flex-direction: column; align-items: flex-start;">
+                    <h4 class="modal-title ml-2 font-weight-bold" id="clashLeaveModalLabel" style="color: hsl(8,77%,56%); font-size: 1.5rem; display: inline-block;">Leave Clash Due to <span style="color: black; font-size: 1.2rem;">Overlapping Job Positions</span>
+                    </h4>
+                    <button type="button" style="margin-top: 3px; margin-right: 5px; border: none; outline: none; position: absolute; top: 10px; right: 10px;" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             populateleaves();
@@ -317,8 +332,6 @@
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
 
-        let leaveData = []; // Array to store all leave requests
-
         function populateleaves() {
             $.ajax({
                 type: "POST",
@@ -326,6 +339,15 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\r\n|\r|\n/g, '');
                     leaveData = JSON.parse(cleanedResponse);
@@ -350,21 +372,21 @@
 
                                     if (profileImg != "") {
                                         profileHTML = `<div style='display: flex; align-items: center;'>
-    <img src='${profileImg}' alt='Profile Picture' class='rounded-circle' style='width: 40px; height: 40px;'>
-    <div style='margin-left: 15px;'>
-        <div>${empName}</div>
-        <div>${data.department_name} / ${data.job_position_name}</div>
-    </div>
-</div>`;
+                                                            <img src='${profileImg}' alt='Profile Picture' class='rounded-circle' style='width: 40px; height: 40px;'>
+                                                            <div style='margin-left: 15px;'>
+                                                                <div>${empName}</div>
+                                                                <div>${data.department_name} / ${data.job_position_name}</div>
+                                                            </div>
+                                                        </div>`;
                                     } else {
                                         profileHTML = `<div style='display: flex; align-items: center;'>
-    <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 40px; height: 40px; background-color: ${profileColor}; color: white; font-weight: bold;'>
-    ${profileLetters}</span>
-    <div style='margin-left: 15px;'>
-        <div>${empName}</div>
-        <div>${data.department_name} / ${data.job_position_name}</div>
-    </div>
-</div>`;
+                                                            <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 40px; height: 40px; background-color: ${profileColor}; color: white; font-weight: bold;'>
+                                                            ${profileLetters}</span>
+                                                            <div style='margin-left: 15px;'>
+                                                                <div>${empName}</div>
+                                                                <div>${data.department_name} / ${data.job_position_name}</div>
+                                                            </div>
+                                                        </div>`;
                                     }
 
                                     return profileHTML;
@@ -394,9 +416,15 @@
                                 }
                             },
                             {
-                                data: null,
+                                data: 'clashLeaveIds',
                                 render: function (data) {
-                                    return `<span>need to work</span>`;
+                                    let clashCount = data.split(',').length;
+                                    return `<div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fa-solid fa-users" style="font-size: 30px;"></i> 
+                                        <div style="margin-top:-25px; margin-right:-20px; width: 20px; height: 20px; border-radius: 50%; background-color: hsl(8,61%,50%); color: white; font-size: 12px; font-weight: bold;">
+                                           ${clashCount}
+                                        </div>
+                                    </div>`;
                                 }
                             },
                             {
@@ -438,17 +466,117 @@
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
-            <img src="/asset/no-announcements.png" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+            <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
             <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
          </div>`
                         }
                     });
-
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
                 }
             });
         }
 
-        $('#LeavesTable').on('click', 'tr', function () {
+        $('#LeavesTable').on('click', 'td:nth-child(6)', function () {
+            var table = $('#LeavesTable').DataTable();
+            var rowData = table.row(this).data();
+            var clashLeaveIds = rowData.clashLeaveIds.split(',');
+
+            if (clashLeaveIds.length > 0) {
+                var clashRows = clashLeaveIds.map(function (leaveId) {
+                    return table.rows().data().toArray().filter(function (row) {
+                        return row.leave_id === leaveId;
+                    })[0];
+                });
+
+                var profileHTML = rowData.profile_img
+                    ? `<div style='display: flex; align-items: center;'>
+                            <img src='${rowData.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 25px; height: 25px;'> 
+                            <div style='margin-left: 10px;'>
+                                <div>${rowData.emp_name}</div>
+                                <div style="color:#888">${rowData.department_name} / ${rowData.job_position_name}</div>
+                            </div>
+                        </div>`
+                    : `<div style='display: flex; align-items: center;'>
+                            <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 25px; height: 25px; background-color: ${rowData.profile_color}; color: white;'> 
+                            ${rowData.profile_letters}</span>
+                            <div style='margin-left: 10px;'>
+                                <div>${rowData.emp_name}</div>
+                                <div style="color:#888">${rowData.department_name} / ${rowData.job_position_name}</div>
+                            </div>
+                        </div>`;
+
+                let modalContent = `
+                <div style="max-width: 100%; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid gray; color: gray;">
+                                <th style="padding: 8px; text-align: left;">Employee</th>
+                                <th style="padding: 8px; text-align: left;">Leave</th>
+                                <th style="padding: 8px; text-align: left;">Start Date</th>
+                                <th style="padding: 8px; text-align: left;">Start Date Breakdown</th>
+                                <th style="padding: 8px; text-align: left;">End Date</th>
+                                <th style="padding: 8px; text-align: left;">End Date Breakdown</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px; font-size: 1vw;">
+                                  ${profileHTML}
+                                </td>
+                                <td style="padding: 8px; font-size: 1vw;">${rowData.leave_type}</td>
+                                <td style="padding: 8px; font-size: 1vw;">${rowData.start_date}</td>
+                                <td style="padding: 8px; font-size: 1vw;">${rowData.start_date_breakdown}</td>
+                                <td style="padding: 8px; font-size: 1vw;">${rowData.end_date}</td>
+                                <td style="padding: 8px; font-size: 1vw; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${rowData.end_date_breakdown}</td>
+                            </tr>`;
+
+                clashRows.forEach(function (row) {
+                    profileHTML = row.profile_img
+                        ? `<div style='display: flex; align-items: center;'>
+                            <img src='${row.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 25px; height: 25px;'> 
+                            <div style='margin-left: 10px;'>
+                                <div>${row.emp_name}</div>
+                                <div style="color:#888">${row.department_name} / ${row.job_position_name}</div>
+                            </div>
+                        </div>`
+                        : `<div style='display: flex; align-items: center;'>
+                            <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 25px; height: 25px; background-color: ${row.profile_color}; color: white;'> 
+                            ${row.profile_letters}</span>
+                            <div style='margin-left: 10px;'>
+                                <div>${row.emp_name}</div>
+                                <div style="color:#888">${row.department_name} / ${row.job_position_name}</div>
+                            </div>
+                        </div>`;
+                    modalContent += `
+                <tr>
+                    <td style="padding: 8px; font-size: 1vw;">
+                       ${profileHTML}
+                    </td>
+                    <td style="padding: 8px; font-size: 1vw; white-space: nowrap;">${row.leave_type}</td>
+                    <td style="padding: 8px; font-size: 1vw; white-space: nowrap;">${row.start_date}</td>
+                    <td style="padding: 8px; font-size: 1vw;">${row.start_date_breakdown}</td>
+                    <td style="padding: 8px; font-size: 1vw; white-space: nowrap;">${row.end_date}</td>
+                    <td style="padding: 8px; font-size: 1vw; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${row.end_date_breakdown}</td>
+                </tr>
+            `;
+                });
+
+                modalContent += '</tbody></table></div>';
+
+                $('#clashLeaveModal .modal-body').html(modalContent);
+                $('#clashLeaveModal').modal('show');
+            }
+        });
+
+
+
+        $('#LeavesTable').on('click', 'td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(7)', function () {
             const table = $('#LeavesTable').DataTable();
             const rowData = table.row(this).data();
             if (!rowData) return;
@@ -461,95 +589,95 @@
 
                 const profileHTML = data.profile_img
                     ? `<div style='display: flex; align-items: center;'>
-         <img src='${data.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 60px; height: 60px;'> 
-         <div style='margin-left: 20px;'>
-             <div style="font-weight: bold; font-size: 1.2rem;">${data.emp_name}</div>
-             <div style="font-size: 1rem;">${data.department_name} / ${data.job_position_name}</div>
-         </div>
-     </div>`
+            <img src='${data.profile_img}' alt='Profile Picture' class='rounded-circle' style='width: 60px; height: 60px;'> 
+            <div style='margin-left: 20px;'>
+                <div style="font-weight: bold; font-size: 1.2rem;">${data.emp_name}</div>
+                <div style="font-size: 1rem;">${data.department_name} / ${data.job_position_name}</div>
+            </div>
+        </div>`
                     : `<div style='display: flex; align-items: center;'>
-         <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 60px; height: 60px; background-color: ${data.profile_color}; color: white; font-weight: bold; font-size: 1.5rem;'> 
-         ${data.profile_letters}</span>
-         <div style='margin-left: 20px;'>
-             <div style="font-weight: bold; font-size: 1.5rem;">${data.emp_name}</div>
-             <div style="font-size: 1.2rem;color:#4d4a4a">${data.department_name} / ${data.job_position_name}</div>
-         </div>
-     </div>`;
+            <span class='rounded-circle d-inline-flex justify-content-center align-items-center' style='width: 60px; height: 60px; background-color: ${data.profile_color}; color: white; font-weight: bold; font-size: 1.5rem;'> 
+            ${data.profile_letters}</span>
+            <div style='margin-left: 20px;'>
+                <div style="font-weight: bold; font-size: 1.5rem;">${data.emp_name}</div>
+                <div style="font-size: 1.2rem;color:#4d4a4a">${data.department_name} / ${data.job_position_name}</div>
+            </div>
+        </div>`;
 
                 carouselItems += `
-     <div class="carousel-item ${activeClass}">
-         <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
-             <h5 class="modal-title">Details</h5>
-             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                 <span aria-hidden="true">&times;</span>
-             </button>
-         </div>
-         <div class="modal-body">
-             <div class="d-flex justify-content-center align-items-center mb-3">
-                 ${profileHTML}  
-             </div>
-              <div class="leave_details" style="margin-left:12%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%;">
-                 <div class="row" style="width: 100%; justify-content: flex-start;">
-                     <div class="col-sm-6 style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Leave Type:</span><br>
-                         <span style="font-size: 1rem;">${data.leave_type}</span>
-                     </div>
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Requested Days:</span><br> 
-                         <span style="font-size: 1rem;">${data.requested_days}</span>
-                     </div>
-                 </div>
-                 <div class="row" style="width: 100%; justify-content: flex-start;">
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Start Date:</span><br> 
-                         <span style="font-size: 1rem;">${data.start_date}</span>
-                     </div>
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Start Date Breakdown:</span><br> 
-                         <span style="font-size: 1rem;">${data.start_date_breakdown}</span>
-                     </div>
-                 </div>
-                 <div class="row" style="width: 100%; justify-content: flex-start;">
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">End Date:</span><br> 
-                         <span style="font-size: 1rem;">${data.end_date}</span>
-                     </div>
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">End Date Breakdown:</span><br> 
-                         <span style="font-size: 1rem;">${data.end_date_breakdown}</span>
-                     </div>
-                 </div>
-                 <div class="row mt-3" style="width: 100%; justify-content: flex-start;">
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Created Date:</span><br> 
-                         <span style="font-size: 1rem;">${data.created_time}</span>
-                     </div>
-                     <div class="col-sm-6" style="padding: 10px; text-align: left;">
-                         <span style="color: gray; font-size: 1rem;">Created By:</span><br> 
-                         <span style="font-size: 1rem;">${data.emp_name}</span>
-                     </div>
-                 </div>
-                 <div class="mt-3 ml-4" style="text-align: center;">
-                     <button class="btn btn-link description-link" data-description="${data.leave_description}" data-leave-type="${data.leave_type}">
-                         View Description
-                     </button>
-                     <button class="btn btn-link attachment-link" onclick="window.open('${data.attachment}', '_blank')">
-                         View Attachment
-                     </button>
-                 </div>
-             </div>
-         </div>
-         <div class="modal-footer justify-content-center" style="border:none">
-            <button style="width:100px; height:40px; border-radius:0;" class="btn btn-success btn-sm" onclick="approveleave(${data.leave_id})">
-                <i class="fas fa-check-circle"></i> Approve
-            </button>
-            <button style="width:100px; height:40px; border-radius:0;" class="btn btn-danger btn-sm" onclick="rejectleave(${data.leave_id})">
-                <i class="fas fa-times-circle"></i> Reject
-            </button>
+        <div class="carousel-item ${activeClass}">
+            <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
+                <h5 class="modal-title">Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center mb-3">
+                    ${profileHTML}  
+                </div>
+                 <div class="leave_details" style="margin-left:12%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%;">
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Leave Type:</span><br />
+                            <span style="font-size: 1rem;">${data.leave_type}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Requested Days:</span><br /> 
+                            <span style="font-size: 1rem;">${data.requested_days}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Start Date:</span><br /> 
+                            <span style="font-size: 1rem;">${data.start_date}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Start Date Breakdown:</span><br /> 
+                            <span style="font-size: 1rem;">${data.start_date_breakdown}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">End Date:</span><br /> 
+                            <span style="font-size: 1rem;">${data.end_date}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">End Date Breakdown:</span><br /> 
+                            <span style="font-size: 1rem;">${data.end_date_breakdown}</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Created Date:</span><br /> 
+                            <span style="font-size: 1rem;">${data.created_time}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Created By:</span><br /> 
+                            <span style="font-size: 1rem;">${data.emp_name}</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 ml-4" style="text-align: center;">
+                        <button class="btn btn-link description-link" data-description="${data.leave_description}" data-leave-type="${data.leave_type}">
+                            View Description
+                        </button>
+                        <button class="btn btn-link attachment-link" onclick="window.open('${data.attachment}', '_blank')">
+                            View Attachment
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center" style="border:none">
+               <button style="width:100px; height:40px; border-radius:0;" class="btn btn-success btn-sm" onclick="approveleave(${data.leave_id})">
+                   <i class="fas fa-check-circle"></i> Approve
+               </button>
+               <button style="width:100px; height:40px; border-radius:0;" class="btn btn-danger btn-sm" onclick="rejectleave(${data.leave_id})">
+                   <i class="fas fa-times-circle"></i> Reject
+               </button>
+           </div>
         </div>
-     </div>
-
- `;
+   
+    `;
             });
 
             $('#carouselContent').html(carouselItems);

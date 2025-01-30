@@ -642,7 +642,7 @@
                     else {
                         announcementsHTML = '<div id="empty_announcement" style="padding-top: 10%">\
                             <div class="empty_announcement">\
-                                <img style="display: block; width: 100px; margin: 20px auto;" src="/asset/no-announcements.png" />\
+                                <img style="display: block; width: 100px; margin: 20px auto;" src="/asset/img/no-announcements.png" />\
                                 <h5 style="color: hsl(0,0%,45%); text-align: center;">No Announcements to show.</h5>\
                             </div>\
                         </div>';

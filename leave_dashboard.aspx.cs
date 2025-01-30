@@ -36,6 +36,7 @@ namespace hrms
             public string requested_days { get; set; }
             public string leave_description { get; set; }
             public string attachment { get; set; }
+            public string clashLeaveIds { get; set; }
             public string leave_status { get; set; }
             public string created_by { get; set; }
             public string created_time { get; set; }
@@ -56,7 +57,7 @@ namespace hrms
                     conn.Open();
 
                     var emp_id = HttpContext.Current.Session["emp_id"];
-                    string leave_Query = $@"SELECT l.leave_requests_id AS leave_id, l.emp_id, CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters, 
+                    string leave_Query = $@"SELECT l.leave_requests_id AS leave_id, l.emp_id, d.department_id, j.job_position_id, CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters, 
                                             CONCAT(e.first_name, ' ', e.last_name) AS emp_name, d.department_name, j.job_position_name, p.profile_img, p.profile_color, 
                                             lt.leave_type, l.start_date, l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, 
                                             l.leave_status, la.level_1, la.level_1, la.level_1, l.created_by, l.created_time 
@@ -128,6 +129,14 @@ namespace hrms
                             }
                         }
 
+                        string clashLeaveIds = GetClashingLeaveRequests(conn, startDate, endDate, row["job_position_id"].ToString(), row["leave_id"].ToString());
+
+                        if (clashLeaveIds.Contains("ExceptionMessage"))
+                        {
+                            data = "ExceptionMessage - " + clashLeaveIds;
+                            return data;
+                        }
+
                         List.Add(new leave
                         {
                             leave_id = row["leave_id"].ToString(),
@@ -145,6 +154,7 @@ namespace hrms
                             requested_days = totalDays.ToString("0.##"),
                             leave_description = row["leave_description"].ToString(),
                             attachment = row["attachment"].ToString(),
+                            clashLeaveIds = clashLeaveIds,
                             leave_status = row["leave_status"].ToString(),
                             created_by = row["created_by"].ToString(),
                             created_time = row["created_time"].ToString()
@@ -159,11 +169,48 @@ namespace hrms
             }
             catch (Exception ex)
             {
-                log.Error("Error in populate_leaves: " + ex.ToString());
+                log.Error("Error in populateleaves: " + ex.ToString());
                 data = "ExceptionMessage - " + ex.Message;
             }
 
             return JsonConvert.SerializeObject(data);
         }
+
+        private static string GetClashingLeaveRequests(MySqlConnection conn, DateTime startDate, DateTime endDate, string jobPositionId, string currentLeaveId)
+        {
+            string clashLeaveIds = "";
+
+            try
+            {
+                string clashQuery = $@"
+            SELECT l.leave_requests_id 
+            FROM hrms.leave_requests l
+            LEFT JOIN hrms.employee e ON e.emp_id = l.emp_id
+            WHERE  l.leave_requests_id != '{currentLeaveId}'
+            AND ((l.start_date BETWEEN '{startDate.ToString("yyyy-MM-dd")}' AND '{endDate.ToString("yyyy-MM-dd")}')
+            OR (l.end_date BETWEEN '{startDate.ToString("yyyy-MM-dd")}' AND '{endDate.ToString("yyyy-MM-dd")}'))
+            AND (l.leave_status IS NULL OR l.leave_status != 'Canceled')";
+
+                MySqlCommand cmd = new MySqlCommand(clashQuery, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    if (!string.IsNullOrEmpty(clashLeaveIds))
+                        clashLeaveIds += ", ";
+                    clashLeaveIds += reader["leave_requests_id"].ToString();
+                }
+
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetClashingLeaveRequests: " + ex.ToString());
+                return "ExceptionMessage - " + ex.Message;
+            }
+
+            return clashLeaveIds;
+        }
+
     }
 }
