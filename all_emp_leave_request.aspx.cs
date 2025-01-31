@@ -214,7 +214,7 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string approveLeave(int leaveId)
+        public static string approveLeave(List<int> leaveIds)
         {
             try
             {
@@ -226,10 +226,10 @@ namespace hrms
                     string query = @"UPDATE hrms.leave_requests 
                              SET leave_status = 'Approved', status_updated_by = @emp_id, 
                                  status_updated_time = NOW(), status_updated_reason = null 
-                             WHERE leave_requests_id = @leaveId AND (leave_status IS NULL OR leave_status != 'Canceled')";
+                             WHERE leave_requests_id IN (" + string.Join(",", leaveIds) + @") 
+                             AND (leave_status IS NULL OR leave_status != 'Canceled')";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@leaveId", leaveId);
                     cmd.Parameters.AddWithValue("@emp_id", HttpContext.Current.Session["emp_id"]);
                     cmd.ExecuteNonQuery();
 
@@ -245,8 +245,9 @@ namespace hrms
             }
         }
 
+
         [WebMethod]
-        public static string rejectLeave(int leaveId, string rejectionReason)
+        public static string rejectLeave(List<int> leaveIds, string rejectionReason)
         {
             try
             {
@@ -258,10 +259,10 @@ namespace hrms
                     string query = @"UPDATE hrms.leave_requests 
                              SET leave_status = 'Rejected', status_updated_by = @emp_id, 
                                  status_updated_time = NOW(), status_updated_reason = @reason 
-                             WHERE leave_requests_id = @leaveId AND (leave_status IS NULL OR leave_status != 'Canceled')";
+                             WHERE leave_requests_id IN (" + string.Join(",", leaveIds) + @") 
+                             AND (leave_status IS NULL OR leave_status != 'Canceled')";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@leaveId", leaveId);
                     cmd.Parameters.AddWithValue("@emp_id", HttpContext.Current.Session["emp_id"]);
                     cmd.Parameters.AddWithValue("@reason", rejectionReason);
                     cmd.ExecuteNonQuery();
@@ -277,6 +278,7 @@ namespace hrms
                 return "ExceptionMessage - " + ex.Message;
             }
         }
+
 
     }
 }

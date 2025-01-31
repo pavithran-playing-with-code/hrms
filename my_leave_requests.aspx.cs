@@ -282,6 +282,95 @@ WHERE l.emp_id = '{emp_id}';";
             return JsonConvert.SerializeObject(data);
         }
 
+        [WebMethod]
+        public static string GetLeaveBalanceandLeaveHistory()
+        {
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                var leaveBalanceList = new List<object>();
+                var leaveHistoryList = new List<object>();
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+                    string leaveRequestsQuery = $@"SELECT l.leave_requests_id AS leave_id, l.emp_id, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, 
+                                            lt.leave_type, l.start_date, l.start_date_breakdown, l.end_date, l.end_date_breakdown, 
+                                            l.leave_description, l.leave_status 
+                                            FROM hrms.leave_requests l 
+                                            LEFT JOIN hrms.employee e ON (e.emp_id = l.emp_id)
+                                            LEFT JOIN hrms.leave_type lt ON (lt.leave_type_id = l.leave_type_id)
+                                            WHERE e.emp_id = '{emp_id}';";
+
+                    DataTable leaveRequests = new DataTable();
+                    using (var leaveAdapter = new MySqlDataAdapter(leaveRequestsQuery, conn))
+                    {
+                        leaveAdapter.Fill(leaveRequests);
+                    }
+
+                    string leaveTypeQuery = "SELECT leave_type, max_leave FROM hrms.leave_type WHERE deleted_by IS NULL;";
+                    DataTable leaveTypes = new DataTable();
+                    using (var leaveTypeAdapter = new MySqlDataAdapter(leaveTypeQuery, conn))
+                    {
+                        leaveTypeAdapter.Fill(leaveTypes);
+                    }
+
+                    DateTime currentDate = DateTime.Now;
+
+                    foreach (DataRow leaveTypeRow in leaveTypes.Rows)
+                    {
+                        string leaveType = leaveTypeRow["leave_type"].ToString();
+                        int maxLeave = Convert.ToInt32(leaveTypeRow["max_leave"]);
+
+                        var leaveCount = leaveRequests.AsEnumerable()
+                            .Where(r => r["leave_type"].ToString() == leaveType &&
+                                        Convert.ToDateTime(r["end_date"]) < currentDate &&
+                                        r["leave_status"].ToString() == "Approved")
+                            .Count();
+
+                        leaveBalanceList.Add(new
+                        {
+                            LeaveType = leaveType,
+                            MaxLeave = maxLeave,
+                            BalanceLeave = maxLeave - leaveCount
+                        });
+                    }
+
+                    foreach (DataRow leaveRequestRow in leaveRequests.Rows)
+                    {
+                        DateTime endDate = Convert.ToDateTime(leaveRequestRow["end_date"]);
+
+                        if (endDate < currentDate && leaveRequestRow["leave_status"].ToString() == "Approved")
+                        {
+                            leaveHistoryList.Add(new
+                            {
+                                LeaveID = leaveRequestRow["leave_id"].ToString(),
+                                EmpName = leaveRequestRow["emp_name"].ToString(),
+                                StartDate = Convert.ToDateTime(leaveRequestRow["start_date"]).ToString("MM-dd-yyyy"),
+                                EndDate = endDate.ToString("MM-dd-yyyy"),
+                                LeaveType = leaveRequestRow["leave_type"].ToString(),
+                                Reason = leaveRequestRow["leave_description"].ToString()
+                            });
+                        }
+                    }
+
+                    conn.Close();
+                }
+
+                return JsonConvert.SerializeObject(new
+                {
+                    LeaveBalance = leaveBalanceList,
+                    LeaveHistory = leaveHistoryList
+                });
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetLeaveData: " + ex.ToString());
+                return JsonConvert.SerializeObject(new { ExceptionMessage = ex.Message });
+            }
+        }
 
     }
 }

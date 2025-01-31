@@ -38,6 +38,7 @@
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         #Quickaction-container {
@@ -100,7 +101,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
-            background-color: #f8f9fa !important;
         }
 
             #LeavesTable td button {
@@ -193,7 +193,12 @@
             </div>
             <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
                 <h1 style="font-size: 2rem; font-weight: 700 !important;" class="ml-1">Leave Requests</h1>
-                <div id="dataTableControls" class="d-flex align-items-center mr-2" style="gap: 20px;"></div>
+                <div id="bulkActionsContainer" class="d-flex" style="gap: 10px;">
+                    <button class="btn btn-success" style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;" onclick="approveleave(null)">Bulk Approve</button>
+                    <button class="btn btn-danger" style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;" onclick="rejectleave(null)">Bulk Reject</button>
+                    <button class="btn btn-primary" style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;" onclick="exportData()">Export</button>
+                </div>
+                <div id="dataTableControls" class="d-flex align-items-center mr-2 mt-3" style="gap: 20px;"></div>
             </div>
             <div class="mt-2">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
@@ -204,7 +209,7 @@
                                     <tr>
                                         <th>Leave ID</th>
                                         <th>
-                                            <input type="checkbox" id="selectAll" /></th>
+                                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" /></th>
                                         <th>Employee</th>
                                         <th>Leave Type</th>
                                         <th>Start Date</th>
@@ -364,6 +369,36 @@
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
 
+        function toggleSelectAll() {
+            const isChecked = $('#selectAll').is(':checked');
+            $('.leave-checkbox').prop('checked', isChecked);
+            $('.leave-checkbox').each(function () {
+                const row = $(this).closest('tr');
+                
+                if (isChecked) {
+                    row.css('background-color', 'hsl(8, 77%, 90%)');
+                } else {
+                    row.css('background-color', '#f8f9fa');
+                }
+            });
+        }
+
+        function toggleBulkActions() {
+            const allCheckboxes = $('.leave-checkbox');
+            const isAllChecked = allCheckboxes.length === allCheckboxes.filter(':checked').length;
+            $('#selectAll').prop('checked', isAllChecked);
+
+            allCheckboxes.each(function () {
+                const row = $(this).closest('tr');
+                
+                if ($(this).is(':checked')) {
+                    row.css('background-color', 'hsl(8, 77%, 90%)');
+                } else {
+                    row.css('background-color', '#f8f9fa');
+                }
+            });
+        }
+
         function populateleaves() {
             $.ajax({
                 type: "POST",
@@ -398,7 +433,7 @@
                         columnDefs: [
                             { orderable: false, targets: 1 }
                         ],
-                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp", 
+                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
                             $('#LeavesTable_length').detach().appendTo('#dataTableControls');
                             $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
@@ -501,7 +536,7 @@
                                 data: 'attachment',
                                 render: function (data) {
                                     if (!data || data.trim() === "") {
-                                        return "<span style='color:gray'>No attachments</span>"; 
+                                        return "<span style='color:gray'>No attachments</span>";
                                     }
                                     const attachmentParts = data.split('/').pop().split('_');
                                     const originalFileName = attachmentParts.slice(2).join('_');
@@ -780,10 +815,27 @@
             $('#descriptionModal').modal('show');
         });
 
-        function approveleave(leaveId) {
+        function approveleave(leaveId = null) {
+            const isBulk = !leaveId;
+            const selectedCheckboxes = document.querySelectorAll('.leave-checkbox:checked');
+            const leaveIds = isBulk
+                ? Array.from(selectedCheckboxes).map((checkbox) => checkbox.value)
+                : [leaveId];
+
+            if (isBulk && leaveIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Requests Selected',
+                    text: 'Please select at least one leave request to proceed.',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Are you sure?',
-                text: 'Do you really want to approve this leave request?',
+                text: `Do you want to approve ${isBulk ? "all selected" : "this"} leave request${isBulk ? "s" : ""}?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -795,13 +847,14 @@
                     $.ajax({
                         type: "POST",
                         url: 'all_emp_leave_request.aspx/approveLeave',
-                        data: JSON.stringify({ leaveId: leaveId }),
+                        data: JSON.stringify({ leaveIds: leaveIds }),
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
                             if (response.d === "Success") {
-                                display_green_alert("The leave request has been approved successfully..");
+                                display_green_alert(`The leave request${isBulk ? "s" : ""} have been approved successfully.`);
                                 populateleaves();
+                                document.getElementById("selectAll").checked = false;
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -824,7 +877,24 @@
             });
         }
 
-        function rejectleave(leaveId) {
+        function rejectleave(leaveId = null) {
+            const isBulk = !leaveId;
+            const selectedCheckboxes = document.querySelectorAll('.leave-checkbox:checked');
+            const leaveIds = isBulk
+                ? Array.from(selectedCheckboxes).map((checkbox) => checkbox.value)
+                : [leaveId];
+
+            if (isBulk && leaveIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Requests Selected',
+                    text: 'Please select at least one leave request to proceed.',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Reason to reject',
                 input: 'textarea',
@@ -833,27 +903,28 @@
                 confirmButtonText: 'Reject',
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#FF6F61',
-                preConfirm: function (reason) {
+                preConfirm: (reason) => {
                     if (!reason) {
                         Swal.showValidationMessage('Please enter a rejection reason');
                     } else {
                         return reason;
                     }
                 }
-            }).then(function (result) {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     const rejectionReason = result.value;
 
                     $.ajax({
                         type: "POST",
                         url: 'all_emp_leave_request.aspx/rejectLeave',
-                        data: JSON.stringify({ leaveId: leaveId, rejectionReason: rejectionReason }),
+                        data: JSON.stringify({ leaveIds: leaveIds, rejectionReason: rejectionReason }),
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
                             if (response.d === "Success") {
-                                display_green_alert("The leave request has been rejected successfully..");
+                                display_green_alert(`The leave request${isBulk ? "s" : ""} have been rejected successfully.`);
                                 populateleaves();
+                                document.getElementById("selectAll").checked = false;
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -875,6 +946,46 @@
                 }
             });
         }
+
+        function exportData() {
+            const selectedCheckboxes = document.querySelectorAll('.leave-checkbox:checked');
+            const selectedData = [];
+
+            if (selectedCheckboxes.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Requests Selected',
+                    text: 'Please select at least one leave request to export.',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            selectedCheckboxes.forEach((checkbox) => {
+                const rowData = $('#LeavesTable').DataTable().row($(checkbox).closest('tr')).data();
+                selectedData.push({
+                    "Employee Name": rowData.emp_name,
+                    "Department": rowData.department_name,
+                    "Job Position": rowData.job_position_name,
+                    "Leave Type": rowData.leave_type,
+                    "Start Date": rowData.start_date,
+                    "Start Date": rowData.start_date_breakdown,
+                    "End Date": rowData.end_date,
+                    "End Date": rowData.end_date_breakdown,
+                    "Requested Days": rowData.requested_days,
+                    "Leave Status": rowData.leave_status,
+                    "Description": rowData.leave_description
+                });
+            });
+
+            const ws = XLSX.utils.json_to_sheet(selectedData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Leave Requests");
+
+            XLSX.writeFile(wb, "LeaveRequests.xlsx");
+        }
+
 
     </script>
 </body>

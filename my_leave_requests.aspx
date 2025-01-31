@@ -223,6 +223,50 @@
                             </table>
                         </div>
                     </div>
+                    <div class="row mt-5 mx-1 mb-5">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light text-dark" style="font-weight: bold;">
+                                    Leave Balance
+                                </div>
+                                <div class="card-body p-3">
+                                    <table id="LeaveBalanceTable" class="table table-striped table-bordered" style="width: 100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Leave Type</th>
+                                                <th>Max Leaves</th>
+                                                <th>Balance Leave</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light text-dark" style="font-weight: bold;">
+                                    Leave History
+                                </div>
+                                <div class="card-body p-3">
+                                    <table id="LeaveHistoryTable" class="table table-striped table-bordered" style="width: 100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Leave ID</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Leave Type</th>
+                                                <th>Reason</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="Quickaction-container">
@@ -321,6 +365,7 @@
     <script>
         $(document).ready(function () {
             populateleaves();
+            GetLeaveBalanceandLeaveHistory();
         });
 
         function display_green_alert(message) {
@@ -435,7 +480,7 @@
                                     else if (data == "Canceled") {
                                         return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
                                     }
-                                    return data === "True"
+                                    return data === "Approved"
                                         ? `<span style="color: green;font-weight: bold;">Approved</span>`
                                         : `<span style="color: red;font-weight: bold;">Rejected</span>`;
                                 }
@@ -668,6 +713,91 @@
                                 icon: "error"
                             });
                         }
+                    });
+                }
+            });
+        }
+
+        function GetLeaveBalanceandLeaveHistory() {
+            $.ajax({
+                type: "POST",
+                url: 'my_leave_requests.aspx/GetLeaveBalanceandLeaveHistory',
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
+                    const data = JSON.parse(response.d);
+
+                    if ($.fn.DataTable.isDataTable('#LeaveBalanceTable')) {
+                        $('#LeaveBalanceTable').DataTable().clear().destroy();
+                    }
+
+                    $('#LeaveBalanceTable').DataTable({
+                        data: data.LeaveBalance,
+                        columns: [
+                            { data: 'LeaveType' },
+                            { data: 'MaxLeave' },
+                            {
+                                data: 'BalanceLeave',
+                                render: function (data, type, row) {
+                                    if (data <= 0) {
+                                        return `<span style="color: red; font-weight: bold;">${data}</span>`;
+                                    }
+                                    return data; 
+                                }
+                            }
+                        ],
+                        paging: false,
+                        searching: false,
+                        ordering: false,
+                        info: false,
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+</div>`
+                        }
+                    });
+
+                    if ($.fn.DataTable.isDataTable('#LeaveHistoryTable')) {
+                        $('#LeaveHistoryTable').DataTable().clear().destroy();
+                    }
+
+                    $('#LeaveHistoryTable').DataTable({
+                        data: data.LeaveHistory,
+                        columns: [
+                            { data: 'LeaveID' },
+                            { data: 'StartDate' },
+                            { data: 'EndDate' },
+                            { data: 'LeaveType' },
+                            { data: 'Reason' }
+                        ],
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        info: true,
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+</div>`
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
                     });
                 }
             });
