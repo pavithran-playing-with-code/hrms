@@ -86,7 +86,7 @@
         <div class="flex-shrink-0" style="margin-left: -20%; margin-top: 10px">
             <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" id="mom_redirect_url" runat="server" href="#">
                 <div class="sidebar-brand-icon">
-                    <img src="\asset\   img\hrms_icon.jpg" class="rounded-circle" style="width: 36px; height: 34px; object-fit: cover;">
+                    <img src="\asset\img\hrms_icon.jpg" class="rounded-circle" style="width: 36px; height: 34px; object-fit: cover;">
                 </div>
                 <div class="sidebar-brand-text ml-2 mt-1" style="line-height: 0.7;">
                     <span>HRMS.</span><br />
