@@ -341,7 +341,7 @@
                                     <div class="onleave-body" id="onleaveListCard" style="height: 300px; border: none;">
                                         <div id="empty_leave" style="padding-top: 20%">
                                             <div class="empty_message">
-                                                <img style="display: block; width: 70px; margin: 20px auto;" src="\asset\attendance.png" />
+                                                <img style="display: block; width: 70px; margin: 20px auto;" src="\asset\img\attendance.png" />
                                                 <h5 style="color: hsl(0,0%,45%); text-align: center;">No employees have taken leave today.</h5>
                                             </div>
                                         </div>
