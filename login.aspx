@@ -191,7 +191,7 @@
     </div>
 
     <div class="image-container">
-        <img src="/asset/hrms_icon.jpg" alt="HRMS Icon" />
+        <img src="/asset/img/hrms_icon.jpg" alt="HRMS Icon" />
     </div>
 
     <script>
