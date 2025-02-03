@@ -67,11 +67,11 @@
         }
 
         #Quickaction-container {
-            display: flex;
-            position: fixed;
-            right: -10px;
+            position: absolute;
+            right: 5px;
             bottom: 10px;
             user-select: none;
+            z-index: 1050;
         }
 
         .dropdown-card {

@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class modals
+    public partial class holidays
     {
     }
 }

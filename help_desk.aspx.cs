@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace hrms
 {
-    public partial class modals : System.Web.UI.Page
+    public partial class help_desk : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {

@@ -41,11 +41,11 @@
 
     <style>
         #Quickaction-container {
-            display: flex;
-            position: fixed;
-            right: -10px;
+            position: absolute;
+            right: 5px;
             bottom: 10px;
             user-select: none;
+            z-index: 1050;
         }
 
         .main-container {
@@ -275,73 +275,6 @@
         </div>
     </div>
 
-    <div class="modal fade pt-5" id="createLeavemodal" tabindex="-1" aria-labelledby="createLeavemodalLabel">
-        <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="max-width: 41%; margin: 0 auto;">
-            <div class="modal-content" style="border-radius: 0px !important; width: 100%;">
-                <div class="modal-header" style="padding: 1.50rem 1.70rem 1rem; height: 30px; background-color: transparent; border-bottom: none;">
-                    <h2 class="modal-title" id="createLeavemodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;">Create Leave</h2>
-                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body createLeavefields">
-                    <div class="mx-2 mb-2" style="color: hsl(0, 0%, 11%); font-weight: 500; background-color: hsl(0,0%,100%); border: 1px solid hsl(213,22%,84%); padding: 1.2rem;">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="id_leave_type">Leave Type:</label>
-                                <select name="leave_type" class="form-control select2" id="id_leave_type">
-                                    <option value="" disabled="disabled" selected="selected">Select Leave Type</option>
-                                    <option value="1">Sick Leave</option>
-                                    <option value="2">Casual Leave</option>
-                                    <option value="3">Earned Leave</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="id_attachments">Attachments:</label>
-                                <input type="file" name="attachments" class="form-control-file" id="id_attachments" />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="id_start_date">Start Date:</label>
-                                <input type="date" name="start_date" class="form-control" id="id_start_date" />
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="id_start_day_breakdown">Start Day Breakdown:</label>
-                                <select name="start_day_breakdown" class="form-control" id="id_start_day_breakdown">
-                                    <option value="Full">Full Day</option>
-                                    <option value="First Half">First Half</option>
-                                    <option value="Second Half">Second Half</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="id_end_date">End Date:</label>
-                                <input type="date" name="end_date" class="form-control" id="id_end_date" />
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="id_end_day_breakdown">End Day Breakdown:</label>
-                                <select name="end_day_breakdown" class="form-control" id="id_end_day_breakdown">
-                                    <option value="Full">Full Day</option>
-                                    <option value="First Half">First Half</option>
-                                    <option value="Second Half">Second Half</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="id_description">Description:</label>
-                            <textarea id="id_description" class="form-control" rows="4" placeholder="Enter description here..."></textarea>
-                        </div>
-                        <div class="text-right">
-                            <button onclick="save_Leave()" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -373,39 +306,6 @@
             document.getElementById("greenAlertmessage").innerHTML = message;
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            var today = new Date().toISOString().split('T')[0];
-
-            document.getElementById('id_start_date').setAttribute('min', today);
-            document.getElementById('id_end_date').setAttribute('min', today);
-        });
-
-        document.getElementById('id_start_day_breakdown').addEventListener('change', function () {
-            var startDate = document.getElementById('id_start_date').value;
-            if (!startDate) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please select a start date first.',
-                });
-                document.getElementById('id_start_day_breakdown').value = 'Full';
-                return;
-            }
-        });
-
-        document.getElementById('id_end_day_breakdown').addEventListener('change', function () {
-            var endDate = document.getElementById('id_end_date').value;
-            if (!endDate) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please select a end date first.',
-                });
-                document.getElementById('id_end_day_breakdown').value = 'Full';
-                return;
-            }
-        });
 
         function populateleaves() {
             $.ajax({
@@ -550,136 +450,6 @@
             });
         }
 
-        function UploadFiles(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const base64File = reader.result.split(',')[1];
-
-                    $.ajax({
-                        url: 'dashboard.aspx/UploadFiles',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "leave" }),
-                        success: function (response) {
-                            resolve(response.d);
-                        },
-                        error: function (xhr, status, error) {
-                            reject(error);
-                        }
-                    });
-                };
-                reader.onerror = function () {
-                    reject("Error reading file.");
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function save_Leave() {
-            const leaveType = $('#id_leave_type').val();
-            const startDate = $('#id_start_date').val();
-            const startDayBreakdown = $('#id_start_day_breakdown').val();
-            const endDate = $('#id_end_date').val();
-            const endDayBreakdown = $('#id_end_day_breakdown').val();
-            const description = $('#id_description').val();
-            let attachment = '';
-
-            if (!startDate ||
-                !endDate ||
-                (startDate > endDate) ||
-                (startDate === endDate && startDayBreakdown === "Second Half" && (endDayBreakdown === "Full" || endDayBreakdown === "First Half")) ||
-                (startDate < endDate && endDayBreakdown === "Second Half")) {
-                Swal.fire({
-                    title: "Invalid Dates or Breakdown",
-                    text: "Please ensure the start and end dates, along with the breakdown, are valid. End date cannot be 'Second Half' if it spans multiple days.",
-                    icon: "warning"
-                });
-                return;
-            }
-
-
-            if (!leaveType || !startDate || !startDayBreakdown || !endDate || !endDayBreakdown || !description) {
-                Swal.fire({
-                    title: "Missing Fields",
-                    text: "Please fill in all the required fields before proceeding.",
-                    icon: "warning"
-                });
-                return;
-            }
-
-            const fileInput = document.getElementById('id_attachments');
-            if (fileInput.files.length > 0) {
-                try {
-                    attachment = await UploadFiles(fileInput.files[0]);
-                } catch (error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Failed to upload the attachment. Please try again.",
-                        icon: "error"
-                    });
-                    return;
-                }
-            }
-
-            const data = {
-                leaveType: leaveType,
-                startDate: startDate,
-                startDayBreakdown: startDayBreakdown,
-                endDate: endDate,
-                endDayBreakdown: endDayBreakdown,
-                description: description,
-                attachment: attachment
-            };
-
-            $.ajax({
-                type: "POST",
-                url: 'my_leave_requests.aspx/save_Leave',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    let data = response.d;
-                    data = JSON.parse(data);
-                    if (data === "success") {
-                        $('#createLeavemodal').modal('hide');
-                        clearLeaveRequestFields();
-                        populateleaves();
-                        display_green_alert("The leave request has been saved successfully.");
-                    } else if (data === "duplicate") {
-                        Swal.fire({
-                            title: "Duplicate Request!",
-                            text: "A leave request for the selected dates and breakdown already exists.",
-                            icon: "warning"
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "Failure!",
-                            text: "The leave request could not be saved. Please try again.",
-                            icon: "error"
-                        });
-                    }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function clearLeaveRequestFields() {
-            $('#id_leave_type').val(null).trigger('change');
-            $('#id_start_date').val('');
-            $('#id_start_day_breakdown').val('full');
-            $('#id_end_date').val('');
-            $('#id_end_day_breakdown').val('full');
-            $('#id_description').val('');
-            $('#id_attachments').val('');
-        }
-
         function cancelleave(leave_id) {
             Swal.fire({
                 title: "Are you sure?",
@@ -752,7 +522,7 @@
                                     if (data <= 0) {
                                         return `<span style="color: red; font-weight: bold;">${data}</span>`;
                                     }
-                                    return data; 
+                                    return data;
                                 }
                             }
                         ],

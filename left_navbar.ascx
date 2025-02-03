@@ -151,9 +151,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a id="TeastingNavLink" class="nav-link" href="../testing.aspx" runat="server">
-                        <i class="fa-solid fa-gamepad" style="font-size: 1.25rem;"></i>
-                        <span>Testing</span>
+                    <a id="HelpDeskNavLink" class="nav-link" href="../help_desk.aspx" runat="server">
+                        <i class="fa-solid fa-headset" style="font-size: 1.25rem;"></i>
+                        <span>Help Desk</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="HolidaysNavLink" class="nav-link" href="../holidays.aspx" runat="server">
+                        <i class="fas fa-umbrella-beach" style="font-size: 1.25rem;"></i>
+                        <span>holidays</span>
                     </a>
                 </li>
 
@@ -161,6 +168,13 @@
                     <a class="nav-link" href="../configuration.aspx" id="configurationNavLink" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Configuration</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="A1" class="nav-link" href="../testing.aspx" runat="server">
+                        <i class="fa-solid fa-gamepad" style="font-size: 1.25rem;"></i>
+                        <span>Testing</span>
                     </a>
                 </li>
             </ul>

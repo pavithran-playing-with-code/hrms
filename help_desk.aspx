@@ -1,13 +1,13 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="testing.aspx.cs" Inherits="hrms.testing" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="help_desk.aspx.cs" Inherits="hrms.help_desk" %>
 
-<%@ Register Src="~/testnavbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
+<%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/quick_action.ascx" TagName="Quick_action" TagPrefix="uc" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Testing</title>
+    <title>Help Desk</title>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
@@ -62,7 +62,7 @@
             right: 5px;
             bottom: 10px;
             user-select: none;
-            z-index: 1050; 
+            z-index: 1050;
         }
     </style>
 </head>
@@ -76,12 +76,44 @@
             <div class="header-container">
                 <uc:HeaderNavBar runat="server" />
             </div>
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+                <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Announcements</h1>
+                <div id="dataTableControls" class="d-flex align-items-center ml-auto mr-4 mt-2" style="gap: 20px;"></div>
+                <button id="createAnnouncement" class="btn btn-outline-custom"
+                    style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                    onclick="opencreateannouncementmodal()" title="Create Announcement">
+                    <i class="fa fa-plus"></i>&nbsp;Create
+         
+                </button>
+            </div>
             <div class="mt-3">
-                <span>Testing...</span>
-
-                <div id="Quickaction-container">
-                    <uc:Quick_action runat="server" />
+                <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
+                    <div class="card-body p-3">
+                        <table id="announcementsTable" class="table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th>Announcement ID</th>
+                                    <th>Employee ID</th>
+                                    <th>Employee Name</th>
+                                    <th>Department</th>
+                                    <th>Job Position</th>
+                                    <th>Heading</th>
+                                    <th>Posted On</th>
+                                    <th>Expire Date</th>
+                                    <th>Description</th>
+                                    <th>Attachments</th>
+                                    <th>Comments</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
+            <div id="Quickaction-container">
+                <uc:Quick_action runat="server" />
             </div>
         </div>
     </div>

@@ -239,10 +239,11 @@
     <Content Include="Global.asax" />
     <Content Include="header_navbar.ascx" />
     <Content Include="all_emp_leave_request.aspx" />
+    <Content Include="help_desk.aspx" />
+    <Content Include="holidays.aspx" />
     <Content Include="leave_configuration.aspx" />
     <Content Include="left_navbar.ascx" />
     <Content Include="login.aspx" />
-    <Content Include="modals.aspx" />
     <Content Include="my_leave_requests.aspx" />
     <Content Include="quick_action.ascx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -381,6 +382,20 @@
     <Compile Include="all_emp_leave_request.aspx.designer.cs">
       <DependentUpon>all_emp_leave_request.aspx</DependentUpon>
     </Compile>
+    <Compile Include="help_desk.aspx.cs">
+      <DependentUpon>help_desk.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="help_desk.aspx.designer.cs">
+      <DependentUpon>help_desk.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="holidays.aspx.cs">
+      <DependentUpon>holidays.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="holidays.aspx.designer.cs">
+      <DependentUpon>holidays.aspx</DependentUpon>
+    </Compile>
     <Compile Include="leave_configuration.aspx.cs">
       <DependentUpon>leave_configuration.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -401,13 +416,6 @@
     </Compile>
     <Compile Include="login.aspx.designer.cs">
       <DependentUpon>login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="modals.aspx.cs">
-      <DependentUpon>modals.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="modals.aspx.designer.cs">
-      <DependentUpon>modals.aspx</DependentUpon>
     </Compile>
     <Compile Include="my_leave_requests.aspx.cs">
       <DependentUpon>my_leave_requests.aspx</DependentUpon>

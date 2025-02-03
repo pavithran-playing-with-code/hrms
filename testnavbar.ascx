@@ -158,6 +158,13 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" onclick="$('#createLeavemodal').modal('show');">
+                        <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
+                        <span>createLeavemodal</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="../configuration.aspx" id="configurationNavLink" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Configuration</span>

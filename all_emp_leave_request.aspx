@@ -42,11 +42,11 @@
 
     <style>
         #Quickaction-container {
-            display: flex;
-            position: fixed;
-            right: -10px;
+            position: absolute;
+            right: 5px;
             bottom: 10px;
             user-select: none;
+            z-index: 1050;
         }
 
         .main-container {
@@ -374,7 +374,7 @@
             $('.leave-checkbox').prop('checked', isChecked);
             $('.leave-checkbox').each(function () {
                 const row = $(this).closest('tr');
-                
+
                 if (isChecked) {
                     row.css('background-color', 'hsl(8, 77%, 90%)');
                 } else {
@@ -390,7 +390,7 @@
 
             allCheckboxes.each(function () {
                 const row = $(this).closest('tr');
-                
+
                 if ($(this).is(':checked')) {
                     row.css('background-color', 'hsl(8, 77%, 90%)');
                 } else {
@@ -797,9 +797,7 @@
                    <i class="fas fa-times-circle"></i> Reject
                </button>
            </div>
-        </div>
-   
-    `;
+        </div>`;
             });
 
             $('#carouselContent').html(carouselItems);
