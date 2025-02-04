@@ -152,6 +152,8 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
+
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
@@ -291,7 +293,9 @@
                         cell.append($(`<div class="holiday-exists mt-1" style="color: hsl(8, 77%, 85%)">${holidayData[fullDate]}</div>`));
                     }
 
-                    cell.click(() => openEditModal(fullDate));
+                    if ($("#emp_access_lvl").val() == "true") {
+                        cell.click(() => openEditModal(fullDate));
+                    }
                     row.append(cell);
                     currentDay++;
                 }
