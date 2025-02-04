@@ -165,6 +165,11 @@
             transition: opacity 2s ease-in-out;
         }
 
+        #addAnnouncement:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
         .createannouncementfields input, select {
             border-radius: 0px !important;
         }
@@ -177,11 +182,6 @@
         .createannouncementfields .form-group select[multiple] {
             height: 40px;
             scrollbar-width: thin;
-        }
-
-        #addAnnouncement:focus {
-            outline: none;
-            box-shadow: none;
         }
 
         .createannouncementfields label {
@@ -349,6 +349,85 @@
                                 </div>
                             </div>
                         </div>
+                        <%-- createannouncementmodal --%>
+                        <div class="modal fade pt-5" id="createannouncementmodal" tabindex="-1" aria-labelledby="createannouncementmodalLabel">
+                            <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="max-width: 41%; margin: 0 auto;">
+                                <div class="modal-content" style="border-radius: 0px !important; width: 100%;">
+                                    <div class="modal-header" style="padding: 1.50rem 1.70rem 1rem; height: 30px; background-color: transparent; border-bottom: none;">
+                                        <h2 class="modal-title" id="createannouncementmodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;"></h2>
+                                        <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body createannouncementfields">
+                                        <div class="mx-2 mb-2" style="color: hsl(0, 0%, 11%); font-weight: 500; background-color: hsl(0,0%,100%); border: 1px solid hsl(213,22%,84%); padding: 1.2rem;">
+                                            <div class="form-group">
+                                                <label for="id_title">Title:</label>
+                                                <input type="text" name="title" class="form-control" id="id_title" placeholder="Title" maxlength="100" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="id_description">Description:</label>
+                                                <textarea id="id_description" class="form-control"></textarea>
+                                            </div>
+                                            <div class="form-group d-flex flex-column">
+                                                <div class="d-flex align-items-center">
+                                                    <label for="id_attachments" class="mr-2">Attachments:</label>
+                                                    <input type="file" name="attachments" class="attachment_file" id="id_attachments" />
+                                                </div>
+                                                <div class="d-flex align-items-center row ml-1">
+                                                    <div id="id_attachments_helper">
+                                                        <input type="text" id="id_attachments_helper_value" hidden="hidden" />
+                                                    </div>
+                                                    <button type="button" style="width: 17%; position: relative; left: 16%; outline: none; background-color: #f6f6f6; border: 1px solid #000; color: #000; cursor: pointer; font-size: 14px; display: none;"
+                                                        class="btn btn-danger btn-sm mt-2" id="remove_attachment_btn">
+                                                        Remove
+                                                    </button>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="id_expire_date">Expire Date:</label>
+                                                <input type="date" name="expire_date" class="form-control" id="id_expire_date" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="id_department">Department:</label>
+                                                <select name="department" class="form-control select2" id="id_department" multiple="multiple"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="id_job_position">Job Position:</label>
+                                                <select name="job_position" class="form-control select2" id="id_job_position" multiple="multiple"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="id_employees">Employees:</label>
+                                                <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
+                                            </div>
+                                            <div class="form-group d-flex align-items-center">
+                                                <label class="mr-3">Notify:</label>
+                                                <div class="custom-control custom-switch mr-3">
+                                                    <input type="checkbox" class="custom-control-input" id="toggle_notify_email" />
+                                                    <label class="custom-control-label" for="toggle_notify_email">Email</label>
+                                                </div>
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" class="custom-control-input" id="toggle_notify_phone" />
+                                                    <label class="custom-control-label" for="toggle_notify_phone">Phone</label>
+                                                </div>
+
+                                                <div class="ml-auto" style="padding-right: 20px;">
+                                                    <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
+                                                    <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <button onclick="publish_edit_save_announcement('publish')" id="publishannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
+                                                <button onclick="publish_edit_save_announcement('edit')" id="editannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Edit</button>
+                                                <button onclick="publish_edit_save_announcement('save')" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div id="Quickaction-container">
                             <uc:Quick_action runat="server" />
                         </div>
@@ -436,85 +515,6 @@
                         <button id="commentButton" onclick="populatecomments()" class="btn btn-secondary mt-2" style="display: none; background-color: hsl(8,77%,56%)">Comment</button>
                     </div>
                     <div id="announcement_comments" class="mt-3">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <%-- createannouncementmodal --%>
-    <div class="modal fade pt-5" id="createannouncementmodal" tabindex="-1" aria-labelledby="createannouncementmodalLabel">
-        <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="max-width: 41%; margin: 0 auto;">
-            <div class="modal-content" style="border-radius: 0px !important; width: 100%;">
-                <div class="modal-header" style="padding: 1.50rem 1.70rem 1rem; height: 30px; background-color: transparent; border-bottom: none;">
-                    <h2 class="modal-title" id="createannouncementmodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;"></h2>
-                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body createannouncementfields">
-                    <div class="mx-2 mb-2" style="color: hsl(0, 0%, 11%); font-weight: 500; background-color: hsl(0,0%,100%); border: 1px solid hsl(213,22%,84%); padding: 1.2rem;">
-                        <div class="form-group">
-                            <label for="id_title">Title:</label>
-                            <input type="text" name="title" class="form-control" id="id_title" placeholder="Title" maxlength="100" />
-                        </div>
-                        <div class="form-group">
-                            <label for="id_description">Description:</label>
-                            <textarea id="id_description" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group d-flex flex-column">
-                            <div class="d-flex align-items-center">
-                                <label for="id_attachments" class="mr-2">Attachments:</label>
-                                <input type="file" name="attachments" class="attachment_file" id="id_attachments" />
-                            </div>
-                            <div class="d-flex align-items-center row ml-1">
-                                <div id="id_attachments_helper">
-                                    <input type="text" id="id_attachments_helper_value" hidden="hidden" />
-                                </div>
-                                <button type="button" style="width: 17%; position: relative; left: 16%; outline: none; background-color: #f6f6f6; border: 1px solid #000; color: #000; cursor: pointer; font-size: 14px; display: none;"
-                                    class="btn btn-danger btn-sm mt-2" id="remove_attachment_btn">
-                                    Remove
-                                </button>
-                            </div>
-
-                        </div>
-
-                        <div class="form-group">
-                            <label for="id_expire_date">Expire Date:</label>
-                            <input type="date" name="expire_date" class="form-control" id="id_expire_date" />
-                        </div>
-                        <div class="form-group">
-                            <label for="id_department">Department:</label>
-                            <select name="department" class="form-control select2" id="id_department" multiple="multiple"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="id_job_position">Job Position:</label>
-                            <select name="job_position" class="form-control select2" id="id_job_position" multiple="multiple"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="id_employees">Employees:</label>
-                            <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="mr-3">Notify:</label>
-                            <div class="custom-control custom-switch mr-3">
-                                <input type="checkbox" class="custom-control-input" id="toggle_notify_email" />
-                                <label class="custom-control-label" for="toggle_notify_email">Email</label>
-                            </div>
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="toggle_notify_phone" />
-                                <label class="custom-control-label" for="toggle_notify_phone">Phone</label>
-                            </div>
-
-                            <div class="ml-auto" style="padding-right: 20px;">
-                                <label for="id_disable_comments" class="form-check-label">Disable Comments:</label>
-                                <input type="checkbox" name="disable_comments" class="form-check-input ml-2 mt-2" id="id_disable_comments" />
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <button onclick="publish_edit_save_announcement('publish')" id="publishannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Publish</button>
-                            <button onclick="publish_edit_save_announcement('edit')" id="editannouncementbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Edit</button>
-                            <button onclick="publish_edit_save_announcement('save')" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
-                        </div>
                     </div>
                 </div>
             </div>

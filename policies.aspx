@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="testing.aspx.cs" Inherits="hrms.testing" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="policies.aspx.cs" Inherits="hrms.policies" %>
 
 <%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
 <%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
@@ -8,7 +8,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Testing</title>
+    <title>Policies</title>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
@@ -110,8 +110,8 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
-    <input type="hidden" id="announcement_id" name="announcement_id" />
-    <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
+    <input type="hidden" id="policy_id" name="policy_id" />
 
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
@@ -124,9 +124,9 @@
             <div class="header-container">
                 <uc:HeaderNavBar runat="server" />
             </div>
-            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-4 mr-4">
                 <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Policies</h1>
-                <button id="createPolicies" class="btn btn-outline-custom" style="outline: none; border: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                <button id="createPolicies" class="btn btn-outline-custom onlyhighaccesslvl" style="outline: none; border: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
                     onclick="opencreatepolicymodal()" data-toggle="modal" data-target="#createpolicymodal" title="Create">
                     <i class="fa fa-plus"></i>&nbsp;Create
                
@@ -134,50 +134,7 @@
             </div>
             <div class="mt-3">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
-                    <div class="row mt-3" id="policyContainer">
-                        <div class="col-md-3">
-                            <div class="card p-3" style="height: 500px; display: flex; flex-direction: column;">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="m-0"><span style="color: green; font-size: 0.5rem"><i class="fa-solid fa-circle mr-2"></i></span>Leave Policy</h5>
-                                    <div>
-                                        <i class="fa-sharp fa-solid fa-pen-to-square m-0"></i>
-                                        <i class="fa-solid fa-trash-can m-0 ml-2"></i>
-                                    </div>
-                                </div>
-                                <%--  --%>
-                                <span class="card-text mb-3" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">aafefwefwef</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwfsfwrf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">werf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">wr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">wr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">gwr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fewf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">ewfeq</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">f</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);">
-                                        <span style="font-size: 36px;"><span style="font-weight: bolder;">
-                                            <br>
-                                        </span></span>
-                                    </p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fs</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);">
-                                        <span style="font-size: 36px;"><span style="font-weight: bolder;">
-                                            <br>
-                                        </span></span>
-                                    </p>
-                                </span>
-
-                                <%--  --%>
-                                <button onclick="viewPolicy('t', 'd')"
-                                    style="margin-top: auto; border: none; outline: none; width: 100%; height: 40px; border-radius: 0; background-color: hsl(8, 77%, 56%);" class="btn btn-success btn-sm">
-                                    View policy</button>
-                            </div>
-                        </div>
-
-                    </div>
+                    <div class="row mt-3 ml-2 mr-2" id="policyContainer"></div>
                 </div>
                 <%-- createpolicymodal --%>
                 <div class="modal fade pt-5" id="createpolicymodal" tabindex="-1" role="dialog" aria-labelledby="createpolicymodalLabel" aria-hidden="true">
@@ -192,8 +149,8 @@
                             <div class="modal-body createannouncementfields">
                                 <div class="mx-2 mb-2" style="color: hsl(0, 0%, 11%); font-weight: 500; background-color: hsl(0,0%,100%); border: 1px solid hsl(213,22%,84%); padding: 1.2rem;">
                                     <div class="form-group">
-                                        <label for="policy_title">Policy:</label>
-                                        <input type="text" name="title" class="form-control" id="policy_title" placeholder="Title" maxlength="100" />
+                                        <label for="policy_name">Policy:</label>
+                                        <input type="text" name="title" class="form-control" id="policy_name" placeholder="Title" maxlength="100" />
                                     </div>
                                     <div class="form-group">
                                         <label for="id_description">Description:</label>
@@ -201,6 +158,7 @@
                                     </div>
                                     <div class="text-right">
                                         <button onclick="createpolicy()" id="createpolicybtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">save</button>
+                                        <button onclick="editpolicy()" id="editpolicybtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">edit</button>
                                     </div>
                                 </div>
                             </div>
@@ -236,7 +194,14 @@
 
     <script>
         $(document).ready(function () {
-            //populatepolicies();
+            if ($("#emp_access_lvl").val() != "true") {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.style.display = 'none';
+                });
+            }
+
+            populatepolicies();
+
             $('#id_description').summernote({
                 height: 60,
                 minHeight: null,
@@ -284,23 +249,29 @@
                     let html = "";
                     policies.forEach((p, i) => {
                         if (i % 4 === 0) html += '<div class="w-100"></div>';
-                        html += `<div class="col-md-3">
-                                    <div class="card p-3">
+                        html += `<div class="col-md-3 policy_${p.policy_id}" style="margin-bottom:35px;">
+                                    <div class="card p-3" style="height: 500px; display: flex; flex-direction: column;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="m-0">${p.policy_name}</h5>
-                                            <div>
-                                                <i class="fa-sharp fa-solid fa-pen-to-square m-0" onclick="editPolicy(${p.policy_id}, '${p.policy_name}', '${p.description}')"></i>
-                                                <i class="fa-solid fa-trash-can m-0" onclick="deletePolicy(${p.policy_id})"></i>
+                                            <h5 class="m-0"><span style="color: green; font-size:0.5rem"><i class="fa-solid fa-circle mr-2"></i></span>${p.policy_name}</h5>
+                                            <div class="onlyhighaccesslvl">
+                                                <i class="fa-sharp fa-solid fa-pen-to-square m-0" onclick="openeditpolicy(${p.policy_id}, '${p.policy_name}', '${encodeURIComponent(p.description)}')"></i>
+                                                <i class="fa-solid fa-trash-can m-0 ml-2" onclick="deletepolicy(${p.policy_id})"></i>
                                             </div>
                                         </div>
-                                        <span class="card-text mb-2">${p.description}</span>
-                                        <button onclick="viewPolicy('${p.policy_name}', '${p.description}')"
-                                            style="border: none; outline: none; width: 100%; height: 40px; border-radius: 0; background-color: hsl(8, 77%, 56%);" class="btn btn-success btn-sm">
+                                        <span class="card-text mb-3" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">${p.description}</span>
+                                        <button onclick="viewPolicy('${p.policy_name}', '${encodeURIComponent(p.description)}')"
+                                            style="margin-top: auto; border: none; outline: none; width: 100%; height: 40px; border-radius: 0; background-color: hsl(8, 77%, 56%);" class="btn btn-success btn-sm">
                                             View policy</button>
                                     </div>
                                 </div>`;
                     });
                     $("#policyContainer").html(html);
+
+                    if ($("#emp_access_lvl").val() != "true") {
+                        document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                            element.style.display = 'none';
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -314,20 +285,22 @@
 
         function viewPolicy(title, description) {
             $("#descriptionModalLabel").text(title);
-            $("#fullDescriptionContent").html(description);
+            $("#fullDescriptionContent").html(decodeURIComponent(description));
             $("#descriptionModal").modal("show");
         }
 
         function opencreatepolicymodal() {
-            $("#policy_title").val('');
+            $("#policy_name").val('');
             $('#id_description').summernote('code', '');
+            $('#createpolicybtn').show();
+            $('#editpolicybtn').hide();
         }
 
         function createpolicy() {
-            const policy_title = $('#policy_title').val();
+            const policy_name = $('#policy_name').val();
             const description = $('#id_description').summernote('code');
 
-            if ((!policy) ||
+            if ((!policy_name) ||
                 (!description || description === "<p><br></p>")) {
                 Swal.fire({
                     title: "Missing Fields",
@@ -340,17 +313,13 @@
             $.ajax({
                 type: "POST",
                 url: 'policies.aspx/createpolicy',
-                data: JSON.stringify({ policy_title: policy_title, description: description }),
+                data: JSON.stringify({ policy_name: policy_name, description: description }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
-                    let data = response.d;
-                    data = JSON.parse(data);
-                    if (data == "success") {
-                        $('#createpolicymodal').modal('hide');
-                        populatepolicies();
-                        display_green_alert("Policy created successfully.");
-                    }
+                    $('#createpolicymodal').modal('hide');
+                    display_green_alert(response.d);
+                    populatepolicies();
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -362,6 +331,83 @@
             });
         }
 
+        function openeditpolicy(policy_id, policy_name, description) {
+            $("#policy_id").val(policy_id);
+            $("#policy_name").val(policy_name);
+            $('#id_description').summernote('code', decodeURIComponent(description));
+            $('#createpolicybtn').hide();
+            $('#editpolicybtn').show();
+            $('#createpolicymodal').modal('show');
+        }
+
+        function editpolicy() {
+            const policy_id = $("#policy_id").val();
+            const policy_name = $('#policy_name').val();
+            const description = $('#id_description').summernote('code');
+
+            if ((!policy_name) ||
+                (!description || description === "<p><br></p>")) {
+                Swal.fire({
+                    title: "Missing Fields",
+                    text: "Please fill in all the required fields before proceeding.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "policies.aspx/editpolicy",
+                data: JSON.stringify({ policy_id: policy_id, policy_name: policy_name, description: description }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    display_green_alert(response.d);
+                    $('#createpolicymodal').modal('hide');
+                    populatepolicies();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        function deletepolicy(policy_id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This policy will be permanently deleted!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "policies.aspx/deletepolicy",
+                        data: JSON.stringify({ policy_id: policy_id }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            display_green_alert(response.d);
+                            populatepolicies();
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
     </script>
 </body>
 </html>

@@ -165,9 +165,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="../configuration.aspx" id="configurationNavLink" runat="server">
+                    <a id="configurationNavLink" class="nav-link" href="../configuration.aspx" runat="server">
                         <i class="fas fa-cog" style="font-size: 1.25rem;"></i>
                         <span>Configuration</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="PoliciesNavLink" class="nav-link" href="../policies.aspx" runat="server">
+                        <i class="fa fa-thin fa-clipboard-list" style="font-size: 1.25rem;"></i>
+                        <span>Policies</span>
                     </a>
                 </li>
 
@@ -177,6 +184,7 @@
                         <span>Testing</span>
                     </a>
                 </li>
+
             </ul>
         </div>
     </div>

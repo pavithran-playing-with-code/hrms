@@ -58,7 +58,7 @@ namespace hrms
                 using (var connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = "SELECT holiday_date, holiday_name FROM holidays WHERE MONTH(holiday_date) = @month AND YEAR(holiday_date) = @year";
+                    string query = "SELECT holiday_date, holiday_name FROM hrms.holidays WHERE MONTH(holiday_date) = @month AND YEAR(holiday_date) = @year";
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@month", month);
@@ -100,11 +100,11 @@ namespace hrms
                     MySqlCommand command;
                     if (isEdit)
                     {
-                        command = new MySqlCommand("UPDATE holidays SET holiday_name = @data, edited_by = @emp_id, edited_time = NOW() WHERE holiday_date = @date", conn);
+                        command = new MySqlCommand("UPDATE hrms.holidays SET holiday_name = @data, edited_by = @emp_id, edited_time = NOW() WHERE holiday_date = @date", conn);
                     }
                     else
                     {
-                        command = new MySqlCommand("INSERT INTO holidays (holiday_date, holiday_name, created_by, created_time) VALUES (@date, @data, @emp_id, NOW())", conn);
+                        command = new MySqlCommand("INSERT INTO hrms.holidays (holiday_date, holiday_name, created_by, created_time) VALUES (@date, @data, @emp_id, NOW())", conn);
                     }
 
                     command.Parameters.AddWithValue("@date", holidayDate);
