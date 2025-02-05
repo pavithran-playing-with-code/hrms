@@ -105,15 +105,6 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlAnchor leaveConfigurationNavLink;
 
         /// <summary>
-        /// HelpDeskNavLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor HelpDeskNavLink;
-
-        /// <summary>
         /// HolidaysNavLink control.
         /// </summary>
         /// <remarks>
@@ -121,6 +112,24 @@ namespace hrms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlAnchor HolidaysNavLink;
+
+        /// <summary>
+        /// HelpDeskSubMenu control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl HelpDeskSubMenu;
+
+        /// <summary>
+        /// ticketsNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor ticketsNavLink;
 
         /// <summary>
         /// configurationNavLink control.

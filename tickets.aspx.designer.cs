@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class help_desk
+    public partial class tickets
     {
     }
 }

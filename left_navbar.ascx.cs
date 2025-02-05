@@ -77,6 +77,18 @@ namespace hrms
                         break;
                 }
             }
+
+            if (currentPage == "tickets.aspx")
+            {
+                HelpDeskSubMenu.Attributes["class"] = "collapse show";
+
+                switch (currentPage)
+                {
+                    case "tickets.aspx":
+                        ticketsNavLink.Attributes["class"] += " active-page";
+                        break;
+                }
+            }
         }
 
     }

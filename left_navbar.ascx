@@ -151,17 +151,26 @@
                 </li>
 
                 <li class="nav-item">
-                    <a id="HelpDeskNavLink" class="nav-link" href="../help_desk.aspx" runat="server">
-                        <i class="fa-solid fa-headset" style="font-size: 1.25rem;"></i>
-                        <span>Help Desk</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
                     <a id="HolidaysNavLink" class="nav-link" href="../holidays.aspx" runat="server">
                         <i class="fas fa-umbrella-beach" style="font-size: 1.25rem;"></i>
                         <span>holidays</span>
                     </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#HelpDeskSubMenu" data-toggle="collapse" aria-expanded="false" aria-controls="HelpDeskSubMenu">
+                        <i class="fa-solid fa-headset" style="font-size: 1.25rem;"></i>
+                        <span>Help Desk</span>
+                    </a>
+                    <div id="HelpDeskSubMenu" runat="server" clientidmode="Static" class="collapse">
+                        <ul class="navbar-nav text-light">
+                            <li class="nav-item">
+                                <a id="ticketsNavLink" class="nav-link" href="../tickets.aspx" runat="server">
+                                    <span>Tickets</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
                 <li class="nav-item">

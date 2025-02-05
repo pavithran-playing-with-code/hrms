@@ -239,7 +239,7 @@
     <Content Include="Global.asax" />
     <Content Include="header_navbar.ascx" />
     <Content Include="all_emp_leave_request.aspx" />
-    <Content Include="help_desk.aspx" />
+    <Content Include="tickets.aspx" />
     <Content Include="holidays.aspx" />
     <Content Include="leave_configuration.aspx" />
     <Content Include="left_navbar.ascx" />
@@ -383,12 +383,12 @@
     <Compile Include="all_emp_leave_request.aspx.designer.cs">
       <DependentUpon>all_emp_leave_request.aspx</DependentUpon>
     </Compile>
-    <Compile Include="help_desk.aspx.cs">
-      <DependentUpon>help_desk.aspx</DependentUpon>
+    <Compile Include="tickets.aspx.cs">
+      <DependentUpon>tickets.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="help_desk.aspx.designer.cs">
-      <DependentUpon>help_desk.aspx</DependentUpon>
+    <Compile Include="tickets.aspx.designer.cs">
+      <DependentUpon>tickets.aspx</DependentUpon>
     </Compile>
     <Compile Include="holidays.aspx.cs">
       <DependentUpon>holidays.aspx</DependentUpon>

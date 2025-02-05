@@ -144,33 +144,8 @@
                                         <i class="fa-solid fa-trash-can m-0 ml-2"></i>
                                     </div>
                                 </div>
-                                <%--  --%>
-                                <span class="card-text mb-3" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">aafefwefwef</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwfsfwrf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">werf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">wr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">wr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">gwr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwr</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fewf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">ewfeq</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">f</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);">
-                                        <span style="font-size: 36px;"><span style="font-weight: bolder;">
-                                            <br>
-                                        </span></span>
-                                    </p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fs</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);"><span style="font-size: 36px;"><span style="font-weight: bolder;">fwf</span></span></p>
-                                    <p style="color: rgb(28, 28, 28);">
-                                        <span style="font-size: 36px;"><span style="font-weight: bolder;">
-                                            <br>
-                                        </span></span>
-                                    </p>
+                                <span class="card-text mb-3" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">Testing
                                 </span>
-
-                                <%--  --%>
                                 <button onclick="viewPolicy('t', 'd')"
                                     style="margin-top: auto; border: none; outline: none; width: 100%; height: 40px; border-radius: 0; background-color: hsl(8, 77%, 56%);" class="btn btn-success btn-sm">
                                     View policy</button>

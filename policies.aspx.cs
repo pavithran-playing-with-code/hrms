@@ -10,6 +10,7 @@ using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Twilio.Jwt.Taskrouter;
+using static hrms.tickets;
 
 namespace hrms
 {
@@ -80,7 +81,8 @@ namespace hrms
             }
             catch (Exception ex)
             {
-                log.Error("Error in SaveHoliday: " + ex.ToString());
+                log.Error("Error in populatepolicies: " + ex.ToString());
+                return new List<Policy>();
             }
 
             return policies;
@@ -109,6 +111,7 @@ namespace hrms
             }
             catch (Exception ex)
             {
+                log.Error("Error in createpolicy: " + ex.ToString());
                 return "Error: " + ex.Message;
             }
         }
@@ -137,6 +140,7 @@ namespace hrms
             }
             catch (Exception ex)
             {
+                log.Error("Error in editpolicy: " + ex.ToString());
                 return "Error: " + ex.Message;
             }
         }
@@ -163,6 +167,7 @@ namespace hrms
             }
             catch (Exception ex)
             {
+                log.Error("Error in deletepolicy: " + ex.ToString());
                 return "Error: " + ex.Message;
             }
         }
