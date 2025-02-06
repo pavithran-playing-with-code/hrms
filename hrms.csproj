@@ -208,13 +208,11 @@
   <ItemGroup>
     <Content Include="About.aspx" />
     <Content Include="announcements.aspx" />
-    <Content Include="asset\attendance.png" />
-    <Content Include="asset\hrms_icon.jpg" />
     <Content Include="asset\img\attendance.png" />
     <Content Include="asset\img\hrms_icon.jpg" />
     <Content Include="asset\img\no-announcements.png" />
     <Content Include="asset\img\no-leave-requests.png" />
-    <Content Include="asset\no-announcements.png" />
+    <Content Include="asset\img\no-tickets.jpg" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -486,6 +484,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="UploadedLeaveFiles\" />
+    <Folder Include="UploadedTicketsFiles\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

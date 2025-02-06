@@ -581,6 +581,10 @@ namespace hrms
                 {
                     folderPath = HttpContext.Current.Server.MapPath("~/UploadedLeaveFiles/");
                 }
+                else if (where == "tickets")
+                {
+                    folderPath = HttpContext.Current.Server.MapPath("~/UploadedTicketsFiles/");
+                }
 
                 byte[] fileBytes = Convert.FromBase64String(fileData);
                 string empId = HttpContext.Current.Session["emp_id"].ToString();
@@ -597,6 +601,10 @@ namespace hrms
                 else if (where == "leave")
                 {
                     return $"/UploadedLeaveFiles/{uniqueFileName}";
+                }
+                else if (where == "tickets")
+                {
+                    return $"/UploadedTicketsFiles/{uniqueFileName}";
                 }
                 return "";
             }

@@ -344,6 +344,7 @@
                         },
                         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
+                            $('#dataTableControls').empty(); 
                             $('#LeavesTable_length').detach().appendTo('#dataTableControls');
                             $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
                         },

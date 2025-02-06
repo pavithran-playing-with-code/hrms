@@ -170,22 +170,12 @@
             box-shadow: none;
         }
 
-        .createannouncementfields input, select {
-            border-radius: 0px !important;
-        }
-
-        .createannouncementfields .form-group label {
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .createannouncementfields .form-group select[multiple] {
-            height: 40px;
-            scrollbar-width: thin;
-        }
-
-        .createannouncementfields label {
-            font-size: 14px;
+        .createannouncementfields .form-control,
+        .createannouncementfields select,
+        .createannouncementfields textarea,
+        .createannouncementfields input[type="file"],
+        .createannouncementfields button {
+            border-radius: 0 !important;
         }
 
         .form-group {
@@ -736,6 +726,7 @@
         }
 
         document.getElementById('remove_attachment_btn').addEventListener('click', function () {
+            $('#id_attachments').val('');
             document.getElementById('id_attachments_helper').style.display = 'none';
             document.getElementById('remove_attachment_btn').style.display = 'none';
         });

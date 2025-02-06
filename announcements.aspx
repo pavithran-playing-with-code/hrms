@@ -82,6 +82,10 @@
             padding: 0;
         }
 
+        .table.dataTable thead th {
+            background-color: white !important;
+        }
+
         .table.table-striped.table-bordered th,
         .table.table-striped.table-bordered td {
             border-color: white !important;
@@ -123,22 +127,12 @@
                 white-space: nowrap;
             }
 
-        .createannouncementfields input, select {
-            border-radius: 0px !important;
-        }
-
-        .createannouncementfields .form-group label {
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .createannouncementfields .form-group select[multiple] {
-            height: 40px;
-            scrollbar-width: thin;
-        }
-
-        .createannouncementfields label {
-            font-size: 14px;
+        .createannouncementfields .form-control,
+        .createannouncementfields select,
+        .createannouncementfields textarea,
+        .createannouncementfields input[type="file"],
+        .createannouncementfields button {
+            border-radius: 0 !important;
         }
 
 
@@ -433,6 +427,7 @@
                         },
                         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
+                            $('#dataTableControls').empty(); 
                             $('#announcementsTable_length').detach().appendTo('#dataTableControls');
                             $('#announcementsTable_filter').detach().appendTo('#dataTableControls');
                         },
@@ -568,6 +563,20 @@
             document.getElementById('id_expire_date').value = localDate;
         }
 
+        document.getElementById('remove_attachment_btn').addEventListener('click', function () {
+            $('#id_attachments').val('');
+            document.getElementById('id_attachments_helper').style.display = 'none';
+            document.getElementById('remove_attachment_btn').style.display = 'none';
+        });
+
+        document.getElementById('id_attachments').addEventListener('change', function () {
+            const fileInput = this;
+            if (fileInput.files.length > 0) {
+                document.getElementById('id_attachments_helper').style.display = 'none';
+                document.getElementById('remove_attachment_btn').style.display = 'block';
+            }
+        });
+
         function populatecreateannouncementmodal(dropdowntype, value, departmentValues, callback) {
             $.ajax({
                 type: "POST",
@@ -644,7 +653,7 @@
                         url: 'dashboard.aspx/UploadFiles',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify({ fileName: file.name, fileData: base64File }),
+                        data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "announcement" }),
                         success: function (response) {
                             resolve(response.d);
                         },
