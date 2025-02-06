@@ -307,6 +307,10 @@
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
 
+        document.addEventListener("leaveRequestSaved", function () {
+            populateleaves();
+        });
+
         function populateleaves() {
             $.ajax({
                 type: "POST",

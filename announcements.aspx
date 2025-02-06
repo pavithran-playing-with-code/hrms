@@ -141,50 +141,43 @@
             font-size: 14px;
         }
 
-        .form-control.select2-hidden-accessible + .select2-container {
-            width: 100% !important;
-            height: calc(1.5em + .75rem + 2px) !important;
+
+        .form-group {
+            flex: 1;
+            min-width: 150px;
         }
 
         .select2-container--default .select2-selection--multiple {
-            height: calc(1.5em + .75rem + 2px) !important;
+            height: 38px !important;
             border: 1px solid #ced4da;
             border-radius: 0;
-            padding: 0.375rem 0.75rem;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
+            overflow: hidden;
+            flex-wrap: nowrap;
         }
 
             .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-                line-height: 1.5 !important;
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overflow-x: hidden;
+                white-space: nowrap;
+                width: 100%;
+            }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
                 overflow: hidden;
-                padding: 0 !important;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
-
-            .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
-                color: #6c757d;
-                font-style: italic;
-            }
-
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: white;
-            color: black;
+            background-color: gray !important;
+            color: white !important;
         }
 
-        .select2-container--default .select2-results__option:hover {
-            background-color: #f1f1f1 !important;
-            color: #333 !important;
-        }
-
-        .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #d6d6d6 !important;
-            color: #333 !important;
-        }
-
-        .select2-selection__rendered .select2-selection__clear {
-            margin-bottom: .25rem !important;
-        }
 
         @keyframes slideInFromRight {
             from {
@@ -587,7 +580,9 @@
                     data = JSON.parse(data);
                     $('#id_employees, #id_department, #id_job_position').select2({
                         placeholder: "Select an option",
-                        allowClear: true
+                        allowClear: true,
+                        closeOnSelect: false,
+                        width: "100%",
                     });
 
                     if (dropdowntype === "department") {

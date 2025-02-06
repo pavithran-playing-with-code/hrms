@@ -65,10 +65,6 @@
     .quick-action.open i {
         transform: rotate(45deg);
     }
-
-    .modal {
-        z-index: 1055 !important;
-    }
 </style>
 
 <nav id="quickaction-navbar" style="background-color: transparent !important;" class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-primary p-0">
@@ -150,8 +146,8 @@
                             </select>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="id_attachments">Attachments:</label>
-                            <input type="file" name="attachments" class="form-control-file" id="id_attachments" />
+                            <label for="leave_attachments">Attachments:</label>
+                            <input type="file" name="attachments" class="form-control-file" id="leave_attachments" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -183,8 +179,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="id_description">Description:</label>
-                        <textarea id="id_description" class="form-control" rows="4" placeholder="Enter description here..."></textarea>
+                        <label for="leave_description">Description:</label>
+                        <textarea id="leave_description" class="form-control" rows="4" placeholder="Enter description here..."></textarea>
                     </div>
                     <div class="text-right">
                         <button onclick="save_Leave()" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
@@ -270,7 +266,7 @@
         const startDayBreakdown = $('#id_start_day_breakdown').val();
         const endDate = $('#id_end_date').val();
         const endDayBreakdown = $('#id_end_day_breakdown').val();
-        const description = $('#id_description').val();
+        const description = $('#leave_description').val();
         let attachment = '';
 
         if (!startDate ||
@@ -296,7 +292,7 @@
             return;
         }
 
-        const fileInput = document.getElementById('id_attachments');
+        const fileInput = document.getElementById('leave_attachments');
         if (fileInput.files.length > 0) {
             try {
                 attachment = await UploadFiles(fileInput.files[0]);
@@ -333,6 +329,7 @@
                     $('#createLeavemodal').modal('hide');
                     clearLeaveRequestFields();
                     display_green_alert("The leave request has been saved successfully.");
+                    document.dispatchEvent(new Event("leaveRequestSaved"));
                 } else if (data === "duplicate") {
                     Swal.fire({
                         title: "Duplicate Request!",
@@ -363,8 +360,8 @@
         $('#id_start_day_breakdown').val('full');
         $('#id_end_date').val('');
         $('#id_end_day_breakdown').val('full');
-        $('#id_description').val('');
-        $('#id_attachments').val('');
+        $('#leave_description').val('');
+        $('#leave_attachments').val('');
     }
 
 </script>
