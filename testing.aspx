@@ -156,6 +156,10 @@
             border-radius: 0 !important;
         }
 
+        .active-tab {
+            font-weight: bold;
+        }
+
         @keyframes slideInFromRight {
             from {
                 transform: translateX(100%);
@@ -219,35 +223,71 @@
             </div>
             <div class="mt-3">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
-                    <div class="card-body p-3">
-                        <table id="TicketsTable" class="table table-striped table-bordered" style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <th>Tickets ID</th>
-                                    <th>Employee ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Attachments</th>
-                                    <th>Ticket Type</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Assignee</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    <div class="card mx-auto mb-5" style="border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
+                        <div class="card-header d-flex w-100 p-0" style="background-color: transparent;">
+                            <div id="myTicketsTab" class="w-50 d-flex justify-content-center align-items-center fw-bold py-2 active-tab"
+                                style="border-right: 1px solid gray; cursor: pointer;">
+                                My Tickets
+       
+                            </div>
+                            <div id="suggestedTicketsTab" class="w-50 d-flex justify-content-center align-items-center fw-bold py-2"
+                                style="color: gray; cursor: pointer;">
+                                Suggested Tickets
+       
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="TicketsTableContainer">
+                                <table id="TicketsTable" class="table table-striped table-bordered" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Tickets ID</th>
+                                            <th>Employee ID</th>
+                                            <th>Employee Name</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Attachments</th>
+                                            <th>Ticket Type</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Assignee</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="SuggestedTicketsTableContainer" style="display: none">
+                                <table id="SuggestedTicketsTable" class="table table-striped table-bordered" style="width: 100%; display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Tickets ID</th>
+                                            <th>Employee ID</th>
+                                            <th>Created By</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Attachments</th>
+                                            <th>Ticket Type</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+
                     <div id="createTicketTypes">
                         <div class="onlyhighaccesslvl">
                             <div>
-                                <div class="card p-3" style="height: 500px; display: flex; flex-direction: column;">
-                                    <div class="d-flex mb-3">
-                                        <h5 class="m-0">Ticket Types</h5>
-                                    </div>
-
+                                <div class="d-flex align-items-center justify-content-between bg-light p-2 mt-4 mb-4 mr-3">
+                                    <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Ticket Types</h1>
+                                </div>
+                                <div class="card p-3 mb-5" style="height: 500px; display: flex; flex-direction: column; border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
                                     <div class="d-flex flex-column align-items-center p-2 mb-3 mt-2">
                                         <div class="d-flex justify-content-between w-100 px-2 mb-2">
                                             <div class="text-center w-25">
@@ -394,12 +434,23 @@
 
     <script>
         $(document).ready(function () {
-            /* if ($("#emp_access_lvl").val() != "true") {
-                 document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
-                     element.style.display = 'none';
-                 });
-             }*/
             populatetickets();
+            populate_suggested_tickets();
+
+            $("#myTicketsTab").click(function () {
+                $("#TicketsTableContainer").css("display", "block");
+                $("#SuggestedTicketsTableContainer").css("display", "none");
+                $("#myTicketsTab").addClass("active-tab").css("color", "black");
+                $("#suggestedTicketsTab").removeClass("active-tab").css("color", "gray");
+            });
+
+            $("#suggestedTicketsTab").click(function () {
+                $("#TicketsTableContainer").css("display", "none");
+                $("#SuggestedTicketsTableContainer").css("display", "block");
+                $("#suggestedTicketsTab").addClass("active-tab").css("color", "black");
+                $("#myTicketsTab").removeClass("active-tab").css("color", "gray");
+            });
+
             populate_ticket_type();
             populatecreateticketmodal("department", null, null);
         });
@@ -449,6 +500,7 @@
             $.ajax({
                 type: "POST",
                 url: 'tickets.aspx/populatetickets',
+                data: JSON.stringify({ from: "mytickets" }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -475,12 +527,6 @@
                         scrollCollapse: true,
                         fixedColumns: {
                             rightColumns: 1
-                        },
-                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
-                        initComplete: function () {
-                            $('#dataTableControls').empty(); 
-                            $('#TicketsTable_length').detach().appendTo('#dataTableControls');
-                            $('#TicketsTable_filter').detach().appendTo('#dataTableControls');
                         },
                         columns: [
                             { data: 'ticket_id', visible: false },
@@ -723,6 +769,169 @@
             $("#priority").val(priority).trigger("change");
             $("#status").val(status).trigger("change");
 
+        }
+
+        function populate_suggested_tickets() {
+            $.ajax({
+                type: "POST",
+                url: 'tickets.aspx/populatetickets',
+                data: JSON.stringify({ from: "suggestedtickets" }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    if ($.fn.DataTable.isDataTable('#SuggestedTicketsTable')) {
+                        $('#SuggestedTicketsTable').DataTable().clear().destroy();
+                    }
+
+                    $('#SuggestedTicketsTable').DataTable({
+                        data: data,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
+                        columns: [
+                            { data: 'ticket_id', visible: false },
+                            { data: 'emp_id', visible: false },
+                            { data: 'emp_name' },
+                            { data: 'title' },
+                            {
+                                data: 'ticket_description',
+                                render: function (data) {
+                                    return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
+                                }
+                            },
+                            {
+                                data: 'attachments',
+                                render: function (data) {
+                                    if (!data || data.trim() === "") {
+                                        return "<span style='color:gray'>No attachments</span>";
+                                    }
+                                    const attachmentParts = data.split('/').pop().split('_');
+                                    const originalFileName = attachmentParts.slice(2).join('_');
+                                    return `<a href="${data}" target="_blank">${originalFileName}</a>`;
+                                }
+                            },
+                            { data: 'ticket_type' },
+                            {
+                                data: 'priority',
+                                render: function (data) {
+                                    if (data == "1") {
+                                        return `<span>High</span>`;
+                                    }
+                                    else if (data == "2") {
+                                        return `<span>Medium</span>`;
+                                    }
+                                    else if (data == "3") {
+                                        return `<span>Low</span>`;
+                                    }
+                                    return `<span style="color: red;font-weight: bold;">Issue</span>`;
+                                }
+                            },
+                            {
+                                data: 'ticket_status',
+                                render: function (data) {
+                                    if (data == "New") {
+                                        return `<span style="color: dodgerblue;font-weight: bold;">New</span>`;
+                                    }
+                                    else if (data == "In Progress") {
+                                        return `<span style="color: orange;font-weight: bold;">In Progress</span>`;
+                                    }
+                                    else if (data == "Hold") {
+                                        return `<span style="color: gray;font-weight: bold;">Hold</span>`;
+                                    }
+                                    else if (data == "Resolved") {
+                                        return `<span style="color: green;font-weight: bold;">Resolved</span>`;
+                                    }
+                                    else if (data == "Canceled") {
+                                        return `<span style="color: red;font-weight: bold;">Canceled</span>`;
+                                    }
+                                    return `<span style="color: red;font-weight: bold;">Issue</span>`;
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    if (row.ticket_status === "New") {
+                                        return `<div class="btn-group w-100" role="group">
+                                          <button class="btn btn-warning btn-sm edit-btn w-50"
+                                          onclick="open_edit_ticket('${row.ticket_id}', '${row.title}', '${encodeURIComponent(row.ticket_description)}', '${encodeURIComponent(row.attachments)}', 
+                                          '${row.ticket_type_id}', '${row.priority}', '${row.ticket_status}')">Edit</button>
+                                          <button class="btn btn-danger btn-sm delete-btn w-50" onclick="delete_ticket_and_type('${row.ticket_id}', 'tickets')">Delete</button>
+                                      </div>`;
+                                    } else {
+                                        let statusText = row.ticket_status;
+                                        let statusColor = "";
+
+                                        switch (row.ticket_status) {
+                                            case "In Progress":
+                                                statusColor = "orange";
+                                                break;
+                                            case "Hold":
+                                                statusColor = "gray";
+                                                break;
+                                            case "Resolved":
+                                                statusColor = "green";
+                                                break;
+                                            case "Canceled":
+                                                statusColor = "red";
+                                                break;
+                                            default:
+                                                statusText = "Issue";
+                                                statusColor = "red";
+                                                break;
+                                        }
+
+                                        return `<span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>`;
+                                    }
+                                }
+                            }
+                        ],
+                        headerCallback: function (thead, data, start, end, display) {
+                            $('th', thead).addClass('text-center');
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $('td', row).addClass('text-center');
+                        },
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+        <img src="/asset/img/no-tickets.jpg" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+        <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+                        </div>`
+                        }
+                    });
+
+                    $('#SuggestedTicketsTable').on('click', '.description-link', function (e) {
+                        e.preventDefault();
+                        const description = $(this).data('description');
+                        const heading = $(this).closest('tr').find('td').eq(3).text();
+                        $('#descriptionModalLabel').text(heading);
+                        $('#fullDescriptionContent').html(description);
+                        $('#descriptionModal').modal('show');
+                    });
+
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
         }
 
         function populatecreateticketmodal(dropdowntype, value, departmentValues, callback) {

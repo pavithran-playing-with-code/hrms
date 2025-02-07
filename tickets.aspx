@@ -80,13 +80,15 @@
             border-color: white !important;
         }
 
-        #TicketsTable_length select {
+        #TicketsTable_length select,
+        #SuggestedTicketsTable_length select {
             border: 1px solid #aaa;
             background-color: transparent;
             padding: 4px;
         }
 
-        #TicketsTable_filter input {
+        #TicketsTable_filter input,
+        #SuggestedTicketsTable_filter input {
             border: 1px solid #aaa;
             border-radius: 3px;
             padding: 5px;
@@ -94,11 +96,13 @@
             margin-left: 3px;
         }
 
-        #TicketsTable th {
+        #TicketsTable th,
+        #SuggestedTicketsTable th {
             white-space: nowrap;
         }
 
-        #TicketsTable td {
+        #TicketsTable td,
+        #SuggestedTicketsTable td {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -106,11 +110,13 @@
             background-color: #f8f9fa !important;
         }
 
-            #TicketsTable td button {
+            #TicketsTable td button,
+            #SuggestedTicketsTable td button {
                 margin-right: 5px;
                 margin-bottom: 5px;
                 white-space: nowrap;
             }
+
 
         .form-group {
             flex: 1;
@@ -156,6 +162,10 @@
             border-radius: 0 !important;
         }
 
+        .active-tab {
+            font-weight: bold;
+        }
+
         @keyframes slideInFromRight {
             from {
                 transform: translateX(100%);
@@ -187,10 +197,15 @@
             opacity: 0;
             transition: opacity 2s ease-in-out;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa">
 
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
     <input type="hidden" id="edit_ticket_id" name="edit_ticket_id" />
     <input type="hidden" id="edited_ticket_type_id" name="edited_ticket_type_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
@@ -219,77 +234,111 @@
             </div>
             <div class="mt-3">
                 <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
-                    <div class="card-body p-3">
-                        <table id="TicketsTable" class="table table-striped table-bordered" style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <th>Tickets ID</th>
-                                    <th>Employee ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Attachments</th>
-                                    <th>Ticket Type</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Assignee</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    <div class="card mx-auto mb-5" style="border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
+                        <div class="card-header d-flex w-100 p-0 ticket_card_header" style="background-color: transparent;">
+                            <div id="myTicketsTab" class="w-50 d-flex justify-content-center align-items-center fw-bold py-2 active-tab"
+                                style="border-right: 1px solid gray; cursor: pointer;">
+                                My Tickets
+       
+                            </div>
+                            <div id="suggestedTicketsTab" class="w-50 d-flex justify-content-center align-items-center fw-bold py-2"
+                                style="color: gray; cursor: pointer;">
+                                Suggested Tickets
+       
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="TicketsTableContainer">
+                                <table id="TicketsTable" class="table table-striped table-bordered" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Tickets ID</th>
+                                            <th>Employee ID</th>
+                                            <th>Employee Name</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Attachments</th>
+                                            <th>Ticket Type</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Status History</th>
+                                            <th>Assignee</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="SuggestedTicketsTableContainer" style="display: none">
+                                <table id="SuggestedTicketsTable" class="table table-striped table-bordered" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Tickets ID</th>
+                                            <th>Employee ID</th>
+                                            <th>Created By</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Attachments</th>
+                                            <th>Ticket Type</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Status History</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+
                     <div id="createTicketTypes">
-                        <div class="onlyhighaccesslvl">
-                            <div>
-                                <div class="card p-3" style="height: 500px; display: flex; flex-direction: column;">
-                                    <div class="d-flex mb-3">
-                                        <h5 class="m-0">Ticket Types</h5>
+                        <div class="d-flex align-items-center justify-content-between bg-light p-2 mt-4 mb-4 mr-3">
+                            <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Ticket Types</h1>
+                        </div>
+                        <div class="card p-3 mb-5" style="height: 500px; display: flex; flex-direction: column; border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
+                            <div class="d-flex flex-column align-items-center p-2 mb-3 mt-2">
+                                <div class="d-flex justify-content-between w-100 px-2 mb-2">
+                                    <div class="text-center w-25">
+                                        <label for="newTicketType"><strong>Leave Type</strong></label>
                                     </div>
-
-                                    <div class="d-flex flex-column align-items-center p-2 mb-3 mt-2">
-                                        <div class="d-flex justify-content-between w-100 px-2 mb-2">
-                                            <div class="text-center w-25">
-                                                <label for="newTicketType"><strong>Leave Type</strong></label>
-                                            </div>
-                                            <div class="text-center w-75">
-                                                <label><strong>Assignee</strong></label>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center w-100 px-2">
-                                            <div class="form-group w-25">
-                                                <input type="text" id="newTicketType" class="form-control" placeholder="Enter Ticket Type" />
-                                            </div>
-                                            <div class="d-flex w-75">
-                                                <div class="form-group flex-grow-1 mx-1">
-                                                    <select name="department" class="form-control select2" id="id_department" multiple="multiple"></select>
-                                                </div>
-                                                <div class="form-group flex-grow-1 mx-1">
-                                                    <select name="job_position" class="form-control select2" id="id_job_position" multiple="multiple"></select>
-                                                </div>
-                                                <div class="form-group flex-grow-1 mx-1">
-                                                    <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
-                                                </div>
-                                            </div>
-                                            <div class="ml-2 d-flex align-items-center" style="margin-top: -15px;">
-                                                <button id="create_ticket_type" class="btn btn-outline-custom"
-                                                    style="padding: 8px 20px; border-radius: 20px; font-weight: bold; background-color: hsl(8, 77%, 56%); color: white;"
-                                                    onclick="create_ticket_type()">
-                                                    Add
-                                                </button>
-                                                <button id="edit_ticket_type" class="btn btn-outline-custom"
-                                                    style="display: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; background-color: hsl(8, 77%, 56%); color: white;"
-                                                    onclick="edit_ticket_type()">
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-text p-2 mt-1 mb-3" id="ticket_types_container" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">
+                                    <div class="text-center w-75">
+                                        <label><strong>Assignee</strong></label>
                                     </div>
                                 </div>
+                                <div class="d-flex justify-content-between align-items-center w-100 px-2 onlyhighaccesslvl">
+                                    <div class="form-group w-25">
+                                        <input type="text" id="newTicketType" class="form-control" placeholder="Enter Ticket Type" />
+                                    </div>
+                                    <div class="d-flex w-75">
+                                        <div class="form-group flex-grow-1 mx-1">
+                                            <select name="department" class="form-control select2" id="id_department" multiple="multiple"></select>
+                                        </div>
+                                        <div class="form-group flex-grow-1 mx-1">
+                                            <select name="job_position" class="form-control select2" id="id_job_position" multiple="multiple"></select>
+                                        </div>
+                                        <div class="form-group flex-grow-1 mx-1">
+                                            <select name="employees" class="form-control select2" id="id_employees" multiple="multiple"></select>
+                                        </div>
+                                    </div>
+                                    <div class="ml-2 d-flex align-items-center" style="margin-top: -15px;">
+                                        <button id="create_ticket_type" class="btn btn-outline-custom"
+                                            style="padding: 8px 20px; border-radius: 20px; font-weight: bold; background-color: hsl(8, 77%, 56%); color: white;"
+                                            onclick="create_ticket_type()">
+                                            Add
+                                        </button>
+                                        <button id="edit_ticket_type" class="btn btn-outline-custom"
+                                            style="display: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; background-color: hsl(8, 77%, 56%); color: white;"
+                                            onclick="edit_ticket_type()">
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-text p-2 mt-1 mb-3" id="ticket_types_container" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">
                             </div>
                         </div>
                     </div>
@@ -392,14 +441,58 @@
         </div>
     </div>
 
+    <div class="modal fade" id="status_historyModal" tabindex="-1" role="dialog" aria-labelledby="status_historyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none;">
+                    <h5 class="modal-title ml-1" id="status_historyModalLabel">Full status_history</h5>
+                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mx-auto p-2 mb-4" style="max-width: 800px; border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
+                        <div class="card-body">
+                            <spam class="card-text" id="fullstatus_historyContent"></spam>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
-            /* if ($("#emp_access_lvl").val() != "true") {
-                 document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
-                     element.style.display = 'none';
-                 });
-             }*/
+            if ($("#emp_access_lvl").val() == "true") {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.classList.remove('hidden');
+                });
+            }
+            else {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.classList.add('hidden');
+                });
+            }
+
             populatetickets();
+            populate_suggested_tickets();
+
+            $("#myTicketsTab").click(function () {
+                $("#TicketsTableContainer").css("display", "block");
+                $("#SuggestedTicketsTableContainer").css("display", "none");
+                $("#myTicketsTab").addClass("active-tab").css("color", "black");
+                $("#suggestedTicketsTab").removeClass("active-tab").css("color", "gray");
+                $('#TicketsTable').DataTable().columns.adjust().draw();
+            });
+
+            $("#suggestedTicketsTab").click(function () {
+                $("#TicketsTableContainer").css("display", "none");
+                $("#SuggestedTicketsTableContainer").css("display", "block");
+                $("#suggestedTicketsTab").addClass("active-tab").css("color", "black");
+                $("#myTicketsTab").removeClass("active-tab").css("color", "gray");
+                $('#SuggestedTicketsTable').DataTable().columns.adjust().draw();
+            });
+
             populate_ticket_type();
             populatecreateticketmodal("department", null, null);
         });
@@ -449,6 +542,7 @@
             $.ajax({
                 type: "POST",
                 url: 'tickets.aspx/populatetickets',
+                data: JSON.stringify({ from: "mytickets" }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -475,12 +569,6 @@
                         scrollCollapse: true,
                         fixedColumns: {
                             rightColumns: 1
-                        },
-                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
-                        initComplete: function () {
-                            $('#dataTableControls').empty(); 
-                            $('#TicketsTable_length').detach().appendTo('#dataTableControls');
-                            $('#TicketsTable_filter').detach().appendTo('#dataTableControls');
                         },
                         columns: [
                             { data: 'ticket_id', visible: false },
@@ -541,6 +629,12 @@
                                     return `<span style="color: red;font-weight: bold;">Issue</span>`;
                                 }
                             },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return `<a href="#" class="status_history" onclick="status_history('${row.ticket_id}')">View status history</a>`;
+                                }
+                            },
                             { data: 'assignee' },
                             {
                                 data: null,
@@ -597,7 +691,7 @@
                     $('#TicketsTable').on('click', '.description-link', function (e) {
                         e.preventDefault();
                         const description = $(this).data('description');
-                        const heading = $(this).closest('tr').find('td').eq(3).text();
+                        const heading = $(this).closest('tr').find('td').eq(1).text();
                         $('#descriptionModalLabel').text(heading);
                         $('#fullDescriptionContent').html(description);
                         $('#descriptionModal').modal('show');
@@ -725,6 +819,274 @@
 
         }
 
+        function populate_suggested_tickets() {
+            $.ajax({
+                type: "POST",
+                url: 'tickets.aspx/populatetickets',
+                data: JSON.stringify({ from: "suggestedtickets" }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    if (data.length == 0) {
+                        document.querySelectorAll('.ticket_card_header').forEach(function (element) {
+                            element.classList.add('hidden');
+                        });
+                    }
+                    else {
+                        if ($.fn.DataTable.isDataTable('#SuggestedTicketsTable')) {
+                            $('#SuggestedTicketsTable').DataTable().clear().destroy();
+                        }
+
+                        $('#SuggestedTicketsTable').DataTable({
+                            data: data,
+                            scrollX: true,
+                            scrollCollapse: true,
+                            fixedColumns: {
+                                rightColumns: 1
+                            },
+                            columns: [
+                                { data: 'ticket_id', visible: false },
+                                { data: 'emp_id', visible: false },
+                                { data: 'emp_name' },
+                                { data: 'title' },
+                                {
+                                    data: 'ticket_description',
+                                    render: function (data) {
+                                        return `<a href="#" class="description-link" data-description='${data}'>View Description</a>`;
+                                    }
+                                },
+                                {
+                                    data: 'attachments',
+                                    render: function (data) {
+                                        if (!data || data.trim() === "") {
+                                            return "<span style='color:gray'>No attachments</span>";
+                                        }
+                                        const attachmentParts = data.split('/').pop().split('_');
+                                        const originalFileName = attachmentParts.slice(2).join('_');
+                                        return `<a href="${data}" target="_blank">${originalFileName}</a>`;
+                                    }
+                                },
+                                { data: 'ticket_type' },
+                                {
+                                    data: 'priority',
+                                    render: function (data) {
+                                        if (data == "1") {
+                                            return `<span>High</span>`;
+                                        }
+                                        else if (data == "2") {
+                                            return `<span>Medium</span>`;
+                                        }
+                                        else if (data == "3") {
+                                            return `<span>Low</span>`;
+                                        }
+                                        return `<span style="color: red;font-weight: bold;">Issue</span>`;
+                                    }
+                                },
+                                {
+                                    data: 'ticket_status',
+                                    render: function (data) {
+                                        if (data == "New") {
+                                            return `<span style="color: dodgerblue;font-weight: bold;">New</span>`;
+                                        }
+                                        else if (data == "In Progress") {
+                                            return `<span style="color: orange;font-weight: bold;">In Progress</span>`;
+                                        }
+                                        else if (data == "Hold") {
+                                            return `<span style="color: gray;font-weight: bold;">Hold</span>`;
+                                        }
+                                        else if (data == "Resolved") {
+                                            return `<span style="color: green;font-weight: bold;">Resolved</span>`;
+                                        }
+                                        else if (data == "Canceled") {
+                                            return `<span style="color: red;font-weight: bold;">Canceled</span>`;
+                                        }
+                                        return `<span style="color: red;font-weight: bold;">Issue</span>`;
+                                    }
+                                },
+                                {
+                                    data: null,
+                                    render: function (data, type, row) {
+                                        return `<a href="#" class="status_history" onclick="status_history('${row.ticket_id}')">View status history</a>`;
+                                    }
+                                },
+                                {
+                                    data: null,
+                                    render: function (data, type, row) {
+                                        let statusButtons = `
+                            ${row.ticket_status !== "In Progress" ? `<button class="btn btn-sm btn-warning" onclick="updateTicketStatus('${row.ticket_id}', 'In Progress')">In Progress</button>` : ""}
+                            ${row.ticket_status !== "Hold" ? `<button class="btn btn-sm btn-secondary" onclick="updateTicketStatus('${row.ticket_id}', 'Hold')">Hold</button>` : ""}
+                            ${row.ticket_status !== "Resolved" ? `<button class="btn btn-sm btn-success" onclick="updateTicketStatus('${row.ticket_id}', 'Resolved')">Resolved</button>` : ""}
+                            ${row.ticket_status !== "Canceled" ? `<button class="btn btn-sm btn-danger" onclick="updateTicketStatus('${row.ticket_id}', 'Canceled')">Canceled</button>` : ""}
+                        `;
+
+                                        return `<div class="btn-group w-100">
+            <button class="btn btn-primary btn-sm w-100 status-btn" data-ticket-id="${row.ticket_id}">
+                Change Status
+            </button>
+        </div>
+        <div class="status-options d-none mt-2" id="status-options-${row.ticket_id}">
+            ${statusButtons.trim() ? statusButtons : "<span class='text-muted'>No actions available</span>"}
+        </div>`;
+                                    }
+                                }
+                            ],
+                            headerCallback: function (thead, data, start, end, display) {
+                                $('th', thead).addClass('text-center');
+                            },
+                            createdRow: function (row, data, dataIndex) {
+                                $('td', row).addClass('text-center');
+                            },
+                            language: {
+                                emptyTable: `<div style="text-align: center;">
+<img src="/asset/img/no-tickets.jpg" alt="No data available" style="max-width: 200px; margin-top: 20px;">
+<p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+                </div>`
+                            }
+                        });
+
+                        $('#SuggestedTicketsTable').on('click', '.description-link', function (e) {
+                            e.preventDefault();
+                            const description = $(this).data('description');
+                            const heading = $(this).closest('tr').find('td').eq(1).text();
+                            $('#descriptionModalLabel').text(heading);
+                            $('#fullDescriptionContent').html(description);
+                            $('#descriptionModal').modal('show');
+                        });
+
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        function status_history(ticket_id) {
+            $.ajax({
+                type: "POST",
+                url: "tickets.aspx/status_history",
+                data: JSON.stringify({ ticket_id: ticket_id }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    let status_history = JSON.parse(cleanedResponse);
+
+                    let historyHtml = "";
+                    if (status_history.length > 0) {
+                        historyHtml += `<table class="table table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Updated By</th>
+                                            <th>Updated Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+                        status_history.forEach(item => {
+                            historyHtml += `<tr>
+                                        <td>${item.status_update}</td>
+                                        <td>${item.emp_name}</td>
+                                        <td>${item.updated_time}</td>
+                                    </tr>`;
+                        });
+
+                        historyHtml += `</tbody></table>`;
+                    } else {
+                        historyHtml = `<p class="text-center text-muted">No status history available</p>`;
+                    }
+
+                    $('#status_historyModalLabel').text("Status History");
+                    $('#fullstatus_historyContent').html(historyHtml);
+                    $('#status_historyModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        $(document).on('click', '.status-btn', function () {
+            let ticketId = $(this).data('ticket-id');
+            $(`#status-options-${ticketId}`).toggleClass('d-none');
+        });
+
+        function updateTicketStatus(ticketId, status) {
+            Swal.fire({
+                title: "Are you sure?",
+                html: `<span style="white-space: nowrap;">You are about to change the ticket status to "<strong>${status}</strong>".</span>`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, update it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: 'tickets.aspx/updateTicketStatus',
+                        data: JSON.stringify({ ticketId: ticketId, status: status }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+                            display_green_alert(response.d);
+                            populate_suggested_tickets();
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire({
+                                title: "Error!",
+                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
         function populatecreateticketmodal(dropdowntype, value, departmentValues, callback) {
             $.ajax({
                 type: "POST",
@@ -848,7 +1210,7 @@
                                          <input type="text" class="form-control mx-1" value="${tt.job_position_name}" disabled="disabled" style="width: 25%;" />
                                          <input type="text" class="form-control mx-1" value="${tt.emp_name}" disabled="disabled" style="width: 25%;" />
                                      </div>
-                                     <div class="d-flex align-items-center ml-2">
+                                     <div class="d-flex align-items-center ml-2 onlyhighaccesslvl">
                                          <i class="fa-sharp fa-solid fa-pen-to-square edit_icon" style="cursor: pointer;"
                                          onclick="enableeditbtn('${tt.ticket_type_id}', '${tt.ticket_type}', '${tt.departments}', '${tt.job_positions}', '${tt.assignee}')"></i>
                                          <i class="fa-solid fa-x close_icon ml-3" style="display: none; cursor: pointer;"
@@ -858,9 +1220,18 @@
                                  </div>`;
                     });
 
-
                     $("#ticket_types_container").html(html);
 
+                    if ($("#emp_access_lvl").val() == "true") {
+                        document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                            element.classList.remove('hidden');
+                        });
+                    }
+                    else {
+                        document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                            element.classList.add('hidden');
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
