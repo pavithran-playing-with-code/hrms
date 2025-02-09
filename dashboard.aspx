@@ -536,7 +536,6 @@
             });
 
             populate_emp_details();
-            populate_emp_details();
             populateannounncements();
         });
 
@@ -752,7 +751,6 @@
                     $('#id_employees, #id_department, #id_job_position').select2({
                         placeholder: "Select an option",
                         allowClear: true,
-                        closeOnSelect: false,
                         width: "100%",
                     });
 

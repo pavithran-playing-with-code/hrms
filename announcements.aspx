@@ -427,7 +427,7 @@
                         },
                         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
-                            $('#dataTableControls').empty(); 
+                            $('#dataTableControls').empty();
                             $('#announcementsTable_length').detach().appendTo('#dataTableControls');
                             $('#announcementsTable_filter').detach().appendTo('#dataTableControls');
                         },
@@ -590,7 +590,6 @@
                     $('#id_employees, #id_department, #id_job_position').select2({
                         placeholder: "Select an option",
                         allowClear: true,
-                        closeOnSelect: false,
                         width: "100%",
                     });
 

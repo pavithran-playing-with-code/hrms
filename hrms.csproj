@@ -209,8 +209,10 @@
     <Content Include="About.aspx" />
     <Content Include="announcements.aspx" />
     <Content Include="asset\img\attendance.png" />
+    <Content Include="asset\img\holidays.png" />
     <Content Include="asset\img\hrms_icon.jpg" />
     <Content Include="asset\img\no-announcements.png" />
+    <Content Include="asset\img\no-holidays.png" />
     <Content Include="asset\img\no-leave-requests.png" />
     <Content Include="asset\img\no-tickets.jpg" />
     <Content Include="Contact.aspx" />
@@ -237,6 +239,7 @@
     <Content Include="Global.asax" />
     <Content Include="header_navbar.ascx" />
     <Content Include="all_emp_leave_request.aspx" />
+    <Content Include="leave_emp_dashboard.aspx" />
     <Content Include="tickets.aspx" />
     <Content Include="holidays.aspx" />
     <Content Include="leave_configuration.aspx" />
@@ -380,6 +383,13 @@
     </Compile>
     <Compile Include="all_emp_leave_request.aspx.designer.cs">
       <DependentUpon>all_emp_leave_request.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="leave_emp_dashboard.aspx.cs">
+      <DependentUpon>leave_emp_dashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="leave_emp_dashboard.aspx.designer.cs">
+      <DependentUpon>leave_emp_dashboard.aspx</DependentUpon>
     </Compile>
     <Compile Include="tickets.aspx.cs">
       <DependentUpon>tickets.aspx</DependentUpon>

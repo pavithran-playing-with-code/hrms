@@ -127,7 +127,7 @@
                     <div id="leaveSubMenu" runat="server" clientidmode="Static" class="collapse">
                         <ul class="navbar-nav text-light">
                             <li class="nav-item">
-                                <a id="LeaveDashboardNavLink" class="nav-link" href="../leave_dashboard.aspx" runat="server">
+                                <a id="LeaveDashboardNavLink" class="nav-link" href="../leave_emp_dashboard.aspx" runat="server">
                                     <span>Dashboard</span>
                                 </a>
                             </li>
