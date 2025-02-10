@@ -309,7 +309,7 @@
                     <div class="carousel-inner" id="carouselContent">
                     </div>
                     <a class="carousel-control-prev" href="#leaveCarousel" role="button" data-slide="prev" style="position: absolute; left: -90px;">
-                        <span style="color: #333; font-size: 0.6rem;" class="carousel-control-prev-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3" style="color: white;" aria-hidden="true">
+                        <span style="color: #333; font-size: 0.6rem;" aria-hidden="true" class="carousel-control-prev-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3">
                             <i class="fa-solid fa-less-than"></i>
                         </span>
                     </a>
@@ -435,7 +435,7 @@
                         ],
                         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
-                            $('#dataTableControls').empty(); 
+                            $('#dataTableControls').empty();
                             $('#LeavesTable_length').detach().appendTo('#dataTableControls');
                             $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
                         },
