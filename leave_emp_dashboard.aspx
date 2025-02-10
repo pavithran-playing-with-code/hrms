@@ -92,6 +92,30 @@
         .table.table-striped.table-bordered th,
         .table.table-striped.table-bordered td {
             border-color: white !important;
+            white-space: nowrap;
+        }
+
+        .table.table-striped.table-bordered td {
+            background-color: #f8f9fa;
+        }
+
+
+        #modaltable th, #modaltable td {
+            border-color: white !important;
+            white-space: nowrap;
+        }
+
+        #modaltable tbody td {
+            background-color: #f8f9fa !important;
+        }
+
+        #modaltable {
+            width: 100% !important;
+            table-layout: fixed;
+        }
+
+        .modal-body {
+            overflow-x: auto;
         }
 
         @keyframes slideInFromRight {
@@ -110,7 +134,6 @@
             animation: slideInFromRight 0.5s ease-out;
         }
 
-
         #greenAlert {
             display: none;
             position: fixed;
@@ -126,6 +149,10 @@
             opacity: 0;
             transition: opacity 2s ease-in-out;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 
 </head>
@@ -133,6 +160,7 @@
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
 
     <div class="main-container">
         <div id="sidebarContainer" class="left-navbar">
@@ -148,24 +176,24 @@
                         <div class="dashboard__left col-12 col-sm-12 col-md-12 col-lg-9">
                             <div class="row mb-5">
                                 <div class="col-12 col-sm-12 col-md-6 col-lg-4">
-                                    <div class="card hovercards">
-                                        <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%);">
+                                    <div class="card hovercards leave-summary-card" data-status="Request to Approve">
+                                        <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%); cursor: pointer">
                                             <h6 class="card-title">Total Leave Requests</h6>
                                             <h1 class="card-text" id="total_leave_request"></h1>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="card hovercards">
-                                        <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%);">
+                                    <div class="card hovercards leave-summary-card" data-status="Approved">
+                                        <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%); cursor: pointer">
                                             <h6 class="card-title">Approved Leave Requests</h6>
                                             <h1 class="card-text" id="approved_leave_request"></h1>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="card hovercards">
-                                        <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%);">
+                                    <div class="card hovercards leave-summary-card" data-status="Rejected">
+                                        <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%); cursor: pointer">
                                             <h6 class="card-title">Rejected Leave Requests</h6>
                                             <h1 class="card-text" id="rejected_leave_request"></h1>
                                         </div>
@@ -178,9 +206,9 @@
                                         <div class="card-header" style="background-color: white">
                                             <h6 class="card-title">Available Leaves</h6>
                                         </div>
-                                        <div class="card-body">
+                                        <div class="card-body" style="max-height: 400px; overflow: auto; overflow-x: hidden">
                                             <canvas id="leaveChart"></canvas>
-                                            <div id="leaveChartContainer"></div>
+                                            <div class="mt-2" id="leaveChartContainer"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -190,7 +218,7 @@
                                             <h6 class="card-title">Total Leaves</h6>
                                             <input type="month" id="monthPicker" class="form-control" style="width: 150px;" />
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="card-body" style="max-height: 500px; overflow: auto;">
                                             <table id="LeavesTable" class="table table-striped table-bordered" style="width: 100%; border: none">
                                                 <thead>
                                                     <tr>
@@ -211,29 +239,27 @@
                             </div>
                         </div>
                         <div class="dashboard__right col-12 col-sm-12 col-md-12 col-lg-3">
-                            <div class="card mb-4">
-                                <div class="card-header d-flex justify-content-center align-items-center" style="background-color: hsl(8,77%,56%); color: white">
-                                    <h6 class="card-title mt-2">View Admin Dashboard <i class="fa-solid fa-arrow-right"></i></h6>
+                            <div class="card mb-4" style="background-color: orange">
+                                <div class="card-header d-flex justify-content-center align-items-center onlyhighaccesslvl" style="background-color: hsl(8,77%,56%); color: white">
+                                    <h6 class="card-title mt-2" style="cursor: pointer;" onclick="window.location.href='leave_admin_dashboard.aspx'">View Admin Dashboard <i class="fa-solid fa-arrow-right"></i></h6>
                                 </div>
                                 <div class="card-body mt-1" style="background-color: orange; color: white">
                                     <div class="d-flex align-items-center">
                                         <div class="mr-3 ml-3 flex-shrink-0">
                                             <img style="width: 70px; height: 70px" src="/asset/img/holidays.png" />
                                         </div>
-                                        <div class="d-flex flex-column justify-content-center">
+                                        <div class="d-flex flex-column justify-content-center" style="margin-top: -10px;">
                                             <span class="mt-2" style="font-size: 0.9rem; font-weight: 700; cursor: pointer;">Next Holiday</span>
-                                            <h4 class="card-title mb-1" id="next_holiday" style="margin-bottom: 0px; word-wrap: break-word; white-space: normal;"></h4>
-                                            <span style="font-size: 0.8rem; font-weight: 600" id="next_holiday_date"></span>
+                                            <h4 class="card-title mt-1" id="next_holiday" style="margin-bottom: 0px; word-wrap: break-word; white-space: normal;"></h4>
+                                            <span class="mt-2" style="font-size: 0.8rem; font-weight: 600" id="next_holiday_date"></span>
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
 
                             <div class="card p-3 mb-4">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px">
-                                    <h6 class="card-title ml-1">Upcoming Holidays</h6>
+                                    <h6 class="card-title ml-1">Holidays This Month</h6>
                                 </div>
                                 <hr />
                                 <div class="card-body">
@@ -245,6 +271,36 @@
                             <uc:Quick_action runat="server" />
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="leaveModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Leave Details</h5>
+                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="modaltable" class="table table-striped table-bordered" style="width: 100%; height: 100%; border: none">
+                        <thead>
+                            <tr>
+                                <th>Leave ID</th>
+                                <th>Employee</th>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Request Days</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -293,27 +349,170 @@
 
     <script>
         $(document).ready(function () {
+            if ($("#emp_access_lvl").val() == "true") {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.classList.remove('hidden');
+                });
+            }
+            else {
+                document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                    element.classList.add('hidden');
+                });
+            }
+
             var today = new Date();
-            nextHolidays(today.getMonth(), today.getFullYear());
-
-            populate_leave_details();
-            GetHolidays();
-            GetLeaveBalanceandLeaveHistory();
-
             const currentMonth = today.getMonth() + 1;
             const currentYear = today.getFullYear();
 
             $('#monthPicker').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
 
-            populateleaves(currentMonth, currentYear);
-
-            $('#monthPicker').on('change', function () {
-                const selectedDate = $(this).val().split('-');
-                const selectedYear = selectedDate[0];
-                const selectedMonth = selectedDate[1];
-                populateleaves(selectedMonth, selectedYear);
-            });
+            populate_leave_details();
+            nextHolidays(today.getMonth(), today.getFullYear());
+            GetLeaveBalanceandLeaveHistory();
+            populate_leaves_based_months("leave_emp_dashboard", currentMonth, currentYear);
+            HolidaysThisMonths();
         });
+
+        $('#monthPicker').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_leaves_based_months("leave_emp_dashboard", selectedMonth, selectedYear);
+        });
+
+        function populate_leave_details() {
+            $.ajax({
+                type: "POST",
+                url: 'leave_emp_dashboard.aspx/populate_leave_details',
+                data: JSON.stringify({ from: "leave_emp_dashboard" }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    const data = JSON.parse(response.d);
+
+                    $("#total_leave_request").text(data.total_leave_request || 0);
+                    $("#approved_leave_request").text(data.approved_leave_request || 0);
+                    $("#rejected_leave_request").text(data.rejected_leave_request || 0);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        $('.leave-summary-card').on('click', function () {
+            let status = $(this).data('status');
+            $('#modalTitle').text(status + ' Leaves');
+            loadLeaveData(status);
+            $('#leaveModal').modal('show');
+        });
+
+        function loadLeaveData(status) {
+            let postData = JSON.stringify({
+                from: "leave_emp_dashboard_total_leave_request",
+                selectedMonth: new Date().getMonth() + 1,
+                selectedYear: new Date().getFullYear()
+            });
+
+            $.ajax({
+                type: "POST",
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                contentType: 'application/json',
+                data: postData,
+                dataType: 'json',
+                success: function (response) {
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    const filteredData = (Array.isArray(data) && data.length > 0)
+                        ? data.filter(item =>
+                            item.leave_status === status ||
+                            (status === "Request to Approve")
+                        )
+                        : data;
+
+                    if ($.fn.DataTable.isDataTable('#modaltable')) {
+                        $('#modaltable').DataTable().destroy();
+                    }
+
+                    $('#modaltable').DataTable({
+                        data: filteredData,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
+                        columns: [
+                            { data: 'leave_id' },
+                            { data: 'emp_name' },
+                            { data: 'leave_type' },
+                            {
+                                data: 'start_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const start_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${start_date}</span>`;
+                                }
+                            },
+                            {
+                                data: 'end_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const end_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${end_date}</span>`;
+                                }
+                            },
+                            {
+                                data: 'requested_days',
+                                render: function (data) {
+                                    return `<span> ${data}<span />`;
+                                }
+                            },
+                            {
+                                data: 'leave_status',
+                                render: function (data) {
+                                    if (!data) {
+                                        return `<span style="color: #077E8C;font-weight: bold;">Pending</span>`;
+                                    }
+                                    else if (data == "Canceled") {
+                                        return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
+                                    }
+                                    return data === "Approved"
+                                        ? `<span style="color: green;font-weight: bold;">Approved</span>`
+                                        : `<span style="color: red;font-weight: bold;">Rejected</span>`;
+                                }
+                            }
+                        ],
+                        headerCallback: function (thead, data, start, end, display) {
+                            $('th', thead).addClass('text-center');
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $('td', row).addClass('text-center');
+                        },
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+</div>`
+                        }
+                    });
+
+                    $('#modaltable').DataTable().columns.adjust().draw();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
 
         function nextHolidays(month, year) {
             $.ajax({
@@ -352,34 +551,11 @@
             });
         }
 
-        function populate_leave_details() {
+        function populate_leaves_based_months(from, selectedMonth, selectedYear) {
             $.ajax({
                 type: "POST",
-                url: 'leave_emp_dashboard.aspx/populate_leave_details',
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    const data = JSON.parse(response.d);
-
-                    $("#total_leave_request").text(data.total_leave_request || 0);
-                    $("#approved_leave_request").text(data.newJoiningThisWeek || 0);
-                    $("#rejected_leave_request").text(data.totalEmpCount || 0);
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function populateleaves(selectedMonth, selectedYear) {
-            $.ajax({
-                type: "POST",
-                url: 'leave_emp_dashboard.aspx/populateleaves',
-                data: JSON.stringify({ selectedMonth: selectedMonth, selectedYear: selectedYear }),
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                data: JSON.stringify({ from: from, selectedMonth: selectedMonth, selectedYear: selectedYear }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -406,12 +582,6 @@
                         scrollCollapse: true,
                         fixedColumns: {
                             rightColumns: 1
-                        },
-                        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
-                        initComplete: function () {
-                            $('#dataTableControls').empty();
-                            $('#LeavesTable_length').detach().appendTo('#dataTableControls');
-                            $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
                         },
                         columns: [
                             { data: 'leave_id', visible: false },
@@ -501,7 +671,11 @@
                 carouselItems += `
         <div class="carousel-item ${activeClass}">
             <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
-                <h5 class="modal-title">Details</h5>
+                <h5 class="modal-title">Details</h5> 
+                <div class="ml-5 mt-1">
+                  <span class="mr-1" style="color: gray; font-size: 1rem;">Create Time:</span>
+                  <span style="font-size: 1rem;">${data.created_time}</span>
+                </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -555,10 +729,10 @@
             $('#detailsModal').modal('show');
         });
 
-        function GetHolidays() {
+        function HolidaysThisMonths() {
             $.ajax({
                 type: "POST",
-                url: "leave_emp_dashboard.aspx/GetHolidays",
+                url: "leave_emp_dashboard.aspx/HolidaysThisMonths",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {

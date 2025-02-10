@@ -81,10 +81,12 @@
     }
 </style>
 
+<input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
+
 <nav id="left-navbar" class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-primary p-0">
     <div class="container-fluid d-flex flex-column p-0" style="background-color: hsl(0,0%,13%); height: 100%;">
         <div class="flex-shrink-0" style="margin-left: -20%; margin-top: 10px">
-            <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" id="mom_redirect_url" runat="server" href="#">
+            <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" runat="server" href="#">
                 <div class="sidebar-brand-icon">
                     <img src="\asset\img\hrms_icon.jpg" class="rounded-circle" style="width: 36px; height: 34px; object-fit: cover;">
                 </div>
@@ -98,14 +100,14 @@
 
         <div class="flex-grow-1 sidebar-nav mt-1" data-simplebar="">
             <ul class="navbar-nav text-light" id="accordionSidebar" runat="server">
-                <li class="nav-item">
+                <li class="nav-item onlyhighaccesslvl">
                     <a id="DashboardNavLink" class="nav-link" href="../dashboard.aspx" runat="server">
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item onlyhighaccesslvl">
                     <a id="AnnouncementsNavLink" class="nav-link" href="../announcements.aspx" runat="server">
                         <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
                         <span>Announcements</span>
@@ -126,12 +128,12 @@
                     </a>
                     <div id="leaveSubMenu" runat="server" clientidmode="Static" class="collapse">
                         <ul class="navbar-nav text-light">
-                            <li class="nav-item">
+                            <li class="nav-item mt-2">
                                 <a id="LeaveDashboardNavLink" class="nav-link" href="../leave_emp_dashboard.aspx" runat="server">
                                     <span>Dashboard</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item onlyhighaccesslvl">
                                 <a id="AllemployeeLeaveRequestNavLink" class="nav-link" href="../all_emp_leave_request.aspx" runat="server">
                                     <span>Leave Requests</span>
                                 </a>
@@ -164,7 +166,7 @@
                     </a>
                     <div id="HelpDeskSubMenu" runat="server" clientidmode="Static" class="collapse">
                         <ul class="navbar-nav text-light">
-                            <li class="nav-item">
+                            <li class="nav-item mt-2">
                                 <a id="ticketsNavLink" class="nav-link" href="../tickets.aspx" runat="server">
                                     <span>Tickets</span>
                                 </a>
@@ -198,3 +200,14 @@
         </div>
     </div>
 </nav>
+
+<script>
+    $(document).ready(function () {
+        if ($("#emp_access_lvl").val() == "flase") {
+            document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
+                element.style.display = 'none ';
+            });
+        }
+    });
+
+</script>

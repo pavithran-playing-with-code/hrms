@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class testing
+    public partial class leave_admin_dashboard
     {
 
         /// <summary>

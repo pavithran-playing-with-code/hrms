@@ -15,13 +15,13 @@ namespace hrms
     {
 
         /// <summary>
-        /// mom_redirect_url control.
+        /// emp_access_lvl control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor mom_redirect_url;
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden emp_access_lvl;
 
         /// <summary>
         /// accordionSidebar control.

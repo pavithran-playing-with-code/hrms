@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Services;
 using System.Web.UI;
@@ -18,11 +19,35 @@ namespace hrms
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            try
+            {
+                var emp_id = HttpContext.Current.Session["emp_id"];
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
 
+                    string accessLevelQuery = @"SELECT access_level FROM hrms.employee WHERE emp_id = @emp_id";
+                    using (var cmd = new MySqlCommand(accessLevelQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        var accessLevel = cmd.ExecuteScalar();
+
+                        if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
+                        {
+                            emp_access_lvl.Value = "true";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Write($"Error: {ex.Message}");
+            }
         }
 
         [WebMethod]
-        public static string populate_leave_details()
+        public static string populate_leave_details(string from)
         {
             var data = new Dictionary<string, object>();
 
@@ -35,18 +60,33 @@ namespace hrms
                     conn.Open();
 
                     var emp_id = HttpContext.Current.Session["emp_id"];
-                    string get_leave_info_query = @"
-                SELECT 
-                    COUNT(*) AS total_leave_requests,
-                    SUM(CASE WHEN l.leave_status = 'Approved' THEN 1 ELSE 0 END) AS approved_leave_requests,
-                    SUM(CASE WHEN l.leave_status = 'Rejected' THEN 1 ELSE 0 END) AS rejected_leave_requests
-                FROM hrms.leave_requests l
-                WHERE l.emp_id = @emp_id
-                AND YEARWEEK(l.start_date, 1) = YEARWEEK(CURDATE(), 1);";
+                    string get_leave_info_query = "";
+
+                    if (from == "leave_emp_dashboard")
+                    {
+                        get_leave_info_query = @"SELECT COUNT(*) AS total_leave_requests,
+                                                        SUM(CASE WHEN l.leave_status = 'Approved' THEN 1 ELSE 0 END) AS approved_leave_requests,
+                                                        SUM(CASE WHEN l.leave_status = 'Rejected' THEN 1 ELSE 0 END) AS rejected_leave_requests
+                                                FROM hrms.leave_requests l
+                                                WHERE  canceled_by IS NULL AND l.emp_id = @emp_id AND YEAR(l.start_date) = YEAR(CURDATE()) ";
+                    }
+                    else if (from == "leave_admin_dashboard")
+                    {
+                        get_leave_info_query = @"SELECT SUM(CASE WHEN l.leave_status IS NULL AND YEAR(l.start_date) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS total_leave_requests, 
+                                                        SUM(CASE WHEN l.leave_status = 'Approved' AND YEAR(l.start_date) = YEAR(CURDATE()) 
+                                                            AND MONTH(l.start_date) = MONTH(CURDATE()) THEN 1 ELSE 0 END) AS approved_leave_requests, 
+                                                        SUM(CASE WHEN l.leave_status = 'Rejected' AND YEAR(l.start_date) = YEAR(CURDATE()) 
+                                                            AND MONTH(l.start_date) = MONTH(CURDATE()) THEN 1 ELSE 0 END) AS rejected_leave_requests 
+                                                FROM hrms.leave_requests l
+                                                WHERE l.canceled_by IS NULL ";
+                    }
 
                     using (var cmd = new MySqlCommand(get_leave_info_query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        if (from == "leave_emp_dashboard")
+                        {
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        }
 
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -88,10 +128,12 @@ namespace hrms
             public string leave_description { get; set; }
             public string attachment { get; set; }
             public string leave_status { get; set; }
+            public string created_by { get; set; }
+            public string created_time { get; set; }
         }
 
         [WebMethod]
-        public static string populateleaves(int selectedMonth = 0, int selectedYear = 0)
+        public static string populate_leaves_based_months(string from, int selectedMonth = 0, int selectedYear = 0)
         {
             var data = "";
             var List = new List<leave>();
@@ -112,19 +154,52 @@ namespace hrms
                     }
 
                     string leave_Query = @"SELECT l.leave_requests_id AS leave_id, l.emp_id, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, lt.leave_type, l.start_date, 
-                                            l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, l.leave_status 
+                                            l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, l.leave_status, l.created_by, l.created_time 
                                             FROM hrms.leave_requests l 
                                             LEFT JOIN hrms.employee e ON e.emp_id = l.emp_id
                                             LEFT JOIN hrms.leave_type lt ON lt.leave_type_id = l.leave_type_id
-                                            WHERE l.emp_id = @emp_id 
-                                            AND MONTH(l.created_time) = @selectedMonth 
-                                            AND YEAR(l.created_time) = @selectedYear";
+                                            WHERE canceled_by IS NULL ";
+
+                    if (from == "leave_emp_dashboard")
+                    {
+                        leave_Query += " AND l.emp_id = @emp_id AND (MONTH(l.start_date) = @selectedMonth OR MONTH(l.end_date) = @selectedMonth) AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                    }
+                    else if (from == "leave_admin_dashboard")
+                    {
+                        leave_Query += " AND (MONTH(l.start_date) = @selectedMonth OR MONTH(l.end_date) = @selectedMonth) AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                    }
+                    else if (from == "leave_emp_dashboard_total_leave_request")
+                    {
+                        leave_Query += " AND l.emp_id = @emp_id AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                    }
+                    else if (from == "leave_admin_dashboard_total_leave_request")
+                    {
+                        leave_Query += " AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                    }
 
                     using (var cmd = new MySqlCommand(leave_Query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
-                        cmd.Parameters.AddWithValue("@selectedMonth", selectedMonth);
-                        cmd.Parameters.AddWithValue("@selectedYear", selectedYear);
+                        if (from == "leave_emp_dashboard")
+                        {
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                            cmd.Parameters.AddWithValue("@selectedMonth", selectedMonth);
+                            cmd.Parameters.AddWithValue("@selectedYear", selectedYear);
+                        }
+                        else if (from == "leave_admin_dashboard")
+                        {
+                            cmd.Parameters.AddWithValue("@selectedMonth", selectedMonth);
+                            cmd.Parameters.AddWithValue("@selectedYear", selectedYear);
+                        }
+                        else if (from == "leave_emp_dashboard_total_leave_request")
+                        {
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                            cmd.Parameters.AddWithValue("@selectedYear", selectedYear);
+                        }
+                        else if (from == "leave_admin_dashboard_total_leave_request")
+                        {
+                            cmd.Parameters.AddWithValue("@selectedYear", selectedYear);
+                        }
+
 
                         var da = new MySqlDataAdapter(cmd);
                         DataTable dt = new DataTable();
@@ -179,6 +254,8 @@ namespace hrms
                                 leave_description = row["leave_description"].ToString(),
                                 attachment = row["attachment"].ToString(),
                                 leave_status = row["leave_status"].ToString(),
+                                created_by = row["created_by"].ToString(),
+                                created_time = row["created_time"].ToString()
                             });
                         }
                     }
@@ -197,7 +274,7 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string GetHolidays()
+        public static string HolidaysThisMonths()
         {
             Dictionary<string, string> holidays = new Dictionary<string, string>();
 
@@ -208,7 +285,7 @@ namespace hrms
                 {
                     connection.Open();
                     string query = "SELECT holiday_date, holiday_name FROM hrms.holidays WHERE MONTH(holiday_date) = MONTH(CURDATE()) AND YEAR(holiday_date) = YEAR(CURDATE()) ";
-                    using (var command = new MySqlCommand(query, connection)) 
+                    using (var command = new MySqlCommand(query, connection))
                     {
                         using (var reader = command.ExecuteReader())
                         {

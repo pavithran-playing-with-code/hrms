@@ -28,12 +28,9 @@ namespace hrms
                         cmd.Parameters.AddWithValue("@emp_id", emp_id);
                         var accessLevel = cmd.ExecuteScalar();
 
-                        if (accessLevel != null && accessLevel.ToString().ToLower() != "high")
+                        if (accessLevel.ToString().ToLower() != "high")
                         {
-                            LeaveDashboardNavLink.Visible = false;
-                            AllemployeeLeaveRequestNavLink.Visible = false;
-                            AnnouncementsNavLink.Visible = false;
-                            DashboardNavLink.Visible = false;
+                            emp_access_lvl.Value = "flase";
                         }
                     }
                 }
@@ -57,13 +54,16 @@ namespace hrms
                 }
             }
 
-            if (currentPage == "leave_emp_dashboard.aspx" || currentPage == "all_emp_leave_request.aspx" || currentPage == "my_leave_requests.aspx" || currentPage == "leave_configuration.aspx")
+            if (currentPage == "leave_emp_dashboard.aspx" || currentPage == "leave_admin_dashboard.aspx" || currentPage == "all_emp_leave_request.aspx" || currentPage == "my_leave_requests.aspx" || currentPage == "leave_configuration.aspx")
             {
                 leaveSubMenu.Attributes["class"] = "collapse show";
 
                 switch (currentPage)
                 {
                     case "leave_emp_dashboard.aspx":
+                        LeaveDashboardNavLink.Attributes["class"] += " active-page";
+                        break;
+                    case "leave_admin_dashboard.aspx":
                         LeaveDashboardNavLink.Attributes["class"] += " active-page";
                         break;
                     case "all_emp_leave_request.aspx":
