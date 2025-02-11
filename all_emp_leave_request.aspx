@@ -47,6 +47,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         .main-container {
@@ -101,6 +102,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
+            cursor: pointer;
         }
 
             #LeavesTable td button {

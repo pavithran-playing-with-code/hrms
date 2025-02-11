@@ -46,6 +46,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         .main-container {

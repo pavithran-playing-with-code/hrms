@@ -71,6 +71,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         * {
@@ -609,7 +610,7 @@
                                     ' <span class="profile-name text-dark font-weight-bold">' + heading + '</span>';
                             }
 
-                            announcementsHTML += '<div class="announcement-row pb-3" draggable="true" onclick="openannouncementmodal(' + announcement_id + ')">' +
+                            announcementsHTML += '<div class="announcement-row pb-3" draggable="true" style="cursor: pointer;" onclick="openannouncementmodal(' + announcement_id + ')">' +
                                 '<div class="announcement-title">' +
                                 '<a class="profile-link" style="text-decoration: none;">' +
                                 '<div class="profile-avatar mr-1">' + profileHTML +

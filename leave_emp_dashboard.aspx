@@ -73,6 +73,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         * {
@@ -97,6 +98,7 @@
 
         .table.table-striped.table-bordered td {
             background-color: #f8f9fa;
+            cursor: pointer;
         }
 
 

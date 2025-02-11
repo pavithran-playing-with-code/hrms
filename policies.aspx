@@ -46,6 +46,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         .main-container {
@@ -254,8 +255,8 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h5 class="m-0"><span style="color: green; font-size:0.5rem"><i class="fa-solid fa-circle mr-2"></i></span>${p.policy_name}</h5>
                                             <div class="onlyhighaccesslvl">
-                                                <i class="fa-sharp fa-solid fa-pen-to-square m-0" onclick="openeditpolicy(${p.policy_id}, '${p.policy_name}', '${encodeURIComponent(p.description)}')"></i>
-                                                <i class="fa-solid fa-trash-can m-0 ml-2" onclick="deletepolicy(${p.policy_id})"></i>
+                                                <i class="fa-sharp fa-solid fa-pen-to-square m-0" style="cursor: pointer;" onclick="openeditpolicy(${p.policy_id}, '${p.policy_name}', '${encodeURIComponent(p.description)}')"></i>
+                                                <i class="fa-solid fa-trash-can m-0 ml-2" style="cursor: pointer;" onclick="deletepolicy(${p.policy_id})"></i>
                                             </div>
                                         </div>
                                         <span class="card-text mb-3" style="flex-grow: 1; overflow-y: auto; max-height: 80%;">${p.description}</span>
