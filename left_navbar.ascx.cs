@@ -28,9 +28,9 @@ namespace hrms
                         cmd.Parameters.AddWithValue("@emp_id", emp_id);
                         var accessLevel = cmd.ExecuteScalar();
 
-                        if (accessLevel.ToString().ToLower() != "high")
+                        if (accessLevel != null && accessLevel.ToString().ToLower() == "high")
                         {
-                            emp_access_lvl.Value = "flase";
+                            emp_access_lvl.Value = "true";
                         }
                     }
                 }

@@ -18,6 +18,7 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -35,6 +36,7 @@
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
 
     <style>
         .main-container {
@@ -73,6 +75,7 @@
             bottom: 10px;
             user-select: none;
             z-index: 1050;
+            cursor: pointer;
         }
 
         * {
@@ -97,6 +100,7 @@
 
         .table.table-striped.table-bordered td {
             background-color: #f8f9fa;
+            cursor: pointer;
         }
 
 
@@ -107,11 +111,6 @@
 
         #modaltable tbody td {
             background-color: #f8f9fa !important;
-        }
-
-        #modaltable thead th {
-            background-color: #e9ecef !important;
-            color: #333 !important;
         }
 
         #modaltable {
@@ -138,7 +137,6 @@
         .alert-custom {
             animation: slideInFromRight 0.5s ease-out;
         }
-
 
         #greenAlert {
             display: none;
@@ -179,24 +177,26 @@
                             <div class="row mb-5">
                                 <div class="col-12 col-sm-12 col-md-6 col-lg-4">
                                     <div class="card hovercards leave-summary-card" data-status="Request to Approve">
-                                        <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%);">
-                                            <h6 class="card-title">Total Leave Requests</h6>
+                                        <div class="card-body" style="border-top: 5px solid hsl(216,18%,64%); cursor: pointer">
+                                            <h6 class="card-title">Requests to Approve</h6>
                                             <h1 class="card-text" id="total_leave_request"></h1>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-sm-4">
                                     <div class="card hovercards leave-summary-card" data-status="Approved">
-                                        <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%);">
-                                            <h6 class="card-title">Approved Leave Requests</h6>
+                                        <div class="card-body" style="border-top: 5px solid hsl(148, 70%, 40%); cursor: pointer">
+                                            <h6 class="card-title">Approved Leaves In This Month</h6>
                                             <h1 class="card-text" id="approved_leave_request"></h1>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-sm-4">
                                     <div class="card hovercards leave-summary-card" data-status="Rejected">
-                                        <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%);">
-                                            <h6 class="card-title">Rejected Leave Requests</h6>
+                                        <div class="card-body" style="border-top: 5px solid hsl(37,90%,47%); cursor: pointer">
+                                            <h6 class="card-title">Rejected Leaves In This Month</h6>
                                             <h1 class="card-text" id="rejected_leave_request"></h1>
                                         </div>
                                     </div>
@@ -206,25 +206,54 @@
                                 <div class="col-12 col-sm-12 col-md-6 col-lg-4">
                                     <div class="card">
                                         <div class="card-header" style="background-color: white">
-                                            <h6 class="card-title">Available Leaves</h6>
+                                            <h6 class="card-title">On Leave</h6>
                                         </div>
-                                        <div class="card-body" style="max-height: 400px; overflow: auto; overflow-x: hidden">
-                                            <canvas id="leaveChart"></canvas>
-                                            <div class="mt-2" id="leaveChartContainer"></div>
+                                        <div class="card-body p-4" id="onleave" style="height: 400px; overflow: auto">
+                                            <div class="mb-3 d-flex align-items-start w-75">
+                                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1" style="flex-shrink: 0; width: 40px; height: 40px; background-color: violet; color: white; font-weight: bold; font-size: 1rem;">bt
+                                                </span>
+                                                <div style="margin-left: 10px;">
+                                                    <div style="font-weight: bold; font-size: 1rem;">ben tenison</div>
+                                                    <div style="font-size: 0.9rem; color: #4d4a4a">IT / Senoir Developer</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">Sick Leave</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">(01-28-2025 to 01-29-2025)</div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 d-flex align-items-start w-75">
+                                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1" style="flex-shrink: 0; width: 40px; height: 40px; background-color: purple; color: white; font-weight: bold; font-size: 1rem;">k1
+                                                </span>
+                                                <div style="margin-left: 10px;">
+                                                    <div style="font-weight: bold; font-size: 1rem;">kevin 11</div>
+                                                    <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">Support / Data Management addveadfaeddkb</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">Sick Leave</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">(01-30-2025 to 01-30-2025)</div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 d-flex align-items-start w-75">
+                                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1" style="flex-shrink: 0; width: 40px; height: 40px; background-color: pink; color: white; font-weight: bold; font-size: 1rem;">gt
+                                                </span>
+                                                <div style="margin-left: 10px;">
+                                                    <div style="font-weight: bold; font-size: 1rem;">gwen tenison</div>
+                                                    <div style="font-size: 0.9rem; color: #4d4a4a">Support / Data Testing</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">Sick Leave</div>
+                                                    <div style="font-size: 0.8rem; color: #dc3545;">(01-30-2025 to 01-30-2025)</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-12 col-lg-8">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white;">
-                                            <h6 class="card-title">Total Leaves</h6>
+                                            <h6 class="card-title">Employee Leaves</h6>
                                             <input type="month" id="monthPicker" class="form-control" style="width: 150px;" />
                                         </div>
-                                        <div class="card-body" style="max-height: 500px; overflow: auto;">
-                                            <table id="LeavesTable" class="table table-striped table-bordered" style="width: 100%; border: none">
+                                        <div class="card-body" style="max-height: 500px; overflow: auto">
+                                            <table id="LeavesTable" class="table table-striped table-bordered" style="width: 100%; height: 100%; border: none">
                                                 <thead>
                                                     <tr>
                                                         <th>Leave ID</th>
+                                                        <th>Employee</th>
                                                         <th>Leave Type</th>
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
@@ -242,8 +271,8 @@
                         </div>
                         <div class="dashboard__right col-12 col-sm-12 col-md-12 col-lg-3">
                             <div class="card mb-4" style="background-color: orange">
-                                <div class="card-header d-flex justify-content-center align-items-center onlyhighaccesslvl" style="background-color: hsl(8,77%,56%); color: white">
-                                    <h6 class="card-title mt-2" style="cursor: pointer;" onclick="window.location.href='leave_admin_dashboard.aspx'">View Admin Dashboard <i class="fa-solid fa-arrow-right"></i></h6>
+                                <div class="card-header d-flex justify-content-center align-items-center " style="background-color: hsl(8,77%,56%); color: white">
+                                    <h6 class="card-title mt-2" style="cursor: pointer;" onclick="window.location.href='leave_emp_dashboard.aspx'">View Personal Dashboard <i class="fa-solid fa-arrow-right"></i></h6>
                                 </div>
                                 <div class="card-body mt-1" style="background-color: orange; color: white">
                                     <div class="d-flex align-items-center">
@@ -257,6 +286,8 @@
                                         </div>
                                     </div>
                                 </div>
+
+
                             </div>
 
                             <div class="card p-3 mb-4">
@@ -335,7 +366,7 @@
                     <div class="carousel-inner" id="carouselContent">
                     </div>
                     <a class="carousel-control-prev" href="#leaveCarousel" role="button" data-slide="prev" style="position: absolute; left: -90px;">
-                        <span style="color: #333; font-size: 0.6rem;" class="carousel-control-prev-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3" style="color: white;" aria-hidden="true">
+                        <span style="color: #333; font-size: 0.6rem;" aria-hidden="true" class="carousel-control-prev-icon bg-white rounded-circle d-flex align-items-center justify-content-center p-3">
                             <i class="fa-solid fa-less-than"></i>
                         </span>
                     </a>
@@ -359,8 +390,8 @@
 
             populate_leave_details();
             nextHolidays(today.getMonth(), today.getFullYear());
-            GetLeaveBalanceandLeaveHistory();
-            populate_leaves_based_months("leave_emp_dashboard", currentMonth, currentYear);
+            //populate_on_leaves();
+            populate_leaves_based_months("leave_admin_dashboard", currentMonth, currentYear);
             HolidaysThisMonths();
         });
 
@@ -368,13 +399,14 @@
             const selectedDate = $(this).val().split('-');
             const selectedYear = selectedDate[0];
             const selectedMonth = selectedDate[1];
-            populate_leaves_based_months("leave_emp_dashboard", selectedMonth, selectedYear);
+            populate_leaves_based_months("leave_admin_dashboard", selectedMonth, selectedYear);
         });
 
         function populate_leave_details() {
             $.ajax({
                 type: "POST",
                 url: 'leave_emp_dashboard.aspx/populate_leave_details',
+                data: JSON.stringify({ from: "leave_admin_dashboard" }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
@@ -403,7 +435,7 @@
 
         function loadLeaveData(status) {
             let postData = JSON.stringify({
-                from: "leave_emp_dashboard",
+                from: "leave_admin_dashboard_total_leave_request",
                 selectedMonth: new Date().getMonth() + 1,
                 selectedYear: new Date().getFullYear()
             });
@@ -419,11 +451,48 @@
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
 
+                    const parseDate = (dateString) => {
+                        const dateParts = dateString.split(' ')[0].split('-');
+                        let day, month, year;
+
+                        if (parseInt(dateParts[0], 10) > 12) {
+                            day = parseInt(dateParts[0], 10);
+                            month = parseInt(dateParts[1], 10) - 1;
+                            year = parseInt(dateParts[2], 10);
+                        } else {
+                            month = parseInt(dateParts[0], 10) - 1;
+                            day = parseInt(dateParts[1], 10);
+                            year = parseInt(dateParts[2], 10);
+                        }
+
+                        return new Date(year, month, day);
+                    };
+
+                    const currentMonth = new Date().getMonth() + 1;
+                    const currentYear = new Date().getFullYear();
+
                     const filteredData = (Array.isArray(data) && data.length > 0)
-                        ? data.filter(item =>
-                            item.leave_status === status ||
-                            (status === "Request to Approve" && item.leave_status === "Pending")
-                        )
+                        ? data.filter(item => {
+                            if (!item.start_date || !item.end_date) return false;
+
+                            const startDate = parseDate(item.start_date);
+                            const endDate = parseDate(item.end_date);
+
+                            const isInCurrentMonth = (
+                                (startDate.getFullYear() === currentYear && startDate.getMonth() + 1 === currentMonth) ||
+                                (endDate.getFullYear() === currentYear && endDate.getMonth() + 1 === currentMonth) ||
+                                (startDate < new Date(currentYear, currentMonth - 1, 1) && endDate > new Date(currentYear, currentMonth, 0))
+                            );
+
+                            if (status === "Request to Approve") {
+                                return item.leave_status !== "Approved" && item.leave_status !== "Rejected";
+                            } else if (status === "Approved") {
+                                return item.leave_status === "Approved" && isInCurrentMonth;
+                            } else if (status === "Rejected") {
+                                return item.leave_status === "Rejected" && isInCurrentMonth;
+                            }
+                            return false;
+                        })
                         : data;
 
                     if ($.fn.DataTable.isDataTable('#modaltable')) {
@@ -445,16 +514,16 @@
                                 data: 'start_date',
                                 render: function (data) {
                                     const dateParts = data.split(' ')[0].split('-');
-                                    const start_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
-                                    return `<span>${start_date}</span>`;
+                                    const formattedDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${formattedDate}</span>`;
                                 }
                             },
                             {
                                 data: 'end_date',
                                 render: function (data) {
                                     const dateParts = data.split(' ')[0].split('-');
-                                    const end_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
-                                    return `<span>${end_date}</span>`;
+                                    const formattedDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${formattedDate}</span>`;
                                 }
                             },
                             {
@@ -468,8 +537,7 @@
                                 render: function (data) {
                                     if (!data) {
                                         return `<span style="color: #077E8C;font-weight: bold;">Pending</span>`;
-                                    }
-                                    else if (data == "Canceled") {
+                                    } else if (data == "Canceled") {
                                         return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
                                     }
                                     return data === "Approved"
@@ -486,9 +554,9 @@
                         },
                         language: {
                             emptyTable: `<div style="text-align: center;">
-   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
-   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
-</div>`
+       <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+       <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+    </div>`
                         }
                     });
 
@@ -541,6 +609,71 @@
             });
         }
 
+        function populate_on_leaves() {
+            let postData = JSON.stringify({
+                from: "leave_admin_dashboard_total_leave_request",
+                selectedMonth: new Date().getMonth() + 1,
+                selectedYear: new Date().getFullYear()
+            });
+
+            $.ajax({
+                type: "POST",
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                contentType: 'application/json',
+                data: postData,
+                dataType: 'json',
+                success: function (response) {
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    let HTML = "";
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(emp => {
+                            HTML += emp.profile_img
+                                ? `<div style='display: flex; align-items: center; margin-bottom: 10px;'>
+                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center" 
+                                    style="width: 40px; height: 40px; overflow: hidden;">
+                                    <img src="${emp.profile_img}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%;">
+                                </span>
+                                <div style="margin-left: 10px;">
+                                    <div style="font-weight: bold; font-size: 1rem;">${emp.emp_name}</div>
+                                    <div style="font-size: 0.9rem; color: #4d4a4a">${emp.department_name} / ${emp.job_position_name}</div>
+                                    <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type} - (${emp.start_date} to ${emp.end_date})</div>
+                                </div>
+                            </div>`
+                                : `<div class="mb-3 d-flex align-items-center">
+                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center"
+                                    style="width: 40px; height: 40px; background-color: ${emp.profile_color}; color: white; font-weight: bold; font-size: 1rem;">
+                                    ${emp.profile_letters}
+                                </span>
+                                <div style="margin-left: 10px;">
+                                    <div style="font-weight: bold; font-size: 1rem;">${emp.emp_name}</div>
+                                    <div style="font-size: 0.9rem; color: #4d4a4a">${emp.department_name} / ${emp.job_position_name}</div>
+                                    <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type} - (${emp.start_date} to ${emp.end_date})</div>
+                                </div>
+                            </div>`;
+                        });
+                    } else {
+                        HTML = `<div class="empty_message text-center">
+                            <img style="display: block; width: 70px; margin: 20px auto;" src="/asset/img/attendance.png" />
+                            <h5 style="color: hsl(0,0%,45%);">No employees have taken leave today.</h5>
+                        </div>`;
+                    }
+
+                    $("#onleave").html(HTML);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+
         function populate_leaves_based_months(from, selectedMonth, selectedYear) {
             $.ajax({
                 type: "POST",
@@ -575,6 +708,7 @@
                         },
                         columns: [
                             { data: 'leave_id', visible: false },
+                            { data: 'emp_name' },
                             { data: 'leave_type' },
                             {
                                 data: 'start_date',
@@ -662,16 +796,22 @@
         <div class="carousel-item ${activeClass}">
             <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
                 <h5 class="modal-title">Details</h5> 
-                <div class="ml-5 mt-1">
-                  <span class="mr-1" style="color: gray; font-size: 1rem;">Create Time:</span>
-                  <span style="font-size: 1rem;">${data.created_time}</span>
-                </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                  <div class="leave_details" style="margin-left:12%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%;">
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Create By:</span><br />
+                            <span style="font-size: 1rem;">${data.emp_name}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Create Time:</span><br /> 
+                            <span style="font-size: 1rem;">${data.created_time}</span>
+                        </div>
+                    </div>
                     <div class="row" style="width: 100%; justify-content: flex-start;">
                         <div class="col-sm-6" style="padding: 10px; text-align: left;">
                             <span style="color: gray; font-size: 1rem;">Leave Type:</span><br />
@@ -756,84 +896,6 @@
                 },
                 error: function () {
                     console.error("Error fetching holiday data.");
-                }
-            });
-        }
-
-
-        function GetLeaveBalanceandLeaveHistory() {
-            $.ajax({
-                type: "POST",
-                url: 'my_leave_requests.aspx/GetLeaveBalanceandLeaveHistory',
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    if (response.d.includes("ExceptionMessage")) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.d,
-                            confirmButtonText: 'Ok'
-                        });
-                        return;
-                    }
-
-                    const data = JSON.parse(response.d);
-                    const leaveData = data.LeaveBalance;
-
-                    if (leaveData.length === 0) {
-                        $("#leaveChartContainer").html(`<h6 class="text-center text-muted">No leave data available.</h6>`);
-                        return;
-                    }
-
-                    const leaveTypes = leaveData.map(item => item.LeaveType);
-                    const balanceLeaves = leaveData.map(item => item.BalanceLeave);
-
-                    const assignedColors = leaveTypes.map(type => generateColorFromText(type));
-
-                    renderLeaveChart(leaveTypes, balanceLeaves, assignedColors);
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function generateColorFromText(text) {
-            let hash = 0;
-            for (let i = 0; i < text.length; i++) {
-                hash = text.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const hue = Math.abs(hash % 360);
-            return `hsl(${hue}, 70%, 60%)`;
-        }
-
-        function renderLeaveChart(leaveTypes, balanceLeaves, colors) {
-            const ctx = document.getElementById('leaveChart').getContext('2d');
-
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: leaveTypes,
-                    datasets: [{
-                        label: "Leave Balance",
-                        data: balanceLeaves,
-                        backgroundColor: colors,
-                        borderColor: '#ffffff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
                 }
             });
         }

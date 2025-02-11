@@ -208,25 +208,7 @@
                                         <div class="card-header" style="background-color: white">
                                             <h6 class="card-title">On Leave</h6>
                                         </div>
-                                        <div class="card-body d-flex flex-column align-items-center justify-content-center" id="onleave" style="max-height: 400px; overflow: auto;">
-                                            <div class="mb-3 d-flex align-items-center">
-                                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center"
-                                                    style="width: 40px; height: 40px; background-color: violet; color: white; font-weight: bold; font-size: 1rem;">BT
-                                                </span>
-                                                <div style="margin-left: 10px;">
-                                                    <div style="font-weight: bold; font-size: 1rem;">Ben Tenison</div>
-                                                    <div style="font-size: 1rem; color: #4d4a4a">IT / Senior Developer</div>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3 d-flex align-items-center">
-                                                <span class="rounded-circle d-inline-flex justify-content-center align-items-center"
-                                                    style="width: 40px; height: 40px; background-color: violet; color: white; font-weight: bold; font-size: 1rem;">BT
-                                                </span>
-                                                <div style="margin-left: 10px;">
-                                                    <div style="font-weight: bold; font-size: 1rem;">Ben Tenison</div>
-                                                    <div style="font-size: 1rem; color: #4d4a4a">IT / Senior Developer</div>
-                                                </div>
-                                            </div>
+                                        <div class="card-body p-4" id="onleave" style="height: 400px; overflow: auto">
                                         </div>
                                     </div>
                                 </div>
@@ -274,8 +256,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
 
                             <div class="card p-3 mb-4">
@@ -378,6 +358,7 @@
 
             populate_leave_details();
             nextHolidays(today.getMonth(), today.getFullYear());
+            populate_on_leaves();
             populate_leaves_based_months("leave_admin_dashboard", currentMonth, currentYear);
             HolidaysThisMonths();
         });
@@ -592,6 +573,85 @@
                 },
                 error: function () {
                     console.error("Error fetching holiday data.");
+                }
+            });
+        }
+
+        function populate_on_leaves() {
+            let postData = JSON.stringify({
+                from: "leave_admin_dashboard_on_leave",
+                selectedMonth: new Date().getMonth() + 1,
+                selectedYear: new Date().getFullYear()
+            });
+
+            $.ajax({
+                type: "POST",
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                contentType: 'application/json',
+                data: postData,
+                dataType: 'json',
+                success: function (response) {
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    let HTML = "";
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(emp => {
+                            $("#onleave").css({
+                                "display": "flex",
+                                "flex-direction": "column",
+                                "align-items": "center",
+                                "justify-content": "flex-start"
+                            });
+
+                            HTML += emp.profile_img
+                                ? `<div class="mb-3 mr-2 d-flex align-items-start w-75">
+                                       <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1" 
+                                           style="flex-shrink: 0; width: 40px; height: 40px; overflow: hidden;">
+                                           <img src="${emp.profile_img}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%;">
+                                       </span>
+                                       <div style="margin-left: 10px;">
+                                           <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
+                                           <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545;">(${emp.start_date} to ${emp.end_date})</div>
+                                       </div>
+                                   </div>`
+                                : `<div class="mb-3 mr-2 d-flex align-items-start w-75">
+                                       <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1"
+                                           style="flex-shrink: 0; width: 40px; height: 40px; background-color: ${emp.profile_color}; color: white; font-weight: bold; font-size: 1rem;">
+                                           ${emp.profile_letters}
+                                       </span>
+                                       <div style="margin-left: 10px;">
+                                           <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
+                                           <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545;">(${emp.start_date} to ${emp.end_date})</div>
+                                       </div>
+                                   </div>`;
+                        });
+                    } else {
+                        $("#onleave").css({
+                            "display": "flex",
+                            "align-items": "center",
+                            "justify-content": "center"
+                        });
+
+                        HTML = `<div class="empty_message text-center">
+                                    <img style="display: block; width: 70px; margin: 20px auto;" src="/asset/img/attendance.png" />
+                                    <h5 style="color: hsl(0,0%,45%);">No employees have taken leave today.</h5>
+                                </div>`;
+                    }
+
+                    $("#onleave").html(HTML);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
                 }
             });
         }

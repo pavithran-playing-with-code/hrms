@@ -119,6 +119,11 @@ namespace hrms
         {
             public string leave_id { get; set; }
             public string emp_name { get; set; }
+            public string department_name { get; set; }
+            public string job_position_name { get; set; }
+            public string profile_letters { get; set; }
+            public string profile_img { get; set; }
+            public string profile_color { get; set; }
             public string leave_type { get; set; }
             public string start_date { get; set; }
             public string end_date { get; set; }
@@ -153,29 +158,45 @@ namespace hrms
                         selectedYear = DateTime.Now.Year;
                     }
 
-                    string leave_Query = @"SELECT l.leave_requests_id AS leave_id, l.emp_id, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, lt.leave_type, l.start_date, 
-                                            l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, l.leave_status, l.created_by, l.created_time 
+                    string leave_Query = @"SELECT l.leave_requests_id AS leave_id, l.emp_id, d.department_id, j.job_position_id, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, 
+                                            CONCAT(LEFT(e.first_name, 1), LEFT(e.last_name, 1)) AS profile_letters, p.profile_img, p.profile_color, d.department_name, j.job_position_name, 
+                                            lt.leave_type, l.start_date, l.start_date_breakdown, l.end_date, l.end_date_breakdown, l.leave_description, l.attachment, l.leave_status, l.created_by, l.created_time 
                                             FROM hrms.leave_requests l 
-                                            LEFT JOIN hrms.employee e ON e.emp_id = l.emp_id
-                                            LEFT JOIN hrms.leave_type lt ON lt.leave_type_id = l.leave_type_id
+                                            LEFT JOIN hrms.employee e ON (e.emp_id = l.emp_id)
+                                            LEFT JOIN hrms.department d ON (d.department_id = e.emp_dept_id)
+                                            LEFT JOIN hrms.job_position j ON (j.job_position_id = e.emp_job_position_id)
+                                            LEFT JOIN profile_picture p ON (p.emp_id = e.emp_id)
+                                            LEFT JOIN hrms.leave_type lt ON (lt.leave_type_id = l.leave_type_id)
                                             WHERE canceled_by IS NULL ";
 
                     if (from == "leave_emp_dashboard")
                     {
-                        leave_Query += " AND l.emp_id = @emp_id AND (MONTH(l.start_date) = @selectedMonth OR MONTH(l.end_date) = @selectedMonth) AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                        leave_Query += @" AND l.emp_id = @emp_id 
+                      AND ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
+                      OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth) 
+                      OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
+                          AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d')))) ";
                     }
                     else if (from == "leave_admin_dashboard")
                     {
-                        leave_Query += " AND (MONTH(l.start_date) = @selectedMonth OR MONTH(l.end_date) = @selectedMonth) AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                        leave_Query += @" AND ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
+                      OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth) 
+                      OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
+                          AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d')))) ";
+                    }
+                    else if (from == "leave_admin_dashboard_on_leave")
+                    {
+                        leave_Query += " AND CURDATE() BETWEEN l.start_date AND l.end_date ";
                     }
                     else if (from == "leave_emp_dashboard_total_leave_request")
                     {
-                        leave_Query += " AND l.emp_id = @emp_id AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                        leave_Query += " AND l.emp_id = @emp_id AND YEAR(l.start_date) = @selectedYear ";
                     }
                     else if (from == "leave_admin_dashboard_total_leave_request")
                     {
-                        leave_Query += " AND (YEAR(l.start_date) = @selectedYear OR YEAR(l.end_date) = @selectedYear) ";
+                        leave_Query += " AND YEAR(l.start_date) = @selectedYear ";
                     }
+
 
                     using (var cmd = new MySqlCommand(leave_Query, conn))
                     {
@@ -245,6 +266,11 @@ namespace hrms
                             {
                                 leave_id = row["leave_id"].ToString(),
                                 emp_name = row["emp_name"].ToString(),
+                                department_name = row["department_name"].ToString(),
+                                job_position_name = row["job_position_name"].ToString(),
+                                profile_letters = row["profile_letters"].ToString(),
+                                profile_img = row["profile_img"].ToString(),
+                                profile_color = row["profile_color"].ToString(),
                                 leave_type = row["leave_type"].ToString(),
                                 start_date = startDate.ToString("MM-dd-yyyy"),
                                 end_date = endDate.ToString("MM-dd-yyyy"),

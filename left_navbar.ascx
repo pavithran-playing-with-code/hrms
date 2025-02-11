@@ -203,7 +203,9 @@
 
 <script>
     $(document).ready(function () {
-        if ($("#emp_access_lvl").val() == "flase") {
+        var chec = $("#emp_access_lvl").val();
+        debugger
+        if ($("#emp_access_lvl").val() != "true") {
             document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
                 element.style.display = 'none ';
             });
