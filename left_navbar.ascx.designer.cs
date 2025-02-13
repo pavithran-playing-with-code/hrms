@@ -33,6 +33,51 @@ namespace hrms
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl accordionSidebar;
 
         /// <summary>
+        /// TeamsChatNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor TeamsChatNavLink;
+
+        /// <summary>
+        /// MyPlannerNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor MyPlannerNavLink;
+
+        /// <summary>
+        /// OutReachNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor OutReachNavLink;
+
+        /// <summary>
+        /// FormsModuleNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor FormsModuleNavLink;
+
+        /// <summary>
+        /// YammerNavLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor YammerNavLink;
+
+        /// <summary>
         /// DashboardNavLink control.
         /// </summary>
         /// <remarks>
@@ -49,15 +94,6 @@ namespace hrms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlAnchor AnnouncementsNavLink;
-
-        /// <summary>
-        /// assessmentFormNavLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor assessmentFormNavLink;
 
         /// <summary>
         /// leaveSubMenu control.

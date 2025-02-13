@@ -88,7 +88,7 @@
             transition: all 0.3s ease-in-out;
         }
 
-        #monthPicker::-webkit-calendar-picker-indicator {
+        #monthPicker_for_emp_leaves::-webkit-calendar-picker-indicator {
             margin-left: -10px;
         }
 
@@ -216,9 +216,9 @@
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white;">
                                             <h6 class="card-title">Employee Leaves</h6>
-                                            <input type="month" id="monthPicker" class="form-control" style="width: 150px;" />
+                                            <input type="month" id="monthPicker_for_emp_leaves" class="form-control" style="width: 150px;" />
                                         </div>
-                                        <div class="card-body" style="max-height: 500px; overflow: auto">
+                                        <div class="card-body" style="height: 400px; overflow: auto">
                                             <table id="LeavesTable" class="table table-striped table-bordered" style="width: 100%; height: 100%; border: none">
                                                 <thead>
                                                     <tr>
@@ -234,6 +234,29 @@
                                                 <tbody>
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-8">
+
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white">
+                                            <h6 class="card-title">Department Leaves</h6>
+                                            <input type="month" id="monthPicker_for_department_leaves" class="form-control" style="width: 150px;" />
+                                        </div>
+                                        <div class="card-body p-4" id="department_leaves" style="height: 400px; overflow: auto">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-4">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white;">
+                                            <h6 class="card-title">Leave Type - Count of leaves</h6>
+                                            <input type="month" id="monthPicker_for_leave_types_leaves" class="form-control" style="width: 150px;" />
+                                        </div>
+                                        <div class="card-body p-4" id="leave_types_leaves" style="height: 400px; overflow: auto">
                                         </div>
                                     </div>
                                 </div>
@@ -354,20 +377,39 @@
             const currentMonth = today.getMonth() + 1;
             const currentYear = today.getFullYear();
 
-            $('#monthPicker').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+            $('#monthPicker_for_emp_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+            $('#monthPicker_for_department_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+            $('#monthPicker_for_leave_types_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
 
             populate_leave_details();
             nextHolidays(today.getMonth(), today.getFullYear());
             populate_on_leaves();
             populate_leaves_based_months("leave_admin_dashboard", currentMonth, currentYear);
             HolidaysThisMonths();
+            populate_department_leaves(currentMonth, currentYear);
+            populate_leave_types(currentMonth, currentYear);
+
         });
 
-        $('#monthPicker').on('change', function () {
+        $('#monthPicker_for_emp_leaves').on('change', function () {
             const selectedDate = $(this).val().split('-');
             const selectedYear = selectedDate[0];
             const selectedMonth = selectedDate[1];
             populate_leaves_based_months("leave_admin_dashboard", selectedMonth, selectedYear);
+        });
+
+        $('#monthPicker_for_department_leaves').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_department_leaves(selectedMonth, selectedYear);
+        });
+
+        $('#monthPicker_for_leave_types_leaves').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_leave_types(selectedMonth, selectedYear);
         });
 
         function populate_leave_details() {
@@ -579,7 +621,7 @@
 
         function populate_on_leaves() {
             let postData = JSON.stringify({
-                from: "leave_admin_dashboard_on_leave",
+                from: "leave_admin_dashboard",
                 selectedMonth: new Date().getMonth() + 1,
                 selectedYear: new Date().getFullYear()
             });
@@ -614,8 +656,8 @@
                                        <div style="margin-left: 10px;">
                                            <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
                                            <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
-                                           <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type}</div>
-                                           <div style="font-size: 0.8rem; color: #dc3545;">(${emp.start_date} to ${emp.end_date})</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">(${emp.start_date} to ${emp.end_date})</div>
                                        </div>
                                    </div>`
                                 : `<div class="mb-3 mr-2 d-flex align-items-start w-75">
@@ -626,8 +668,8 @@
                                        <div style="margin-left: 10px;">
                                            <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
                                            <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
-                                           <div style="font-size: 0.8rem; color: #dc3545;">${emp.leave_type}</div>
-                                           <div style="font-size: 0.8rem; color: #dc3545;">(${emp.start_date} to ${emp.end_date})</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">(${emp.start_date} to ${emp.end_date})</div>
                                        </div>
                                    </div>`;
                         });
@@ -878,6 +920,76 @@
                 },
                 error: function () {
                     console.error("Error fetching holiday data.");
+                }
+            });
+        }
+
+        function populate_department_leaves(selectedMonth, selectedYear) {
+            $.ajax({
+                type: "POST",
+                url: 'leave_admin_dashboard.aspx/populate_leaves_details_based_months',
+                data: JSON.stringify({ from: "department_leaves", selectedMonth: selectedMonth, selectedYear: selectedYear }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    const data = JSON.parse(response.d);
+                    const departmentLeaves = data.departmentLeaves || [];
+                    let html = "";
+
+                    if (departmentLeaves.length > 0) {
+                        departmentLeaves.forEach(item => {
+                            html += `<div class="leave-item">
+                        <strong>${item.department_name}</strong> - ${item.emp_name} (${item.leave_type}) <br>
+                        From: ${item.start_date} (${item.start_date_breakdown}) To: ${item.end_date} (${item.end_date_breakdown}) <br>
+                        Status: ${item.leave_status}
+                    </div><hr>`;
+                        });
+                    } else {
+                        html = "<p>No department leaves found for this month.</p>";
+                    }
+
+                    $("#department_leaves").html(html);
+                },
+                error: function (error) {
+                    console.error("Error fetching department leaves:", error);
+                }
+            });
+        }
+
+        function populate_leave_types(selectedMonth, selectedYear) {
+            $.ajax({
+                type: "POST",
+                url: 'leave_admin_dashboard.aspx/populate_leaves_details_based_months',
+                data: JSON.stringify({ from: "leave_types", selectedMonth: selectedMonth, selectedYear: selectedYear }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    const data = JSON.parse(response.d);
+                    const leaveTypeCounts = data.leaveTypeCounts || [];
+                    let leaveCounts = {};
+
+                    leaveTypeCounts.forEach(item => {
+                        if (!leaveCounts[item.leave_type]) {
+                            leaveCounts[item.leave_type] = 0;
+                        }
+                        leaveCounts[item.leave_type] += parseFloat(item.requested_days);
+                    });
+
+                    let html = "";
+                    if (Object.keys(leaveCounts).length > 0) {
+                        for (const [leaveType, count] of Object.entries(leaveCounts)) {
+                            html += `<div class="leave-count">
+                        <strong>${leaveType}</strong>: ${count} days
+                    </div><hr>`;
+                        }
+                    } else {
+                        html = "<p>No leave data found for this month.</p>";
+                    }
+
+                    $("#leave_types_leaves").html(html);
+                },
+                error: function (error) {
+                    console.error("Error fetching leave types:", error);
                 }
             });
         }

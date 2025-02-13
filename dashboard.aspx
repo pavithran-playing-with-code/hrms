@@ -683,7 +683,7 @@
                                     attachmentLink.innerText = "";
                                     document.getElementById("attachment_container").style.display = "none";
                                 }
-                                if (announcement.comments == "False") {
+                                if (announcement.comments == "True") {
                                     document.querySelector(".comment-button").style.display = 'none';
                                 } else {
                                     document.querySelector(".comment-button").style.display = 'flex';
@@ -974,7 +974,11 @@
         function editannouncement() {
             $('#publishannouncementbtn').hide();
             $('#editannouncementbtn').show();
-            $('#createannouncementmodal').modal('show');
+            $('#announcement_info_modal').modal('hide');
+            $('#announcement_info_modal').on('hidden.bs.modal', function () {
+                $('#createannouncementmodal').modal('show');
+                $(this).off('hidden.bs.modal');
+            });
             clearannouncementfields();
             $.ajax({
                 type: "POST",

@@ -100,7 +100,42 @@
 
         <div class="flex-grow-1 sidebar-nav mt-1" data-simplebar="">
             <ul class="navbar-nav text-light" id="accordionSidebar" runat="server">
-                <li class="nav-item onlyhighaccesslvl">
+                <li class="nav-item">
+                    <a id="TeamsChatNavLink" class="nav-link" runat="server">
+                        <i class="fas fa-comment-dots" style="font-size: 1.25rem;"></i>
+                        <span>Teams Chat</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="MyPlannerNavLink" class="nav-link" runat="server">
+                        <i class="fas fa-crosshairs" style="font-size: 1.25rem;"></i>
+                        <span>My Planner</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="OutReachNavLink" class="nav-link" runat="server">
+                        <i class="fas fa-newspaper" style="font-size: 1.25rem;"></i>
+                        <span>OutReach</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="FormsModuleNavLink" class="nav-link" runat="server">
+                        <i class="fas fa-file-alt" style="font-size: 1.25rem;"></i>
+                        <span>Forms Module</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a id="YammerNavLink" class="nav-link" runat="server">
+                        <i class="fas fa-heart" style="font-size: 1.25rem;"></i>
+                        <span>Yammer</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a id="DashboardNavLink" class="nav-link" href="../dashboard.aspx" runat="server">
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
@@ -111,13 +146,6 @@
                     <a id="AnnouncementsNavLink" class="nav-link" href="../announcements.aspx" runat="server">
                         <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
                         <span>Announcements</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="../assessment_form.aspx" id="assessmentFormNavLink" runat="server">
-                        <i class="fab fa-wpforms" style="font-size: 1.25rem;"></i>
-                        <span>Assessment Form</span>
                     </a>
                 </li>
 
@@ -203,8 +231,6 @@
 
 <script>
     $(document).ready(function () {
-        var chec = $("#emp_access_lvl").val();
-        debugger
         if ($("#emp_access_lvl").val() != "true") {
             document.querySelectorAll('.onlyhighaccesslvl').forEach(function (element) {
                 element.style.display = 'none ';

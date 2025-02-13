@@ -262,6 +262,9 @@ namespace hrms
                         var posted_date = DateTime.Parse(posted_on).ToString("MMM. dd, yyyy");
                         var posted_time = DateTime.Parse(posted_on).ToString("hh:mm tt");
 
+                        var viewedByString = row["viewed_by"].ToString();
+                        var viewedByCount = string.IsNullOrEmpty(viewedByString) ? 0 : viewedByString.Split(',').Length;
+
                         List.Add(new announncement_details
                         {
                             heading = row["heading"].ToString(),
@@ -269,7 +272,7 @@ namespace hrms
                             attachments = row["attachments"].ToString(),
                             posted_date = posted_date,
                             posted_time = posted_time,
-                            viewed_by = row["viewed_by"].ToString(),
+                            viewed_by = viewedByCount.ToString(),
                             comments = row["comments"].ToString()
                         });
                     }
@@ -304,8 +307,15 @@ namespace hrms
                     int rowsAffected = 0;
                     if (!string.IsNullOrEmpty(announcement_id))
                     {
-                        string updatequery = $@"UPDATE announcement SET viewed_by = CONCAT(viewed_by, ',', {emp_id}) 
-                                                WHERE announcement_id = '{announcement_id}' AND (viewed_by IS NULL OR viewed_by = '' OR NOT FIND_IN_SET({emp_id}, viewed_by));";
+                        string updatequery = $@"UPDATE hrms.announcement 
+                                                SET viewed_by = 
+                                                    CASE 
+                                                        WHEN viewed_by IS NULL OR viewed_by = '' THEN '{emp_id}'
+                                                        ELSE CONCAT(viewed_by, ',', '{emp_id}')
+                                                    END
+                                                WHERE announcement_id = '{announcement_id}' 
+                                                AND (viewed_by IS NULL OR viewed_by = '' OR NOT FIND_IN_SET('{emp_id}', viewed_by));";
+
                         MySqlCommand updatecmd = new MySqlCommand(updatequery, conn);
                         rowsAffected = updatecmd.ExecuteNonQuery();
 
