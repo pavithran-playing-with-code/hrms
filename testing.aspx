@@ -7,8 +7,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Testing</title>
+    <title>Admin Leave Dashboard</title>
 
+  
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
@@ -35,7 +36,7 @@
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
-    <style>
+     <style>
         .main-container {
             display: flex;
             min-height: 100vh;
@@ -237,10 +238,7 @@
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
-
     <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
-    <input type="hidden" id="announcement_id" name="announcement_id" />
-    <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
 
     <div class="main-container">
         <div id="sidebarContainer" class="left-navbar">
@@ -304,7 +302,7 @@
                                     <h6 class="card-title">Announcements</h6>
                                     <span class="mb-1">
                                         <button id="addAnnouncement" style="display: inline-block; padding: 0px; border-radius: 6px; display: flex; align-items: center; justify-content: center; width: 50px; height: 28px;"
-                                            class="btn btn-outline-custom ms-3 " onclick="opencreateannouncementmodal()" title="Create Announcement">
+                                            class="btn btn-outline-custom ms-3 onlyhighaccesslvl" onclick="opencreateannouncementmodal()" title="Create Announcement">
                                             <i class="fa fa-plus m-0"></i>
                                         </button>
                                     </span>
@@ -419,148 +417,60 @@
         </div>
     </div>
 
-    <div class="modal fade" id="announcement_info_modal" tabindex="-1" role="dialog" aria-labelledby="announcement_info_modalTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header mt-1 pb-2" style="background-color: transparent; border-bottom: none;">
-                    <h4 class="modal-title font-weight-bold " id="announcement_info_modalTitle">Announcement.</h4>
-                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="card mx-auto p-4 mb-4" style="max-width: 800px; border: 1px solid lightgrey; border-radius: 10px; box-shadow: 2px 2px 2px grey;">
-                        <div class="card-header mb-3" style="background-color: transparent; border-bottom: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <h5 class="card-title fw-bold mb-0 mr-2" id="heading"></h5>
-                                    <div class="d-flex align-items-center border border-success rounded px-2 py-1 text-success" title="1 view" style="cursor: pointer; border-width: 2px !important;">
-                                        <span class="mr-1" style="font-size: 0.9rem; font-weight: bold;" id="viewed_by">1</span>
-                                        <i class="fa-regular fa-eye" style="font-size: 0.9rem;"></i>
-                                    </div>
-                                </div>
-                                <button class="" style="cursor: pointer; background-color: transparent; border: none; outline: none" title="Action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu" style="font-size: 15px;">
-                                    <a class="dropdown-item" href="#" onclick="editannouncement()" style="color: black">Edit</a>
-                                    <a class="dropdown-item" href="#" onclick="Republish()" style="color: black">Publish</a>
-                                    <a class="dropdown-item" href="#" onclick="deleteannouncement()" style="color: red">Delete</a>
-                                </div>
-                            </div>
-                            <span class="text-muted fw-bold d-block mt-2">
-                                <small style="font-weight: bold;">Posted on <span class="dateformat_changer" id="posted_date"></span>
-                                    at <span class="timeformat_changer" id="posted_time"></span></small>
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            <spam class="card-text" id="announcement_description"></spam>
-                            <spam id="attachment_container" class="mt-3 pt-3" style="display: none; margin-top: 10px; font-weight: bold; color: #6c757d!important;">
-                                Attachment: 
-                                <a id="attachment_link" href="#" target="_blank" class="attachment-link"></a>
-                            </spam>
-                        </div>
-                        <div class="card-footer mt-2" style="background-color: transparent; border-top: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <button class="btn btn-light ml-auto comment-button" onclick="$('#commentModal').modal('show');" type="button" title="Comments">
-                                    <i class="fa-regular fa-comment" style="color: red; font-size: 1.5rem;"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <%-- commentModal --%>
-    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: transparent; border-bottom: none;">
-                    <h5 class="modal-title" id="comments_header"></h5>
-                    <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" style="padding-top: 0;">
-                    <div class="pb-3">
-                        <div id="successAlert" class="alert alert-success alert-dismissible fade" role="alert"
-                            style="display: none; position: absolute; top: -1px; right: 15px; z-index: 1050; width: 50%; border-left: 3px solid #155724; padding-left: 15px;">
-                            <strong><i class="fa-sharp fa-solid fa-circle-exclamation mr-1"></i></strong><span id="comment_alert"></span>
-
-                            <button type="button" style="box-shadow: none; border: none" class="close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <input type="text" name="comment" id="commentInput" onkeyup="toggleCommentButton(this);"
-                            class="form-control" placeholder="Comment here" />
-                        <button id="commentButton" onclick="populatecomments()" class="btn btn-secondary mt-2" style="display: none; background-color: hsl(8,77%,56%)">Comment</button>
-                    </div>
-                    <div id="announcement_comments" class="mt-3">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+    <%--  <script>
         $(document).ready(function () {
-            if (sessionStorage.getItem('showAlert') === 'true') {
-                display_green_alert('Login successful.');
-                sessionStorage.removeItem('showAlert');
-            };
+            var today = new Date();
+            const currentMonth = today.getMonth() + 1;
+            const currentYear = today.getFullYear();
 
-            $('#id_description').summernote({
-                height: 60,
-                minHeight: null,
-                maxHeight: null,
-                focus: true,
-                toolbar: [
-                    ['font', ['fontname']],
-                    ['style', ['style']],
-                    ['fontsize', ['fontsize']],
-                    ['style', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
-                    ['color', ['color', 'backcolor']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['height', ['height']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video']],
-                    ['view', ['fullscreen', 'codeview', 'help']],
-                    ['history', ['undo', 'redo']]
-                ]
-            });
+            $('#monthPicker_for_emp_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+            $('#monthPicker_for_department_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+            $('#monthPicker_for_leave_types_leaves').val(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
 
-            populate_emp_details();
-            populateannounncements();
+            populate_leave_details();
+            nextHolidays(today.getMonth(), today.getFullYear());
+            populate_on_leaves();
+            populate_leaves_based_months("leave_admin_dashboard", currentMonth, currentYear);
+            HolidaysThisMonths();
+            populate_department_leaves(currentMonth, currentYear);
+            populate_leave_types(currentMonth, currentYear);
+
         });
 
-        function display_green_alert(message) {
-            document.getElementById("greenAlert").style.display = 'flex';
-            document.getElementById("greenAlertmessage").innerHTML = message;
-            $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
-        }
+        $('#monthPicker_for_emp_leaves').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_leaves_based_months("leave_admin_dashboard", selectedMonth, selectedYear);
+        });
 
-        function toggleCommentButton(input) {
-            const commentButton = document.getElementById('commentButton');
-            if (input.value.trim() === "") {
-                commentButton.style.display = "none";
-            } else {
-                commentButton.style.display = "block";
-            }
-        }
+        $('#monthPicker_for_department_leaves').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_department_leaves(selectedMonth, selectedYear);
+        });
 
-        function populate_emp_details() {
+        $('#monthPicker_for_leave_types_leaves').on('change', function () {
+            const selectedDate = $(this).val().split('-');
+            const selectedYear = selectedDate[0];
+            const selectedMonth = selectedDate[1];
+            populate_leave_types(selectedMonth, selectedYear);
+        });
+
+        function populate_leave_details() {
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/populate_emp_details',
+                url: 'leave_emp_dashboard.aspx/populate_leave_details',
+                data: JSON.stringify({ from: "leave_admin_dashboard" }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
                     const data = JSON.parse(response.d);
 
-                    $("#new_joining_today").text(data.newJoiningAfterToday || 0);
-                    $("#new_joining_this_week").text(data.newJoiningThisWeek || 0);
-                    $("#total_emp").text(data.totalEmpCount || 0);
+                    $("#total_leave_request").text(data.total_leave_request || 0);
+                    $("#approved_leave_request").text(data.approved_leave_request || 0);
+                    $("#rejected_leave_request").text(data.rejected_leave_request || 0);
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -572,56 +482,257 @@
             });
         }
 
-        function populateannounncements() {
+        $('.leave-summary-card').on('click', function () {
+            let status = $(this).data('status');
+            $('#modalTitle').text(status + ' Leaves');
+            loadLeaveData(status);
+            $('#leaveModal').modal('show');
+        });
+
+        function loadLeaveData(status) {
+            let postData = JSON.stringify({
+                from: "leave_admin_dashboard_total_leave_request",
+                selectedMonth: new Date().getMonth() + 1,
+                selectedYear: new Date().getFullYear()
+            });
+
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/populateannounncements',
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
                 contentType: 'application/json',
+                data: postData,
                 dataType: 'json',
                 success: function (response) {
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
-                    let announcementsHTML = '';
 
+                    const parseDate = (dateString) => {
+                        const dateParts = dateString.split(' ')[0].split('-');
+                        let day, month, year;
 
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(announcement => {
-                            const announcement_id = announcement.announcement_id;
-                            const profileImage = announcement.profile_img;
-                            const profileLetters = announcement.profile_letters;
-                            const profileColor = announcement.profile_color;
-                            const heading = announcement.heading;
+                        if (parseInt(dateParts[0], 10) > 12) {
+                            day = parseInt(dateParts[0], 10);
+                            month = parseInt(dateParts[1], 10) - 1;
+                            year = parseInt(dateParts[2], 10);
+                        } else {
+                            month = parseInt(dateParts[0], 10) - 1;
+                            day = parseInt(dateParts[1], 10);
+                            year = parseInt(dateParts[2], 10);
+                        }
 
-                            let profileHTML = '';
-                            if (profileImage) {
-                                profileHTML = '<img src="' + profileImage + '" alt="Profile Picture" class="rounded-circle" style="width: 30px; height: 30px;">' +
-                                    ' <span class="profile-name text-dark font-weight-bold">' + heading + '</span>';
-                            } else {
-                                profileHTML = '<span class="rounded-circle d-inline-flex justify-content-center align-items-center" ' +
-                                    'style="width: 30px; height: 30px; background-color: ' + profileColor + '; color: white; font-weight: bold;">' +
-                                    profileLetters + '</span>' +
-                                    ' <span class="profile-name text-dark font-weight-bold">' + heading + '</span>';
+                        return new Date(year, month, day);
+                    };
+
+                    const currentMonth = new Date().getMonth() + 1;
+                    const currentYear = new Date().getFullYear();
+
+                    const filteredData = (Array.isArray(data) && data.length > 0)
+                        ? data.filter(item => {
+                            if (!item.start_date || !item.end_date) return false;
+
+                            const startDate = parseDate(item.start_date);
+                            const endDate = parseDate(item.end_date);
+
+                            const isInCurrentMonth = (
+                                (startDate.getFullYear() === currentYear && startDate.getMonth() + 1 === currentMonth) ||
+                                (endDate.getFullYear() === currentYear && endDate.getMonth() + 1 === currentMonth) ||
+                                (startDate < new Date(currentYear, currentMonth - 1, 1) && endDate > new Date(currentYear, currentMonth, 0))
+                            );
+
+                            if (status === "Request to Approve") {
+                                return item.leave_status !== "Approved" && item.leave_status !== "Rejected";
+                            } else if (status === "Approved") {
+                                return item.leave_status === "Approved" && isInCurrentMonth;
+                            } else if (status === "Rejected") {
+                                return item.leave_status === "Rejected" && isInCurrentMonth;
                             }
+                            return false;
+                        })
+                        : data;
 
-                            announcementsHTML += '<div class="announcement-row pb-3" draggable="true" style="cursor: pointer;" onclick="openannouncementmodal(' + announcement_id + ')">' +
-                                '<div class="announcement-title">' +
-                                '<a class="profile-link" style="text-decoration: none;">' +
-                                '<div class="profile-avatar mr-1">' + profileHTML +
-                                '</div></a></div></div>';
+                    if ($.fn.DataTable.isDataTable('#modaltable')) {
+                        $('#modaltable').DataTable().destroy();
+                    }
 
+                    $('#modaltable').DataTable({
+                        data: filteredData,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
+                        columns: [
+                            { data: 'leave_id' },
+                            { data: 'emp_name' },
+                            { data: 'leave_type' },
+                            {
+                                data: 'start_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const formattedDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${formattedDate}</span>`;
+                                }
+                            },
+                            {
+                                data: 'end_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const formattedDate = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${formattedDate}</span>`;
+                                }
+                            },
+                            {
+                                data: 'requested_days',
+                                render: function (data) {
+                                    return `<span> ${data}<span />`;
+                                }
+                            },
+                            {
+                                data: 'leave_status',
+                                render: function (data) {
+                                    if (!data) {
+                                        return `<span style="color: #077E8C;font-weight: bold;">Pending</span>`;
+                                    } else if (data == "Canceled") {
+                                        return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
+                                    }
+                                    return data === "Approved"
+                                        ? `<span style="color: green;font-weight: bold;">Approved</span>`
+                                        : `<span style="color: red;font-weight: bold;">Rejected</span>`;
+                                }
+                            }
+                        ],
+                        headerCallback: function (thead, data, start, end, display) {
+                            $('th', thead).addClass('text-center');
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $('td', row).addClass('text-center');
+                        },
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+       <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+       <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+    </div>`
+                        }
+                    });
+
+                    $('#modaltable').DataTable().columns.adjust().draw();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
+        function nextHolidays(month, year) {
+            $.ajax({
+                type: "POST",
+                url: "holidays.aspx/GetHolidays",
+                data: JSON.stringify({ month: month + 1, year: year }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var holidayData = response.d ? JSON.parse(response.d) : {};
+                    var currentDate = new Date();
+                    var nextHoliday = null;
+                    var nextHolidayName = "";
+
+                    Object.keys(holidayData).forEach(dateStr => {
+                        var holidayDate = new Date(dateStr);
+                        if (holidayDate >= currentDate) {
+                            if (!nextHoliday || holidayDate < nextHoliday) {
+                                nextHoliday = holidayDate;
+                                nextHolidayName = holidayData[dateStr];
+                            }
+                        }
+                    });
+
+                    if (nextHoliday) {
+                        $("#next_holiday").text(nextHolidayName);
+                        $("#next_holiday_date").text(nextHoliday.toLocaleDateString('en-GB'));
+                    } else {
+                        $("#next_holiday").text("No Upcoming Holiday");
+                        $("#next_holiday_date").text("-");
+                    }
+                },
+                error: function () {
+                    console.error("Error fetching holiday data.");
+                }
+            });
+        }
+
+        function populate_on_leaves() {
+            let postData = JSON.stringify({
+                from: "leave_admin_dashboard",
+                selectedMonth: new Date().getMonth() + 1,
+                selectedYear: new Date().getFullYear()
+            });
+
+            $.ajax({
+                type: "POST",
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                contentType: 'application/json',
+                data: postData,
+                dataType: 'json',
+                success: function (response) {
+                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                    const data = JSON.parse(cleanedResponse);
+
+                    let HTML = "";
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(emp => {
+                            $("#onleave").css({
+                                "display": "flex",
+                                "flex-direction": "column",
+                                "align-items": "center",
+                                "justify-content": "flex-start"
+                            });
+
+                            HTML += emp.profile_img
+                                ? `<div class="mb-3 mr-2 d-flex align-items-start w-75">
+                                       <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1" 
+                                           style="flex-shrink: 0; width: 40px; height: 40px; overflow: hidden;">
+                                           <img src="${emp.profile_img}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%;">
+                                       </span>
+                                       <div style="margin-left: 10px;">
+                                           <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
+                                           <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">(${emp.start_date} to ${emp.end_date})</div>
+                                       </div>
+                                   </div>`
+                                : `<div class="mb-3 mr-2 d-flex align-items-start w-75">
+                                       <span class="rounded-circle d-inline-flex justify-content-center align-items-center mt-1"
+                                           style="flex-shrink: 0; width: 40px; height: 40px; background-color: ${emp.profile_color}; color: white; font-weight: bold; font-size: 1rem;">
+                                           ${emp.profile_letters}
+                                       </span>
+                                       <div style="margin-left: 10px;">
+                                           <div style="font-weight: bold; font-size: 1rem; white-space: nowrap">${emp.emp_name}</div>
+                                           <div style="font-size: 0.9rem; color: #4d4a4a; white-space: nowrap">${emp.department_name} / ${emp.job_position_name}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">${emp.leave_type}</div>
+                                           <div style="font-size: 0.8rem; color: #dc3545; white-space: nowrap">(${emp.start_date} to ${emp.end_date})</div>
+                                       </div>
+                                   </div>`;
+                        });
+                    } else {
+                        $("#onleave").css({
+                            "display": "flex",
+                            "align-items": "center",
+                            "justify-content": "center"
                         });
 
+                        HTML = `<div class="empty_message text-center">
+                                    <img style="display: block; width: 70px; margin: 20px auto;" src="/asset/img/attendance.png" />
+                                    <h5 style="color: hsl(0,0%,45%);">No employees have taken leave today.</h5>
+                                </div>`;
                     }
-                    else {
-                        announcementsHTML = '<div id="empty_announcement" style="padding-top: 10%">\
-                            <div class="empty_announcement">\
-                                <img style="display: block; width: 100px; margin: 20px auto;" src="/asset/img/no-announcements.png" />\
-                                <h5 style="color: hsl(0,0%,45%); text-align: center;">No Announcements to show.</h5>\
-                            </div>\
-                        </div>';
-                    }
-                    $('#announcementListCard').html(announcementsHTML);
+
+                    $("#onleave").html(HTML);
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -633,415 +744,102 @@
             });
         }
 
-        function openannouncementmodal(announcement_id) {
+        function populate_leaves_based_months(from, selectedMonth, selectedYear) {
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/add_viewed_by',
-                data: JSON.stringify({ announcement_id: announcement_id }),
+                url: 'leave_emp_dashboard.aspx/populate_leaves_based_months',
+                data: JSON.stringify({ from: from, selectedMonth: selectedMonth, selectedYear: selectedYear }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
-                    $('#announcement_info_modal').modal('show');
-
-                    $.ajax({
-                        type: "POST",
-                        url: 'dashboard.aspx/openannouncementmodal',
-                        data: JSON.stringify({ announcement_id: announcement_id }),
-                        contentType: 'application/json',
-                        dataType: 'json',
-                        success: function (response) {
-                            let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
-                            cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
-                            const announcementList = JSON.parse(cleanedResponse);
-
-                            if (announcementList.length > 0) {
-                                const announcement = announcementList[0];
-                                debugger
-                                $("#announcement_id").val(announcement_id);
-                                document.getElementById("heading").innerText = announcement.heading;
-                                document.getElementById("viewed_by").innerText = announcement.viewed_by;
-                                document.getElementById("posted_date").innerText = announcement.posted_date;
-                                document.getElementById("posted_time").innerText = announcement.posted_time;
-                                document.getElementById("announcement_description").innerHTML = announcement.announcement_description;
-                                document.getElementById("comments_header").innerText = announcement.heading + " comments";
-
-                                if (announcement.attachments != "") {
-                                    const attachmentLink = document.getElementById("attachment_link");
-                                    attachmentLink.href = announcement.attachments;
-                                    const attachmentParts = announcement.attachments.split('/').pop().split('_');
-                                    const originalFileName = attachmentParts.slice(2).join('_');
-                                    attachmentLink.innerText = originalFileName;
-                                    document.getElementById("attachment_container").style.display = "block";
-                                } else {
-                                    const attachmentLink = document.getElementById("attachment_link");
-                                    attachmentLink.href = "";
-                                    attachmentLink.innerText = "";
-                                    document.getElementById("attachment_container").style.display = "none";
-                                }
-                                if (announcement.comments == "True") {
-                                    document.querySelector(".comment-button").style.display = 'none';
-                                } else {
-                                    document.querySelector(".comment-button").style.display = 'flex';
-                                    populatecomments();
-                                }
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.fire({
-                                title: "Error!",
-                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                                icon: "error"
-                            });
-                        }
-                    });
-
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function opencreateannouncementmodal() {
-            clearannouncementfields();
-            populatecreateannouncementmodal("department", null, null);
-            $("#announcement_id").val('');
-            $('#publishannouncementbtn').show();
-            $('#editannouncementbtn').hide();
-            $('#createannouncementmodal').modal('show');
-            document.getElementById('createannouncementmodalLabel').innerText = "Create Announcement.";
-
-            const today = new Date();
-            const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            document.getElementById('id_expire_date').value = localDate;
-        }
-
-        document.getElementById('remove_attachment_btn').addEventListener('click', function () {
-            $('#id_attachments').val('');
-            document.getElementById('id_attachments_helper').style.display = 'none';
-            document.getElementById('remove_attachment_btn').style.display = 'none';
-        });
-
-        document.getElementById('id_attachments').addEventListener('change', function () {
-            const fileInput = this;
-            if (fileInput.files.length > 0) {
-                document.getElementById('id_attachments_helper').style.display = 'none';
-                document.getElementById('remove_attachment_btn').style.display = 'block';
-            }
-        });
-
-        function populatecreateannouncementmodal(dropdowntype, value, departmentValues, callback) {
-            $.ajax({
-                type: "POST",
-                url: 'dashboard.aspx/populatecreateannouncementmodal',
-                data: JSON.stringify({ dropdowntype: dropdowntype, value: value, departmentValues: departmentValues }),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    let data = response.d;
-                    data = JSON.parse(data);
-                    $('#id_employees, #id_department, #id_job_position').select2({
-                        placeholder: "Select an option",
-                        allowClear: true,
-                        width: "100%",
-                    });
-
-                    if (dropdowntype === "department") {
-                        populateDropdown("#id_department", data);
-                    } else if (dropdowntype === "job_position") {
-                        populateDropdown("#id_job_position", data);
-                    } else if (dropdowntype === "employees") {
-                        populateDropdown("#id_employees", data);
-                    }
-
-                    if (typeof callback === "function") {
-                        callback();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-        function populateDropdown(selector, items) {
-            const dropdown = $(selector);
-            $('#id_employees').empty();
-            dropdown.empty();
-            if (items.length > 0) {
-                items.forEach(item => {
-                    dropdown.append(new Option(item.name, item.id));
-                });
-                dropdown.trigger('change');
-            }
-        }
-
-        $('#id_department').on('change', function () {
-            const selectedDepartments = $(this).val();
-            if (selectedDepartments != "") {
-                populatecreateannouncementmodal("job_position", selectedDepartments, null);
-            }
-        });
-
-        $('#id_job_position').on('change', function () {
-            const selectedJobPositions = $(this).val();
-            const selectedDepartments = $('#id_department').val();
-            if (selectedJobPositions != "" && selectedDepartments != "") {
-                populatecreateannouncementmodal("employees", selectedJobPositions, selectedDepartments);
-            }
-        });
-
-        function UploadFiles(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const base64File = reader.result.split(',')[1];
-
-                    $.ajax({
-                        url: 'dashboard.aspx/UploadFiles',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "announcement" }),
-                        success: function (response) {
-                            resolve(response.d);
-                        },
-                        error: function (xhr, status, error) {
-                            reject(error);
-                        }
-                    });
-                };
-                reader.onerror = function () {
-                    reject("Error reading file.");
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function publish_edit_save_announcement(action) {
-            var announcementId = $("#announcement_id").val();
-            const title = $('#id_title').val();
-            const description = $('#id_description').summernote('code');
-            const expireDate = $('#id_expire_date').val();
-            const employees = $('#id_employees').val();
-            const department = $('#id_department').val();
-            const jobPosition = $('#id_job_position').val();
-            const disableComments = $('#id_disable_comments').is(':checked');
-            const notifyEmail = $('#toggle_notify_email').is(':checked');
-            const notifyPhone = $('#toggle_notify_phone').is(':checked');
-            let attachments = '';
-            let notify = [];
-
-            if (notifyEmail) notify.push('email');
-            if (notifyPhone) notify.push('phone');
-
-            const fileInput = document.getElementById('id_attachments');
-            if (action == "edit" && document.getElementById('id_attachments_helper').style.display == "block") {
-                attachments = $('#id_attachments_hidden_value').val();
-            } else {
-                if (fileInput.files.length > 0) {
-                    try {
-                        attachments = await UploadFiles(fileInput.files[0]);
-                    } catch (error) {
+                    if (response.d.includes("ExceptionMessage")) {
                         Swal.fire({
-                            title: "Error!",
-                            text: "Failed to upload the attachment. Please try again.",
-                            icon: "error"
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
                         });
                         return;
                     }
-                }
-            }
-
-            if ((!title) ||
-                (!description || description === "<p><br></p>") ||
-                (!expireDate) ||
-                (!employees || employees.length === 0) ||
-                (!department || department.length === 0) ||
-                (!jobPosition || jobPosition.length === 0)) {
-                Swal.fire({
-                    title: "Missing Fields",
-                    text: "Please fill in all the required fields before proceeding.",
-                    icon: "warning"
-                });
-                return;
-            }
-
-            const data = {
-                title: title,
-                description: description,
-                attachments: attachments,
-                expireDate: expireDate,
-                department: department,
-                jobPosition: jobPosition,
-                employees: employees,
-                notify: notify,
-                disableComments: disableComments,
-                action, action,
-                announcementId, announcementId
-            };
-
-            $.ajax({
-                type: "POST",
-                url: 'dashboard.aspx/publish_edit_save_announcement',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    let data = response.d;
-                    data = JSON.parse(data);
-                    if (data == "success") {
-                        clearannouncementfields();
-                        $('#createannouncementmodal').modal('hide');
-                        populateannounncements();
-
-                        var alertMessage = "";
-                        if (action == "edit") {
-                            $('#announcement_info_modal').modal('hide');
-                            alertMessage = "Announcement updated successfully.";
-                        }
-                        else if (action == "publish") {
-                            alertMessage = "Announcement published successfully.";
-                        } else if (action == "save") {
-                            alertMessage = "Announcement saved successfully.";
-                        }
-                        display_green_alert(alertMessage);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
-                }
-            });
-        }
-
-
-
-        function Republish() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to republish this announcement?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Republish!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "POST",
-                        url: 'dashboard.aspx/Republish',
-                        data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
-                        contentType: 'application/json',
-                        dataType: 'json',
-                        success: function (response) {
-                            let data = response.d;
-                            data = JSON.parse(data);
-                            if (data == "success") {
-                                $('#announcement_info_modal').modal('hide');
-                                populateannounncements();
-                                display_green_alert('Announcement created successfully.');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.fire({
-                                title: "Error!",
-                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                                icon: "error"
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        function editannouncement() {
-            $('#publishannouncementbtn').hide();
-            $('#editannouncementbtn').show();
-            $('#announcement_info_modal').modal('hide');
-            $('#announcement_info_modal').on('hidden.bs.modal', function () {
-                $('#createannouncementmodal').modal('show');
-                $(this).off('hidden.bs.modal');
-            });
-            clearannouncementfields();
-            $.ajax({
-                type: "POST",
-                url: 'dashboard.aspx/editannouncement',
-                data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function (response) {
-                    document.getElementById("createannouncementmodalLabel").innerText = "Edit Announcement.";
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
 
-                    if (data.length > 0) {
-                        const announcement = data[0];
-
-                        $('#id_title').val(announcement.Heading);
-                        $('#id_description').summernote('code', announcement.announcement_description);
-
-                        if (announcement.comments == "True") {
-                            $('#id_disable_comments').prop('checked', true);
-                        }
-
-                        if (announcement.expire_date) {
-                            const dateParts = announcement.expire_date.split(' ')[0].split('-');
-                            const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                            $('#id_expire_date').val(formattedDate);
-                        }
-
-                        if (announcement.attachments) {
-                            const attachmentParts = announcement.attachments.split('/').pop().split('_');
-                            const originalFileName = attachmentParts.slice(2).join('_');
-                            document.getElementById('id_attachments_helper').style.display = 'block';
-                            document.getElementById('remove_attachment_btn').style.display = 'block';
-                            document.getElementById('id_attachments_helper').innerHTML = `<span style="font-weight:400">Existing File: ${originalFileName}</span>`;
-                            $('#id_attachments_helper_value').val(announcement.attachments);
-                            $('#id_attachments_hidden_value').val(announcement.attachments);
-                        }
-
-                        const departments = announcement.departments.split(',');
-                        populatecreateannouncementmodal('department', null, null, function () {
-                            $('#id_department').val(departments).trigger('change');
-
-                            populatecreateannouncementmodal('job_position', departments, departments, function () {
-                                const jobPositions = announcement.job_positions.split(',');
-                                $('#id_job_position').val(jobPositions).trigger('change');
-
-                                populatecreateannouncementmodal('employees', jobPositions, departments, function () {
-                                    const employees = announcement.viewable_by.split(',');
-                                    $('#id_employees').val(employees).trigger('change');
-                                });
-                            });
-                        });
-
-                        const notifyValues = announcement.notify.split(',');
-
-                        if (notifyValues.includes("email")) {
-                            $('#toggle_notify_email').prop('checked', true);
-                        } else {
-                            $('#toggle_notify_email').prop('checked', false);
-                        }
-
-                        if (notifyValues.includes("phone")) {
-                            $('#toggle_notify_phone').prop('checked', true);
-                        } else {
-                            $('#toggle_notify_phone').prop('checked', false);
-                        }
+                    if ($.fn.DataTable.isDataTable('#LeavesTable')) {
+                        $('#LeavesTable').DataTable().clear().destroy();
                     }
+
+                    $('#LeavesTable').DataTable({
+                        data: data,
+                        scrollX: true,
+                        scrollCollapse: true,
+                        fixedColumns: {
+                            rightColumns: 1
+                        },
+                        columns: [
+                            { data: 'leave_id', visible: false },
+                            { data: 'emp_name' },
+                            { data: 'leave_type' },
+                            {
+                                data: 'start_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const start_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${start_date}</span>`;
+                                }
+                            },
+                            {
+                                data: 'end_date',
+                                render: function (data) {
+                                    const dateParts = data.split(' ')[0].split('-');
+                                    const end_date = `${dateParts[1]}-${dateParts[0]}-${dateParts[2]}`;
+                                    return `<span>${end_date}</span>`;
+                                }
+                            },
+                            {
+                                data: 'requested_days',
+                                render: function (data) {
+                                    return `<span> ${data}<span />`;
+                                }
+                            },
+                            {
+                                data: 'leave_status',
+                                render: function (data) {
+                                    if (!data) {
+                                        return `<span style="color: #077E8C;font-weight: bold;">Pending</span>`;
+                                    }
+                                    else if (data == "Canceled") {
+                                        return `<span style="color: #FF6F61;font-weight: bold;">Canceled</span>`;
+                                    }
+                                    return data === "Approved"
+                                        ? `<span style="color: green;font-weight: bold;">Approved</span>`
+                                        : `<span style="color: red;font-weight: bold;">Rejected</span>`;
+                                }
+                            }
+                        ],
+                        headerCallback: function (thead, data, start, end, display) {
+                            $('th', thead).addClass('text-center');
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $('td', row).addClass('text-center');
+                        },
+                        language: {
+                            emptyTable: `<div style="text-align: center;">
+   <img src="/asset/img/no-leave-requests.png" alt="No data available" style="max-width: 130px; margin-top: 70px; margin-bottom: 30px">
+   <p style="font-size: 16px; color: #555; margin-top: 10px;">No data available</p>
+</div>`
+                        }
+                    });
+
+                    $('#LeavesTable').on('click', '.description-link', function (e) {
+                        e.preventDefault();
+                        const description = $(this).data('description');
+                        const heading = $(this).closest('tr').find('td').eq(1).text();
+                        $('#descriptionModalLabel').text(heading);
+                        $('#fullDescriptionContent').html(description);
+                        $('#descriptionModal').modal('show');
+                    });
+
                 },
                 error: function (xhr, status, error) {
                     Swal.fire({
@@ -1053,164 +851,240 @@
             });
         }
 
-        function deleteannouncement() {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to delete this announcement?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "POST",
-                        url: 'dashboard.aspx/deleteannouncement',
-                        data: JSON.stringify({ announcement_id: $("#announcement_id").val() }),
-                        contentType: 'application/json',
-                        dataType: 'json',
-                        success: function (response) {
-                            let data = response.d;
-                            data = JSON.parse(data);
+        $('#LeavesTable').on('click', 'td', function () {
+            const table = $('#LeavesTable').DataTable();
+            const rowData = table.row(this).data();
+            if (!rowData) return;
 
-                            if (data == "success") {
-                                $('#announcement_info_modal').modal('hide');
-                                populateannounncements();
-                                display_green_alert('Announcement delelted successfully.');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.fire({
-                                title: "Error!",
-                                text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                                icon: "error"
-                            });
-                        }
-                    });
-                }
+            const rows = table.rows().data().toArray();
+            let carouselItems = '';
+
+            rows.forEach((data, index) => {
+                const activeClass = data.leave_id === rowData.leave_id ? 'active' : '';
+
+                carouselItems += `
+        <div class="carousel-item ${activeClass}">
+            <div class="modal-header ml-3 mt-2" style="border:none; justify-content: center">
+                <h5 class="modal-title">Details</h5> 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                 <div class="leave_details" style="margin-left:12%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: 100%;">
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Create By:</span><br />
+                            <span style="font-size: 1rem;">${data.emp_name}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Create Time:</span><br /> 
+                            <span style="font-size: 1rem;">${data.created_time}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Leave Type:</span><br />
+                            <span style="font-size: 1rem;">${data.leave_type}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Requested Days:</span><br /> 
+                            <span style="font-size: 1rem;">${data.requested_days}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Start Date:</span><br /> 
+                            <span style="font-size: 1rem;">${data.start_date}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">Start Date Breakdown:</span><br /> 
+                            <span style="font-size: 1rem;">${data.start_date_breakdown}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="width: 100%; justify-content: flex-start;">
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">End Date:</span><br /> 
+                            <span style="font-size: 1rem;">${data.end_date}</span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px; text-align: left;">
+                            <span style="color: gray; font-size: 1rem;">End Date Breakdown:</span><br /> 
+                            <span style="font-size: 1rem;">${data.end_date_breakdown}</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 ml-4 mb-3" style="text-align: center;">
+                        <button class="btn btn-link description-link" data-description="${data.leave_description}" data-leave-type="${data.leave_type}">
+                            View Description
+                        </button>
+                        <button class="btn btn-link attachment-link" onclick="window.open('${data.attachment}', '_blank')">
+                            View Attachment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
             });
-        }
 
-        function clearannouncementfields() {
-            document.getElementById('id_attachments_helper').style.display = 'none';
-            $('#id_title').val('');
-            $('#id_description').summernote('code', '');
-            $('#id_attachments').val('');
-            $('#id_employees').val(null).trigger('change');
-            $('#id_department').val(null).trigger('change');
-            $('#id_job_position').val(null).trigger('change');
-            $('#id_disable_comments').prop('checked', false);
-            $('#toggle_notify_email').prop('checked', false);
-            $('#toggle_notify_phone').prop('checked', false);
-        }
-
-        $('#commentButton').click(function () {
-            document.getElementById("comment_alert").innerText = "Your comment was submitted.";
-            $('#successAlert').removeClass('fade show').css('display', 'none');
-            $('#successAlert').fadeIn('slow').addClass('show').css('display', 'block');
+            $('#carouselContent').html(carouselItems);
+            $('#detailsModal').modal('show');
         });
 
-        function populatecomments() {
+        function HolidaysThisMonths() {
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/populatecomments',
-                data: JSON.stringify({ announcement_id: $("#announcement_id").val(), commentInput: $("#commentInput").val() }),
-                contentType: 'application/json',
-                dataType: 'json',
+                url: "leave_emp_dashboard.aspx/HolidaysThisMonths",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
                 success: function (response) {
-                    commentButton.style.display = "none";
-                    $("#commentInput").val("");
+                    var holidayData = response.d ? JSON.parse(response.d) : {};
+                    var holidaysHTML = "";
 
-                    let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
-                    cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
-                    const commentsList = JSON.parse(cleanedResponse);
-                    if (commentsList.length > 0) {
-                        var commentsHtml = "";
-                        const comments = commentsList[0];
-
-                        commentsList.forEach(function (comment) {
-                            let profileHTML = '';
-
-                            if (comments.profile_img) {
-                                profileHTML = `<img src="${comments.profile_img}" alt="Profile Picture" class="rounded-circle" style="width: 30px; height: 30px;"> ${comments.emp_name}`;
-                            } else {
-                                profileHTML = `<span class="rounded-circle d-inline-flex justify-content-center align-items-center" 
-                                style="width: 30px; height: 30px; background-color: ${comments.profile_color}; color: white; font-weight: bold;">${comments.profile_letters}</span> ${comments.emp_name}`;
-                            }
-
-                            commentsHtml += `<div class="comment-card p-3 border-bottom" style="background-color: rgba(233,237,241,0.4);">
-                                <div class="d-flex justify-content-between align-items-center ml-2" style="font-size: 16px; font-weight: 700 !important;">
-                                    <span>${comment.announcement_comments}</span>
-                                    <i class="fa-solid fa-x mr-2" style="cursor: pointer;" onclick="deletecomment(${comment.comment_id})"></i>
-                                </div>
-
-                                <div class="d-flex mt-3 ml-2">
-                                    <div class="d-flex flex-column text-muted fw-bold d-block mt-2" style="min-width: 0; font-weight: 700 !important;">
-                                        <span>By</span>
-                                        <div class="profile mt-1">
-                                            ${profileHTML}
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex flex-column text-end" style="margin-left: 100px;min-width: 0;">
-                                        <span class="text-muted fw-bold d-block mt-2" style="font-weight: 700 !important;">Date &amp; Time</span>
-                                        <span class="oh-timeoff-modal__stat-title mt-1">
-                                            on <span class="dateformat_changer">${comment.posted_date}</span> at <span class="timeformat_changer">${comment.posted_time}</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>`;
-
+                    if (Object.keys(holidayData).length > 0) {
+                        Object.keys(holidayData).forEach(date => {
+                            holidaysHTML += `
+                <div class="holiday-row pb-3 d-flex align-items-center justify-content-start rounded mb-2 shadow-sm" 
+                     style="background-color: #fff; padding: 10px; box-shadow: 5px 5px 10px rgba(0, 0, 0, 1);">
+                   <i class="fas fa-calendar-day text-primary mr-3" style="font-size: 1.5rem;"></i>
+                    <div class="holiday-title">
+                        <span class="profile-name font-weight-bold text-dark" style="font-size: 1rem;">
+                            ${date} <br /> 
+                            <span class="text-success" style="font-size: 1.1rem;">${holidayData[date]}</span>
+                        </span>
+                    </div>
+                </div>`;
                         });
-                        document.getElementById("announcement_comments").innerHTML = commentsHtml;
-                    }
-                    else {
-                        document.getElementById("announcement_comments").innerHTML = "<p>No comments yet.</p>";
+                    } else {
+                        holidaysHTML = `
+            <div id="empty_holiday" class="d-flex flex-column align-items-center justify-content-center text-center" 
+                 style="height: 100%;">
+                <img style="display: block; width: 100px; margin: 20px auto;" src="/asset/img/no-holidays.png" />
+                <h5 style="color: hsl(0,0%,45%); font-weight: bold;">No more holidays scheduled for this month.</h5>
+            </div>`;
                     }
 
+                    $("#holidayListCard").html(holidaysHTML);
                 },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
-                    });
+                error: function () {
+                    console.error("Error fetching holiday data.");
                 }
             });
         }
 
-        function deletecomment(comment_id) {
+        function populate_department_leaves(selectedMonth, selectedYear) {
             $.ajax({
                 type: "POST",
-                url: 'dashboard.aspx/deletecomment',
-                data: JSON.stringify({ comment_id: comment_id }),
+                url: 'leave_admin_dashboard.aspx/populate_leaves_details_based_months',
+                data: JSON.stringify({ from: "department_leaves", selectedMonth: selectedMonth, selectedYear: selectedYear }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
-                    if (response == "false") {
-                        Swal.fire("issue while deleting comment");
-                    } else {
-                        document.getElementById("comment_alert").innerText = "Your comment was deleted.";
-                        $('#successAlert').removeClass('fade show').css('display', 'none');
-                        $('#successAlert').fadeIn('slow').addClass('show').css('display', 'block');
-                        populatecomments();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
-                        icon: "error"
+                    const data = JSON.parse(response.d);
+                    const departmentLeaves = data.departmentLeaves || [];
+
+                    let departmentMap = {};
+                    departmentLeaves.forEach(item => {
+                        if (!departmentMap[item.department_name]) {
+                            departmentMap[item.department_name] = [];
+                        }
+                        departmentMap[item.department_name].push(item);
                     });
+
+                    let html = "";
+                    if (Object.keys(departmentMap).length > 0) {
+                        html += `<div class="accordion" id="departmentAccordion">`;
+
+                        Object.keys(departmentMap).forEach((dept, index) => {
+                            let employees = departmentMap[dept].filter(emp => emp.leave_status === "Approved");
+                            let employeeCount = employees.length;
+                            let employeeLabel = employeeCount === 1 ? "Employee" : "Employees";
+
+                            let employeesHtml = employeeCount > 0
+                                ? employees.map(emp => `
+                            <div class="leave-entry" style="margin-bottom: 10px;">
+                                <div class="leave-header" style="display: flex; align-items: start;">
+                                    <strong>${emp.emp_name} -</strong>
+                                    <div class="leave-details" style="display: flex; flex-direction: column; margin-left: 10px;">
+                                        <div>Leave type: ${emp.leave_type}</div>
+                                        <div>From: ${emp.start_date} (${emp.start_date_breakdown})</div>
+                                        <div>To: ${emp.end_date} (${emp.end_date_breakdown})</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join("")
+                                : `<p>No employees are on leave.</p>`;
+
+                            html += `
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading${index}">
+                                <button class="accordion-button collapsed custom-accordion-button" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#collapse${index}" 
+                                        aria-expanded="false" aria-controls="collapse${index}">
+                                    ${dept} (${employeeCount} ${employeeLabel})
+                                </button>
+                            </h2>
+                            <div id="collapse${index}" class="accordion-collapse collapse" 
+                                 aria-labelledby="heading${index}" data-bs-parent="#departmentAccordion">
+                                <div class="accordion-body">
+                                    ${employeesHtml}
+                                </div>
+                            </div>
+                        </div>`;
+                        });
+
+                        html += `</div>`;
+                    } else {
+                        html = "<p>No department leaves found for this month.</p>";
+                    }
+
+                    $("#department_leaves").html(html);
+                },
+                error: function (error) {
+                    console.error("Error fetching department leaves:", error);
                 }
             });
         }
 
-    </script>
+        function populate_leave_types(selectedMonth, selectedYear) {
+            $.ajax({
+                type: "POST",
+                url: 'leave_admin_dashboard.aspx/populate_leaves_details_based_months',
+                data: JSON.stringify({ from: "leave_types", selectedMonth: selectedMonth, selectedYear: selectedYear }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    const data = JSON.parse(response.d);
+                    const leaveTypeCounts = data.leaveTypeCounts || [];
+                    let leaveCounts = {};
 
+                    leaveTypeCounts.forEach(item => {
+                        if (!leaveCounts[item.leave_type]) {
+                            leaveCounts[item.leave_type] = 0;
+                        }
+                        leaveCounts[item.leave_type] += parseFloat(item.requested_days);
+                    });
+
+                    let html = "";
+                    if (Object.keys(leaveCounts).length > 0) {
+                        for (const [leaveType, count] of Object.entries(leaveCounts)) {
+                            html += `<div class="leave-count">
+                        <strong>${leaveType}</strong>: ${count} days
+                    </div><hr>`;
+                        }
+                    } else {
+                        html = "<p>No leave data found for this month.</p>";
+                    }
+
+                    $("#leave_types_leaves").html(html);
+                },
+                error: function (error) {
+                    console.error("Error fetching leave types:", error);
+                }
+            });
+        }
+
+    </script>--%>
 </body>
 
 </html>
+
 

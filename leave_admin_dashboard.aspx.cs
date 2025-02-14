@@ -68,20 +68,24 @@ namespace hrms
 
                     if (from == "department_leaves")
                     {
-                        string departmentLeaveQuery = @"
-                    SELECT d.department_id, d.department_name, CONCAT(e.first_name, ' ', e.last_name) AS emp_name, lt.leave_type, 
-                           l.start_date, l.end_date, l.leave_status, 
-                           DATE_FORMAT(l.start_date, '%d %b %Y') AS start_date_breakdown,
-                           DATE_FORMAT(l.end_date, '%d %b %Y') AS end_date_breakdown
-                    FROM hrms.department d
-                    LEFT JOIN hrms.employee e ON d.department_id = e.emp_dept_id
-                    LEFT JOIN hrms.leave_requests l ON e.emp_id = l.emp_id
-                    LEFT JOIN hrms.leave_type lt ON l.leave_type_id = lt.leave_type_id
-                    WHERE ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
-                        OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth)
-                        OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
-                            AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d'))))
-                    ORDER BY d.department_name, e.emp_id ASC;";
+                        string departmentLeaveQuery = @"SELECT d.department_id, d.department_name, 
+                                                                IFNULL(CONCAT(e.first_name, ' ', e.last_name), '') AS emp_name, 
+                                                                IFNULL(lt.leave_type, '') AS leave_type, 
+                                                                IFNULL(l.start_date, '') AS start_date, 
+                                                                IFNULL(l.start_date_breakdown, '') AS start_date_breakdown, 
+                                                                IFNULL(l.end_date, '') AS end_date, 
+                                                                IFNULL(l.end_date_breakdown, '') AS end_date_breakdown, 
+                                                                IFNULL(l.leave_status, '') AS leave_status 
+                                                        FROM hrms.department d
+                                                        LEFT JOIN hrms.employee e ON d.department_id = e.emp_dept_id
+                                                        LEFT JOIN hrms.leave_requests l ON e.emp_id = l.emp_id 
+                                                        AND ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
+                                                            OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth)
+                                                            OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
+                                                                AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d'))))
+                                                        LEFT JOIN hrms.leave_type lt ON l.leave_type_id = lt.leave_type_id 
+                                                        AND lt.deleted_by IS NULL
+                                                        ORDER BY d.department_name, e.emp_id ASC;";
 
                         using (var cmd = new MySqlCommand(departmentLeaveQuery, conn))
                         {
@@ -109,16 +113,16 @@ namespace hrms
                     }
                     else if (from == "leave_types")
                     {
-                        string leaveTypeQuery = @"
-        SELECT lt.leave_type, l.start_date, l.end_date, 
-               l.start_date_breakdown, l.end_date_breakdown
-        FROM hrms.leave_type lt
-        LEFT JOIN hrms.leave_requests l ON lt.leave_type_id = l.leave_type_id
-        WHERE ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
-            OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth)
-            OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
-                AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d'))))
-        ORDER BY lt.leave_type ASC;";
+                        string leaveTypeQuery = @"SELECT lt.leave_type, COALESCE(l.start_date, '') AS start_date, COALESCE(l.end_date, '') AS end_date, 
+                                                  COALESCE(l.start_date_breakdown, '') AS start_date_breakdown, COALESCE(l.end_date_breakdown, '') AS end_date_breakdown 
+                                                FROM hrms.leave_type lt
+                                                LEFT JOIN hrms.leave_requests l ON lt.leave_type_id = l.leave_type_id
+                                                AND ((YEAR(l.start_date) = @selectedYear AND MONTH(l.start_date) = @selectedMonth) 
+                                                OR (YEAR(l.end_date) = @selectedYear AND MONTH(l.end_date) = @selectedMonth)
+                                                OR (l.start_date < STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d') 
+                                                AND l.end_date >= LAST_DAY(STR_TO_DATE(CONCAT(@selectedYear, '-', @selectedMonth, '-01'), '%Y-%m-%d'))))
+                                                WHERE l.canceled_by IS NULL AND lt.deleted_by IS NULL
+                                                ORDER BY lt.leave_type ASC;";
 
                         using (var cmd = new MySqlCommand(leaveTypeQuery, conn))
                         {
@@ -129,38 +133,46 @@ namespace hrms
                             {
                                 while (reader.Read())
                                 {
-                                    DateTime startDate = DateTime.Parse(reader["start_date"].ToString());
-                                    DateTime endDate = DateTime.Parse(reader["end_date"].ToString());
+                                    string startDateStr = reader["start_date"].ToString();
+                                    string endDateStr = reader["end_date"].ToString();
+
+                                    DateTime startDate, endDate;
+
+                                    bool hasStartDate = DateTime.TryParse(startDateStr, out startDate);
+                                    bool hasEndDate = DateTime.TryParse(endDateStr, out endDate);
 
                                     string startBreakdown = reader["start_date_breakdown"].ToString();
                                     string endBreakdown = reader["end_date_breakdown"].ToString();
 
                                     double totalDays = 0;
 
-                                    if (startBreakdown == "Full")
-                                        totalDays += 1;
-                                    else if (startBreakdown == "First Half" || startBreakdown == "Second Half")
-                                        totalDays += 0.5;
-
-                                    if (startDate.ToString("yyyy-MM-dd") == endDate.ToString("yyyy-MM-dd"))
+                                    if (hasStartDate && hasEndDate)
                                     {
-                                        if (startBreakdown == "First Half" && endBreakdown == "Second Half")
-                                            totalDays = 1;
-                                        else if (startBreakdown == "Second Half" && endBreakdown == "Second Half")
-                                            totalDays = 0.5;
-                                    }
-                                    else
-                                    {
-                                        for (DateTime date = startDate.AddDays(1); date < endDate; date = date.AddDays(1))
-                                        {
-                                            if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
-                                                totalDays++;
-                                        }
-
-                                        if (endBreakdown == "Full")
+                                        if (startBreakdown == "Full")
                                             totalDays += 1;
-                                        else if (endBreakdown == "First Half" || endBreakdown == "Second Half")
+                                        else if (startBreakdown == "First Half" || startBreakdown == "Second Half")
                                             totalDays += 0.5;
+
+                                        if (startDate.ToString("yyyy-MM-dd") == endDate.ToString("yyyy-MM-dd"))
+                                        {
+                                            if (startBreakdown == "First Half" && endBreakdown == "Second Half")
+                                                totalDays = 1;
+                                            else if (startBreakdown == "Second Half" && endBreakdown == "Second Half")
+                                                totalDays = 0.5;
+                                        }
+                                        else
+                                        {
+                                            for (DateTime date = startDate.AddDays(1); date < endDate; date = date.AddDays(1))
+                                            {
+                                                if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                                                    totalDays++;
+                                            }
+
+                                            if (endBreakdown == "Full")
+                                                totalDays += 1;
+                                            else if (endBreakdown == "First Half" || endBreakdown == "Second Half")
+                                                totalDays += 0.5;
+                                        }
                                     }
 
                                     leaveTypeCounts.Add(new
@@ -169,6 +181,7 @@ namespace hrms
                                         requested_days = totalDays.ToString("0.##")
                                     });
                                 }
+
                             }
                         }
                     }

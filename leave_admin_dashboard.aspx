@@ -18,7 +18,6 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -36,7 +35,6 @@
     <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
 
     <style>
         .main-container {
@@ -120,6 +118,31 @@
 
         .modal-body {
             overflow-x: auto;
+        }
+
+        .accordion-button:focus,
+        .accordion-button:not(.collapsed) {
+            background-color: white !important;
+            color: black !important;
+            box-shadow: none !important;
+        }
+
+        .leave-count-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .leave-type {
+            text-align: left;
+        }
+
+        .leave-days {
+            text-align: right;
+            color: #007bff;
+            font-weight: bold;
         }
 
         @keyframes slideInFromRight {
@@ -239,14 +262,14 @@
                                 </div>
                             </div>
                             <div class="row mb-5">
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-8">
-
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-6">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: white">
                                             <h6 class="card-title">Department Leaves</h6>
                                             <input type="month" id="monthPicker_for_department_leaves" class="form-control" style="width: 150px;" />
                                         </div>
                                         <div class="card-body p-4" id="department_leaves" style="height: 400px; overflow: auto">
+                                            <div id="departmentAccordion"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -934,21 +957,67 @@
                 success: function (response) {
                     const data = JSON.parse(response.d);
                     const departmentLeaves = data.departmentLeaves || [];
-                    let html = "";
 
-                    if (departmentLeaves.length > 0) {
-                        departmentLeaves.forEach(item => {
-                            html += `<div class="leave-item">
-                        <strong>${item.department_name}</strong> - ${item.emp_name} (${item.leave_type}) <br>
-                        From: ${item.start_date} (${item.start_date_breakdown}) To: ${item.end_date} (${item.end_date_breakdown}) <br>
-                        Status: ${item.leave_status}
-                    </div><hr>`;
+                    let departmentMap = {};
+                    departmentLeaves.forEach(item => {
+                        if (!departmentMap[item.department_name]) {
+                            departmentMap[item.department_name] = [];
+                        }
+                        if (item.emp_name) {
+                            departmentMap[item.department_name].push(item);
+                        }
+                    });
+
+                    let html = "";
+                    if (Object.keys(departmentMap).length > 0) {
+                        html += `<div id="departmentAccordion">`;
+
+                        Object.keys(departmentMap).forEach((dept, index) => {
+                            let employees = departmentMap[dept].filter(emp => emp.leave_status === "Approved");
+                            let employeeCount = employees.length;
+                            let employeeLabel = employeeCount === 1 ? "Employee" : "Employees";
+
+                            let employeesHtml = employeeCount > 0
+                                ? employees.map(emp => `
+                            <div class="leave-entry" style="margin-bottom: 10px;">
+                                <div class="leave-header" style="display: flex; align-items: start;">
+                                    <strong>${emp.emp_name} -</strong>
+                                    <div class="leave-details" style="display: flex; flex-direction: column; margin-left: 10px;">
+                                        <div>Leave type: ${emp.leave_type}</div>
+                                        <div>From: ${emp.start_date} (${emp.start_date_breakdown})</div>
+                                        <div>To: ${emp.end_date} (${emp.end_date_breakdown})</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join("")
+                                : `<p>No employees are on leave.</p>`;
+
+                            html += `
+                        <div class="card">
+                            <div class="card-header" id="heading${index}" 
+                                data-toggle="collapse" data-target="#collapse${index}" 
+                                aria-expanded="false" aria-controls="collapse${index}" 
+                                style="cursor: pointer; background-color: white; border: 1px solid #ddd;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-dark">${dept}</span>
+                                    <span class="text-muted">(${employeeCount} ${employeeLabel})</span>
+                                </div>
+                            </div>
+                            <div id="collapse${index}" class="collapse" 
+                                aria-labelledby="heading${index}" data-parent="#departmentAccordion">
+                                <div class="card-body">
+                                    ${employeesHtml}
+                                </div>
+                            </div>
+                        </div>`;
                         });
+
+                        html += `</div>`;
                     } else {
                         html = "<p>No department leaves found for this month.</p>";
                     }
 
-                    $("#department_leaves").html(html);
+                    $("#departmentAccordion").html(html);
                 },
                 error: function (error) {
                     console.error("Error fetching department leaves:", error);
@@ -978,9 +1047,10 @@
                     let html = "";
                     if (Object.keys(leaveCounts).length > 0) {
                         for (const [leaveType, count] of Object.entries(leaveCounts)) {
-                            html += `<div class="leave-count">
-                        <strong>${leaveType}</strong>: ${count} days
-                    </div><hr>`;
+                            html += `<div class="leave-count-container">
+                    <strong class="leave-type">${leaveType}</strong>
+                    <span class="leave-days">${count} days</span>
+                </div><hr>`;
                         }
                     } else {
                         html = "<p>No leave data found for this month.</p>";
