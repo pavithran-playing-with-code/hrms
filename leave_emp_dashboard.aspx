@@ -68,7 +68,7 @@
         }
 
         #Quickaction-container {
-            position: absolute;
+            position: fixed;
             right: 5px;
             bottom: 10px;
             user-select: none;

@@ -106,7 +106,7 @@
                 </a>
             </div>
 
-            <div id="icon-item3" class="icon-item round" onclick="$('#createLeavemodal').modal('show');" data-tooltip="Create Leave Request">
+            <div id="icon-item3" class="icon-item round" onclick="open_createLeavemodal()" data-tooltip="Create Leave Request">
                 <a class="text-light">
                     <i class="fas fa-calendar-plus"></i>
                 </a>
@@ -140,9 +140,6 @@
                             <label for="id_leave_type">Leave Type:</label>
                             <select name="leave_type" class="form-control select2" id="id_leave_type">
                                 <option value="" disabled="disabled" selected="selected">Select Leave Type</option>
-                                <option value="1">Sick Leave</option>
-                                <option value="2">Casual Leave</option>
-                                <option value="3">Earned Leave</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
@@ -199,6 +196,37 @@
         container.classList.toggle('open');
         quickActionButton.classList.toggle('open');
     }
+
+    function open_createLeavemodal() {
+        $('#createLeavemodal').modal('show');
+        populateLeaveTypes();
+    }
+
+    function populateLeaveTypes() {
+        $.ajax({
+            type: "POST",
+            url: 'leave_configuration.aspx/populateLeaveTypes',
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                const data = JSON.parse(response.d);
+                const dropdown = $('#id_leave_type');
+                dropdown.find('option:not(:first)').remove();
+
+                data.forEach(item => {
+                    dropdown.append(`<option value="${item.leave_type_id}">${item.leave_type}</option>`);
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    title: "Error!",
+                    text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                    icon: "error"
+                });
+            }
+        });
+    }
+
 
     document.addEventListener('DOMContentLoaded', function () {
         var today = new Date().toISOString().split('T')[0];

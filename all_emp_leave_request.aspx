@@ -42,7 +42,7 @@
 
     <style>
         #Quickaction-container {
-            position: absolute;
+            position: fixed;
             right: 5px;
             bottom: 10px;
             user-select: none;
@@ -179,6 +179,7 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
     <input type="hidden" id="Leave_id" name="Leave_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
 
