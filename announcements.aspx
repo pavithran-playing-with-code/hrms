@@ -208,6 +208,7 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
     <input type="hidden" id="announcement_id" name="announcement_id" />
     <input type="hidden" id="id_attachments_hidden_value" name="id_attachments_hidden_value" />
 

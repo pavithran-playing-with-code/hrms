@@ -13,5 +13,14 @@ namespace hrms
 
     public partial class announcements
     {
+
+        /// <summary>
+        /// emp_access_lvl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden emp_access_lvl;
     }
 }

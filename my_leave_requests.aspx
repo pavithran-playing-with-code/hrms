@@ -178,6 +178,7 @@
     </style>
 </head>
 <body style="background-color: #f8f9fa">
+    <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
     </div>
@@ -345,7 +346,7 @@
                         },
                         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>tp",
                         initComplete: function () {
-                            $('#dataTableControls').empty(); 
+                            $('#dataTableControls').empty();
                             $('#LeavesTable_length').detach().appendTo('#dataTableControls');
                             $('#LeavesTable_filter').detach().appendTo('#dataTableControls');
                         },
