@@ -76,7 +76,7 @@
                 </a>
             </div>
 
-            <div id="icon-item8" class="icon-item round" data-tooltip="Create Ticket">
+            <div id="icon-item8" class="icon-item round" onclick="opencreateticketmodal()" data-tooltip="Create Ticket">
                 <a class="text-light">
                     <i class="fas fa-ticket-alt"></i>
                 </a>
@@ -188,7 +188,256 @@
     </div>
 </div>
 
+<div class="modal fade pt-5" id="createticketmodal" tabindex="-1" aria-labelledby="createticketmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg mx-auto" style="max-width: 41%; margin: 0 auto;">
+        <div class="modal-content" style="border-radius: 0px !important; width: 100%;">
+            <div class="modal-header" style="padding: 1.50rem 1.70rem 1rem; height: 30px; background-color: transparent; border-bottom: none;">
+                <h2 class="modal-title" id="createticketmodalLabel" style="font: normal 80%/1.4 sans-serif; font-size: 1.10rem; font-weight: 600; color: #4f4a4a;"></h2>
+                <button type="button" style="border: none; outline: none" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body createticketfields">
+                <div class="mx-2 mb-2" style="color: hsl(0, 0%, 11%); font-weight: 500; background-color: hsl(0,0%,100%); border: 1px solid hsl(213,22%,84%); padding: 1.2rem;">
+                    <div class="form-group">
+                        <label for="id_ticket_title">Title:</label>
+                        <input type="text" name="title" class="form-control" id="id_ticket_title" placeholder="Title" maxlength="100" />
+                    </div>
+                    <div class="form-group">
+                        <label for="id_ticket_description">Description:</label>
+                        <textarea id="id_ticket_description" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group d-flex flex-column">
+                        <div class="d-flex align-items-center">
+                            <label for="id_ticket_attachments" class="mr-2">Attachments:</label>
+                            <input type="file" name="attachments" class="attachment_file" id="id_ticket_attachments" />
+                        </div>
+                        <div class="d-flex align-items-center row ml-1">
+                            <div id="id_ticket_attachments_helper">
+                                <input type="text" id="id_ticket_attachments_helper_value" hidden="hidden" />
+                            </div>
+                            <button type="button" style="width: 17%; position: relative; left: 16%; outline: none; background-color: #f6f6f6; border: 1px solid #000; color: #000; cursor: pointer; font-size: 14px; display: none;"
+                                class="btn btn-danger btn-sm mt-2" id="remove_ticket_attachment_btn">
+                                Remove
+                            </button>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket_type">Ticket Type:</label>
+                        <select name="ticket_type" class="form-control select2" id="ticket_type"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket_type_assignee">Assignee:</label>
+                        <input type="text" class="form-control" id="ticket_type_assignee" disabled="disabled" />
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority:</label>
+                        <select name="priority" class="form-control select2" id="priority">
+                            <option value="1">High</option>
+                            <option value="2">Medium</option>
+                            <option value="3">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select name="status" class="form-control select2" id="status">
+                            <option value="New">New</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Hold">Hold</option>
+                            <option value="Canceled">Cancel</option>
+                        </select>
+                    </div>
+                    <div class="text-right">
+                        <button onclick="create_edit_ticket('edit')" id="editticketbtn" class="btn btn-primary" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Edit</button>
+                        <button onclick="create_edit_ticket('add')" id="saveticketbtn" class="btn btn-primary ml-2" style="width: 70px; height: 45px; background-color: hsl(8, 77%, 56%); color: hsl(0, 0%, 100%); border-radius: 0px !important; border: none; box-shadow: none; outline: none">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    $(document).ready(function () {
+        $('[data-tooltip]').each(function () {
+            var tooltipText = $(this).attr('data-tooltip');
+            $(this).attr('title', tooltipText);
+        });
+
+        $('[data-tooltip]').tooltip({
+            placement: 'left',
+            trigger: 'hover'
+        });
+    });
+
+    document.getElementById('remove_ticket_attachment_btn').addEventListener('click', function () {
+        $('#id_ticket_attachments').val('');
+        document.getElementById('id_ticket_attachments_helper').style.display = 'none';
+        document.getElementById('remove_ticket_attachment_btn').style.display = 'none';
+    });
+
+    document.getElementById('id_ticket_attachments').addEventListener('change', function () {
+        const fileInput = this;
+        debugger
+        if (fileInput.files.length > 0) {
+            document.getElementById('id_ticket_attachments_helper').style.display = 'none';
+            document.getElementById('remove_ticket_attachment_btn').style.display = 'block';
+        }
+    });
+
+    function opencreateticketmodal() {
+        clearcreateticketmodalFields();
+        document.getElementById('createticketmodalLabel').innerText = "Create Tickets.";
+        $('#saveticketbtn').show();
+        $('#editticketbtn').hide();
+        $('#createticketmodal').modal('show');
+        populate_ticket_type();
+    }
+
+    function clearcreateticketmodalFields() {
+        $("#id_ticket_title").val("");
+        $("#id_ticket_description").val("");
+        $("#id_ticket_attachments").val("");
+        $("#id_ticket_attachments_helper_value").val("");
+        $("#id_ticket_attachments_hidden_value").val("");
+        $("#ticket_type").val(null).trigger("change");
+        $("#ticket_type_assignee").val("");
+        $("#priority").val("high").trigger("change");
+        $("#status").val("new").trigger("change");
+        $("#remove_ticket_attachment_btn").hide();
+    }
+
+    function populate_ticket_type() {
+        $.ajax({
+            type: "POST",
+            url: "tickets.aspx/populate_ticket_type",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                if (response.d.includes("ExceptionMessage")) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.d,
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+                let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
+                let ticket_types = JSON.parse(cleanedResponse);
+
+                let ticketTypeDropdown = $("#ticket_type");
+                ticketTypeDropdown.empty().append('<option selected="selected" disabled="disabled" value="">Select Ticket Type</option>');
+
+                let ticketTypeMap = {};
+
+                ticket_types.forEach((tt) => {
+                    ticketTypeDropdown.append(`<option value="${tt.ticket_type_id}">${tt.ticket_type}</option>`);
+                    ticketTypeMap[tt.ticket_type_id] = tt.emp_name;
+                });
+
+                ticketTypeDropdown.off("change").on("change", function () {
+                    let selectedTicketTypeId = $(this).val();
+                    let assigneeName = ticketTypeMap[selectedTicketTypeId] || "";
+                    $("#ticket_type_assignee").val(assigneeName);
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    title: "Error!",
+                    text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                    icon: "error"
+                });
+            }
+        });
+    }
+
+    function UploadFiles(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const base64File = reader.result.split(',')[1];
+
+                $.ajax({
+                    url: 'dashboard.aspx/UploadFiles',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "tickets" }),
+                    success: function (response) {
+                        resolve(response.d);
+                    },
+                    error: function (xhr, status, error) {
+                        reject(error);
+                    }
+                });
+            };
+            reader.onerror = function () {
+                reject("Error reading file.");
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function create_edit_ticket(action) {
+        const id_ticket_title = $('#id_ticket_title').val();
+        const id_ticket_description = $('#id_ticket_description').val();
+        const ticket_type = $('#ticket_type').val();
+        const priority = $('#priority').val();
+        const status = $('#status').val();
+        let attachments = '';
+        const fileInput = document.getElementById('id_ticket_attachments');
+
+        if (action == "edit" && document.getElementById('id_ticket_attachments_helper').style.display == "block") {
+            attachments = $('#id_ticket_attachments_hidden_value').val();
+        } else {
+            if (fileInput.files.length > 0) {
+                try {
+                    attachments = await UploadFiles(fileInput.files[0]);
+                } catch (error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Failed to upload the attachment. Please try again.",
+                        icon: "error"
+                    });
+                    return;
+                }
+            }
+        }
+
+        if ((!id_ticket_title) || (!id_ticket_description) || (!ticket_type) || (!priority) || (!status)) {
+            Swal.fire({
+                title: "Missing Fields",
+                text: "Please fill the ticket type field before proceeding.",
+                icon: "warning"
+            });
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: 'tickets.aspx/create_edit_ticket',
+            data: JSON.stringify({ action: action, ticket_id: action === "edit" ? $('#edit_ticket_id').val() : null, id_ticket_title: id_ticket_title, id_ticket_description: id_ticket_description, attachments: attachments, ticket_type: ticket_type, priority: priority, status: status }),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                $('#createticketmodal').modal('hide');
+                display_green_alert(response.d);
+                document.dispatchEvent(new Event("callpopulatetickets"));
+                clearcreateticketmodalFields();
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    title: "Error!",
+                    text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                    icon: "error"
+                });
+            }
+        });
+    }
+
     function toggleIcons() {
         const container = document.querySelector('.icon-items-container');
         const quickActionButton = document.querySelector('.quick-action');

@@ -160,7 +160,7 @@ namespace hrms
 
 
         [WebMethod]
-        public static string create_edit_ticket(string action, int? ticket_id, string id_title, string id_description, string attachments, string ticket_type, string priority, string status)
+        public static string create_edit_ticket(string action, int? ticket_id, string id_ticket_title, string id_ticket_description, string attachments, string ticket_type, string priority, string status)
         {
             try
             {
@@ -176,8 +176,8 @@ namespace hrms
                             "ticket_type_id = @ticket_type_id, priority = @priority, ticket_status = @ticket_status, edited_by = @edited_by, edited_time = NOW() WHERE ticket_id = @ticket_id", conn))
                         {
                             cmd.Parameters.AddWithValue("@ticket_id", ticket_id);
-                            cmd.Parameters.AddWithValue("@title", id_title);
-                            cmd.Parameters.AddWithValue("@ticket_description", id_description);
+                            cmd.Parameters.AddWithValue("@title", id_ticket_title);
+                            cmd.Parameters.AddWithValue("@ticket_description", id_ticket_description);
                             cmd.Parameters.AddWithValue("@attachments", attachments);
                             cmd.Parameters.AddWithValue("@ticket_type_id", ticket_type);
                             cmd.Parameters.AddWithValue("@priority", priority);
@@ -195,8 +195,8 @@ namespace hrms
                         using (MySqlCommand cmd = new MySqlCommand("INSERT INTO hrms.tickets (title, ticket_description, attachments, ticket_type_id, priority, ticket_status, created_by, created_time) " +
                             "VALUES (@title, @ticket_description, @attachments, @ticket_type_id, @priority, @ticket_status, @created_by, NOW())", conn))
                         {
-                            cmd.Parameters.AddWithValue("@title", id_title);
-                            cmd.Parameters.AddWithValue("@ticket_description", id_description);
+                            cmd.Parameters.AddWithValue("@title", id_ticket_title);
+                            cmd.Parameters.AddWithValue("@ticket_description", id_ticket_description);
                             cmd.Parameters.AddWithValue("@attachments", attachments);
                             cmd.Parameters.AddWithValue("@ticket_type_id", ticket_type);
                             cmd.Parameters.AddWithValue("@priority", priority);
