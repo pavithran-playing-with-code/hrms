@@ -1084,7 +1084,7 @@
                             if (data == "success") {
                                 $('#announcement_info_modal').modal('hide');
                                 populateannounncements();
-                                display_green_alert('Announcement delelted successfully.');
+                                display_green_alert('Announcement deleted successfully.');
                             }
                         },
                         error: function (xhr, status, error) {

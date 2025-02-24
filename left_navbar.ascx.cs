@@ -54,6 +54,18 @@ namespace hrms
                 }
             }
 
+            if (currentPage == "all_employees.aspx")
+            {
+                EmployeesSubMenu.Attributes["class"] = "collapse show";
+
+                switch (currentPage)
+                {
+                    case "all_employees.aspx":
+                        ticketsNavLink.Attributes["class"] += " active-page";
+                        break;
+                }
+            }
+
             if (currentPage == "leave_emp_dashboard.aspx" || currentPage == "leave_admin_dashboard.aspx" || currentPage == "all_emp_leave_request.aspx" || currentPage == "my_leave_requests.aspx" || currentPage == "leave_configuration.aspx")
             {
                 leaveSubMenu.Attributes["class"] = "collapse show";
@@ -89,6 +101,7 @@ namespace hrms
                         break;
                 }
             }
+
         }
 
     }

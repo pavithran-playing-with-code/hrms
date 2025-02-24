@@ -127,7 +127,7 @@
                         <span>Forms Module</span>
                     </a>
                 </li>
-                
+
                 <li class="nav-item">
                     <a id="YammerNavLink" class="nav-link" runat="server">
                         <i class="fas fa-heart" style="font-size: 1.25rem;"></i>
@@ -140,6 +140,23 @@
                         <i class="fas fa-home" style="font-size: 1.25rem;"></i>
                         <span>Dashboard</span>
                     </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#EmployeesSubMenu" data-toggle="collapse" aria-expanded="false" aria-controls="EmployeesSubMenu">
+                        <i class="fa-solid fa-headset" style="font-size: 1.25rem;"></i>
+                        <span>Employee</span>
+                    </a>
+                    <div id="EmployeesSubMenu" runat="server" clientidmode="Static" class="collapse">
+                        <ul class="navbar-nav text-light">
+                            <li class="nav-item onlyhighaccesslvl">
+                                <a id="A2" class="nav-link" href="../all_employees.aspx" runat="server">
+                                    <i class="fas fa-user-lock" style="font-size: 1.25rem;"></i>
+                                    <span>All Employees</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
                 <li class="nav-item onlyhighaccesslvl">

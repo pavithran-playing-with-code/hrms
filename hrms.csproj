@@ -207,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="all_employees.aspx" />
     <Content Include="announcements.aspx" />
     <Content Include="asset\img\attendance.png" />
     <Content Include="asset\img\holidays.png" />
@@ -331,6 +332,13 @@
     <Content Include="Site.Mobile.Master" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="all_employees.aspx.cs">
+      <DependentUpon>all_employees.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="all_employees.aspx.designer.cs">
+      <DependentUpon>all_employees.aspx</DependentUpon>
+    </Compile>
     <Compile Include="announcements.aspx.cs">
       <DependentUpon>announcements.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
