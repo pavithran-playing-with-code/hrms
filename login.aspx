@@ -148,32 +148,54 @@
 <body>
     <div class="container d-flex justify-content-center align-items-start mt-5">
         <div class="card">
-            <h4 class="card-title text-center my-3 font-weight-bold">Sign In</h4>
-            <p class="text-muted text-center">Please login to access the dashboard.</p>
-            <div class="form-group mt-3">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="e.g. jane.doe@acme.com" />
-                </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Use alphanumeric characters" />
-                    <div class="input-container">
-                        <button type="button" class="btn" style="box-shadow: none;" id="toggle-password">
-                            <i class="fa fa-eye" id="password-icon"></i>
-                        </button>
+            <div id="login-section">
+                <h4 class="card-title text-center my-3 font-weight-bold">Sign In</h4>
+                <p class="text-muted text-center">Please login to access the dashboard.</p>
+                <div class="form-group mt-3">
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="e.g. jane.doe@acme.com" />
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Use alphanumeric characters" />
+                        <div class="input-container">
+                            <button type="button" class="btn" id="toggle-password" style="color: hsl(8,77%,56%);">
+                                <i class="fa fa-eye" id="password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="login_info()" class="btn btn-secondary w-100 mt-4 mb-4" style="background-color: hsl(8,77%,56%); border: none; outline: none">Secure Sign-in</button>
+                    <div class="text-center mt-3">
+                        <small>
+                            <a href="#" onclick="showOTPForm()" class="link link-secondary" style="color: hsl(8,77%,56%);">Forgot password?</a>
+                        </small>
                     </div>
                 </div>
-                <button onclick="login_info()" class="btn btn-secondary btn-shadow w-100 mt-4 mb-4" style="background-color: hsl(8,77%,56%)">
-                    <i class="fa-solid fa-lock mr-1"></i>
-                    Secure Sign-in
-                </button>
-                <div class="text-center mt-3">
-                    <small>
-                        <a onclick="window.location.href = 'forgot-password.aspx'" class="link link-secondary" style="color: hsl(8,77%,56%);">Forgot password?</a>
-                    </small>
-                </div>
             </div>
+
+
+
+            <div id="otp-section" style="display: none;">
+                <h4 class="text-center my-3 font-weight-bold">Login via OTP</h4>
+                <div class="form-group mt-4">
+                    <label for="otp-input">Enter your Email or Mobile Number</label>
+                    <input type="text" id="otp-input" class="form-control" placeholder="Email or Mobile Number" />
+                </div>
+                <button onclick="sendOTP()" class="btn btn-primary w-100 mt-3" style="background-color: hsl(8,77%,56%); border: none; outline: none">Send OTP</button>
+                <button onclick="showLoginForm()" class="btn btn-secondary w-100 mt-2" style="border: none; outline: none">Back to Login</button>
+
+                <div id="otp-verification-section" style="display: none;">
+                    <div class="form-group mt-3">
+                        <label for="otp-code">Enter OTP</label>
+                        <input type="text" id="otp-code" class="form-control" placeholder="Enter OTP" />
+                        <small id="otp-timer" style="display: none; color: red; font-weight: bold;"></small>
+                    </div>
+                    <button onclick="verifyOTP()" id="login-btn" class="btn btn-success w-100 mt-3" style="display: none;">Login</button>
+                </div>
+
+            </div>
+
         </div>
 
         <div id="right-after-card" style="width: 500px; left: 100%; background-color: transparent; border: none; box-shadow: none" class="info-box">
@@ -182,7 +204,7 @@
                 <strong style="display: inline-flex; align-items: center; height: 100%; margin-left: 0; padding-left: 0px;">
                     <i class="fa-sharp fa-solid fa-circle-exclamation mr-3"></i>
                 </strong>
-                <span style="color: black; line-height: 1.5;">Invalid username or password.</span>
+                <span style="color: black; line-height: 1.5;" id="alert-message-text">Invalid username or password.</span>
                 <button type="button" id="close_alert_message" style="margin-left: auto; padding-bottom: 1%; box-shadow: none; border: none; outline: none;" class="close mt-1">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -195,6 +217,33 @@
     </div>
 
     <script>
+        function showErrorMessage(message) {
+            let alertBox = $("#alert-message");
+            alertBox.removeClass("alert-success").addClass("alert-danger");
+            alertBox.css({
+                "display": "flex",
+                "border-left": "5px solid #dc3545",
+                "background-color": "#f8d7da",
+                "color": "#721c24"
+            });
+            $("#alert-message strong i").css("color", "#dc3545");
+            $("#alert-message-text").html(message);
+        }
+
+        function showSuccessMessage(message) {
+            let alertBox = $("#alert-message");
+            alertBox.removeClass("alert-danger").addClass("alert-success");
+            alertBox.css({
+                "display": "flex",
+                "border-left": "5px solid #28a745",
+                "background-color": "#d4f8d4",
+                "color": "#155724"
+            });
+            $("#alert-message strong i").css("color", "#28a745");
+            $("#alert-message-text").html(message);
+        }
+
+
         $('#close_alert_message').click(function () {
             document.getElementById("alert-message").style.display = 'none';
             $('body').css('overflow', 'hidden');
@@ -215,12 +264,119 @@
             }
         });
 
+        function showOTPForm() {
+            $("#login-section").hide();
+            $("#otp-section").show();
+        }
+
+        function showLoginForm() {
+            $("#otp-section").hide();
+            $("#login-section").show();
+        }
+
+        let otpTimer;
+        let timeLeft = 120;
+
+        function startOTPTimer() {
+            clearInterval(otpTimer);
+            timeLeft = 120;
+            $("#otp-timer").text(`Time left: ${timeLeft} sec`).show();
+
+            otpTimer = setInterval(function () {
+                timeLeft--;
+                $("#otp-timer").text(`Time left: ${timeLeft} sec`);
+
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    $("#otp-timer").hide();
+                    $("#otp-verification-section").hide();
+                    $("#otp-code").val("");
+                    $("#otp-input").val("").prop("disabled", false);
+                    showErrorMessage("OTP expired. Please request a new OTP.");
+                }
+            }, 1000);
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+        }
+
+        function sendOTP() {
+            var userInput = $("#otp-input").val().trim();
+            if (userInput === "") {
+                showErrorMessage("Please enter your email or mobile number.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: 'login.aspx/checkUserExists',
+                data: JSON.stringify({ userInput: userInput }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d === "exists") {
+                        showSuccessMessage("OTP has been sent successfully!");
+                        $("#otp-verification-section").show();
+                        $("#otp-code").val("");
+                        $("#login-btn").hide();
+                        startOTPTimer();
+                        $("#otp-input").prop("disabled", true);
+                    } else {
+                        showErrorMessage("This email or mobile number is not registered.");
+                        $("#otp-input").prop("disabled", false);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire("Error!", `An error occurred: ${error}`, "error");
+                }
+            });
+        }
+
+        function verifyOTP() {
+            var userInput = $("#otp-input").val().trim();
+            var enteredOTP = $("#otp-code").val().trim();
+            if (enteredOTP === "") {
+                showErrorMessage("Please enter the OTP.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: 'login.aspx/verifyOTP',
+                data: JSON.stringify({ userInput: userInput, enteredOTP: enteredOTP }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d === "OTP Verified") {
+                        clearInterval(otpTimer);
+                        sessionStorage.setItem('showAlert', 'true');
+                        window.location.href = "dashboard.aspx";
+                    } else {
+                        showErrorMessage("Invalid OTP. Please try again.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire("Error!", `An error occurred: ${error}`, "error");
+                }
+            });
+        }
+
+        $("#otp-code").on("input", function () {
+            if ($(this).val().trim().length > 0) {
+                $("#login-btn").show();
+            } else {
+                $("#login-btn").hide();
+            }
+        });
+
         function login_info() {
             var username = $("#username").val();
             var password = $("#password").val();
             if (username == "" || password == "") {
-                $("#alert-message").show();
-                document.getElementById("alert-message").style.display = 'flex';
+                showErrorMessage("Invalid username or password.");
                 $('body').css('overflow', 'hidden');
                 setTimeout(function () {
                     document.getElementById("alert-message").style.display = 'none';
@@ -237,8 +393,7 @@
                             sessionStorage.setItem('showAlert', 'true');
                             window.location.href = "dashboard.aspx";
                         } else {
-                            $("#alert-message").show();
-                            document.getElementById("alert-message").style.display = 'flex';
+                            showErrorMessage("Invalid username or password.");
                             $('body').css('overflow', 'hidden');
                             setTimeout(function () {
                                 document.getElementById("alert-message").style.display = 'none';

@@ -11,7 +11,7 @@ namespace hrms
 {
 
 
-    public partial class login
+    public partial class testing
     {
     }
 }
