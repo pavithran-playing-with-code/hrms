@@ -60,9 +60,9 @@
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
                 <div class="dropdown-menu" style="font-size: 15px;" aria-labelledby="profileDropdown">
                     <a class="dropdown-item" href="#">My Profile</a>
-                    <a class="dropdown-item" href="#">Change Password</a>
+                    <a class="dropdown-item" href="login.aspx?changePassword">Change Password</a>
                     <hr />
-                    <a class="dropdown-item" href="#" onclick="window.location.href='login.aspx';">Logout</a>
+                    <a class="dropdown-item" href="login.aspx">Logout</a>
                 </div>
             </li>
         </ul>

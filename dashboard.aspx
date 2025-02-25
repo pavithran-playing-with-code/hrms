@@ -65,9 +65,9 @@
             margin-right: 20px;
         }
 
-        
+
         #Quickaction-container {
-            position:fixed;
+            position: fixed;
             right: 5px;
             bottom: 10px;
             user-select: none;
@@ -237,6 +237,9 @@
 <body style="background-color: #f8f9fa; position: relative;">
     <div id="greenAlert" style="display: none; align-items: center;" class="alert alert-success alert-dismissible fade alert-custom" role="alert">
         <strong><i class="fa-sharp fa-solid fa-circle-exclamation ml-1 mr-3"></i></strong><span id="greenAlertmessage"></span>
+        <button type="button" id="close_alert_message" style="margin-left: auto; padding-bottom: 1%; box-shadow: none; border: none; outline: none;" class="close mt-1">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
     <input type="hidden" id="emp_access_lvl" name="emp_access_lvl" runat="server" />
@@ -546,6 +549,10 @@
             document.getElementById("greenAlertmessage").innerHTML = message;
             $('#greenAlert').fadeIn(500).css('opacity', '1').delay(3000).fadeOut(2000);
         }
+
+        $('#close_alert_message').click(function () {
+            document.getElementById("greenAlert").style.display = 'none';
+        });
 
         function toggleCommentButton(input) {
             const commentButton = document.getElementById('commentButton');

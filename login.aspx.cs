@@ -1,6 +1,7 @@
 ﻿using log4net;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto.Generators;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,35 +22,57 @@ namespace hrms
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            HttpContext.Current.Session.Clear();
-            HttpContext.Current.Session.Abandon();
+            if (!Request.Url.Query.Contains("changePassword"))
+            {
+                HttpContext.Current.Session.Clear();
+                HttpContext.Current.Session.Abandon();
+            }
         }
+
 
         [WebMethod]
         public static string login_info(string username, string password)
         {
-            var data = "";
+            string data = "";
             try
             {
                 username = username.Trim().Replace("'", "''");
-                password = password.Trim().Replace("'", "''");
 
                 string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    string login_info_Query = $@"SELECT emp_id FROM hrms.employee WHERE email = '{username}' AND account_password = '{password}' AND is_active = 'Y';";
-                    var cmd = new MySqlCommand(login_info_Query, conn);
-                    var emp_id = cmd.ExecuteScalar();
-                    if (emp_id != null && !string.IsNullOrEmpty(emp_id.ToString()))
+                    string login_info_Query = "SELECT emp_id, account_password FROM hrms.employee WHERE email = @username AND is_active = 'Y'";
+
+                    using (MySqlCommand cmd = new MySqlCommand(login_info_Query, conn))
                     {
-                        HttpContext.Current.Session["emp_id"] = emp_id.ToString();
-                        data = "true";
-                    }
-                    else
-                    {
-                        data = "false";
+                        cmd.Parameters.AddWithValue("@username", username);
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                string emp_id = reader["emp_id"].ToString();
+                                string storedHashedPassword = reader["account_password"].ToString();
+
+                                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password, storedHashedPassword);
+
+                                if (isPasswordCorrect)
+                                {
+                                    HttpContext.Current.Session["emp_id"] = emp_id;
+                                    data = "true";
+                                }
+                                else
+                                {
+                                    data = "false";
+                                }
+                            }
+                            else
+                            {
+                                data = "false";
+                            }
+                        }
                     }
                 }
             }
@@ -57,10 +80,12 @@ namespace hrms
             {
                 log.Error("Error in login: " + ex.ToString());
                 data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
             }
 
             return data;
         }
+
 
         [WebMethod]
         public static string checkUserExists(string userInput)
@@ -125,52 +150,123 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string VerifyOTP(string userInput, string enteredOTP)
+        public static string VerifyOrValidate(string validationType, string userInput, string enteredValue)
         {
             string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
 
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string otpQuery = "SELECT OTP FROM hrms.OTPStorage WHERE UserInput = @UserInput AND ExpiryTime > NOW()";
-                using (MySqlCommand cmd = new MySqlCommand(otpQuery, conn))
+                if (validationType == "OTP")
                 {
-                    cmd.Parameters.AddWithValue("@UserInput", userInput);
-                    object dbOTP = cmd.ExecuteScalar();
-
-                    if (dbOTP != null && dbOTP.ToString() == enteredOTP)
+                    string otpQuery = "SELECT OTP FROM hrms.OTPStorage WHERE UserInput = @UserInput AND ExpiryTime > NOW()";
+                    using (MySqlCommand cmd = new MySqlCommand(otpQuery, conn))
                     {
-                        bool isEmail = userInput.Contains("@");
-                        string empQuery;
+                        cmd.Parameters.AddWithValue("@UserInput", userInput);
+                        object dbOTP = cmd.ExecuteScalar();
 
-                        if (isEmail)
+                        if (dbOTP != null && dbOTP.ToString() == enteredValue)
                         {
-                            empQuery = "SELECT emp_id FROM hrms.employee WHERE email = @UserInput AND is_active = 'Y'";
+                            bool isEmail = userInput.Contains("@");
+                            string empQuery = isEmail
+                                ? "SELECT emp_id FROM hrms.employee WHERE email = @UserInput AND is_active = 'Y'"
+                                : "SELECT emp_id FROM hrms.employee WHERE phone_number = @UserInput AND is_active = 'Y'";
+
+                            using (MySqlCommand empCmd = new MySqlCommand(empQuery, conn))
+                            {
+                                empCmd.Parameters.AddWithValue("@UserInput", userInput);
+                                object emp_id = empCmd.ExecuteScalar();
+
+                                if (emp_id != null)
+                                {
+                                    HttpContext.Current.Session["emp_id"] = emp_id.ToString();
+                                }
+                            }
+                            return "OTP Verified";
                         }
                         else
                         {
-                            empQuery = "SELECT emp_id FROM hrms.employee WHERE phone_number = @UserInput AND is_active = 'Y'";
+                            return "Invalid or Expired OTP";
                         }
+                    }
+                }
+                else if (validationType == "OldPassword")
+                {
+                    var emp_id = HttpContext.Current.Session["emp_id"];
 
-                        using (MySqlCommand empCmd = new MySqlCommand(empQuery, conn))
+                    string passwordQuery = "SELECT account_password FROM hrms.employee WHERE emp_id = @UserInput AND is_active = 'Y'";
+
+                    using (MySqlCommand cmd = new MySqlCommand(passwordQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserInput", emp_id);
+                        var dbPassword = cmd.ExecuteScalar();
+
+                        if (dbPassword != null)
                         {
-                            empCmd.Parameters.AddWithValue("@UserInput", userInput);
-                            object emp_id = empCmd.ExecuteScalar();
+                            bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(enteredValue, dbPassword.ToString());
 
-                            if (emp_id != null)
+                            if (isPasswordCorrect)
                             {
-                                HttpContext.Current.Session["emp_id"] = emp_id.ToString();
+                                return "Password Verified";
                             }
                         }
+                        return "Invalid Password";
+                    }
+                }
 
-                        return "OTP Verified";
+                else
+                {
+                    return "Invalid Validation Type";
+                }
+            }
+        }
+
+        [WebMethod]
+        public static string updatePassword(string newPassword)
+        {
+            string data = "";
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            try
+            {
+                string connectionString = "server=localhost;uid=root;pwd=pavithran@123;database=hrms";
+
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    var emp_id = HttpContext.Current.Session["emp_id"];
+
+                    if (!string.IsNullOrEmpty(newPassword) && emp_id != null)
+                    {
+                        string updatequery = "UPDATE hrms.employee SET account_password = @password WHERE emp_id = @empId";
+
+                        using (MySqlCommand updatecmd = new MySqlCommand(updatequery, conn))
+                        {
+                            updatecmd.Parameters.AddWithValue("@password", hashedPassword);
+                            updatecmd.Parameters.AddWithValue("@empId", emp_id);
+
+                            int rowsAffected = updatecmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                                data = "Password Updated";
+                            else
+                                data = "Error updating password";
+                        }
                     }
                     else
                     {
-                        return "Invalid or Expired OTP";
+                        data = "Invalid request";
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                log.Error("Error in updatePassword: " + ex.ToString());
+                data = "ExceptionMessage - " + ex.Message;
+                HttpContext.Current.Response.StatusCode = 500;
+            }
+
+            return data;
         }
 
     }

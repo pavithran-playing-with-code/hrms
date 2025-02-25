@@ -174,16 +174,28 @@
                 </div>
             </div>
 
-
-
             <div id="otp-section" style="display: none;">
-                <h4 class="text-center my-3 font-weight-bold">Login via OTP</h4>
-                <div class="form-group mt-4">
-                    <label for="otp-input">Enter your Email or Mobile Number</label>
-                    <input type="text" id="otp-input" class="form-control" placeholder="Email or Mobile Number" />
+                <div id="enter-mail-phone-for-otp">
+                    <h4 class="text-center my-3 font-weight-bold">Login via OTP</h4>
+                    <div class="form-group mt-4">
+                        <label for="otp-input">Enter your Email or Mobile Number</label>
+                        <input type="text" id="otp-input" class="form-control" placeholder="Email or Mobile Number" />
+                    </div>
+                    <button onclick="sendOTP()" class="btn btn-primary w-100 mt-3" style="background-color: hsl(8,77%,56%); border: none; outline: none">Send OTP</button>
+                    <button onclick="showLoginForm()" id="Back_to_Login_btn" class="btn btn-secondary w-100 mt-2" style="border: none; outline: none">Back to Login</button>
+                    <button onclick="showChangePassFrom()" id="Back_to_Change_New_Password_btn" class="btn btn-secondary w-100 mt-2" style="display: none; border: none; outline: none">Back to Change New Password</button>
                 </div>
-                <button onclick="sendOTP()" class="btn btn-primary w-100 mt-3" style="background-color: hsl(8,77%,56%); border: none; outline: none">Send OTP</button>
-                <button onclick="showLoginForm()" class="btn btn-secondary w-100 mt-2" style="border: none; outline: none">Back to Login</button>
+
+                <div id="change-password-section" style="display: none;">
+                    <h4 class="text-center my-3 font-weight-bold">Change New Password</h4>
+                    <div class="form-group mt-4">
+                        <label for="old-password">Enter Old Password</label>
+                        <input type="password" id="old-password" class="form-control" placeholder="Enter Old Password" />
+                    </div>
+                    <button onclick="validateOldPassword()" class="btn btn-primary w-100 mt-3" style="background-color: hsl(8,77%,56%); border: none; outline: none">Continue</button>
+                    <button onclick="changePasswordByOTP()" class="btn btn-secondary w-100 mt-2" style="background-color: hsl(8,77%,56%); border: none; outline: none">Change Password via OTP</button>
+                    <button onclick="showLoginForm()" class="btn btn-secondary w-100 mt-2" style="border: none; outline: none">Back to Login</button>
+                </div>
 
                 <div id="otp-verification-section" style="display: none;">
                     <div class="form-group mt-3">
@@ -191,7 +203,16 @@
                         <input type="text" id="otp-code" class="form-control" placeholder="Enter OTP" />
                         <small id="otp-timer" style="display: none; color: red; font-weight: bold;"></small>
                     </div>
-                    <button onclick="verifyOTP()" id="login-btn" class="btn btn-success w-100 mt-3" style="display: none;">Login</button>
+                    <button onclick="verifyOTP('')" id="login-btn" class="btn btn-success w-100 mt-3" style="display: none;">Login</button>
+                    <button onclick="verifyOTP('showChangeNewPassFrom')" id="show-change-pass-btn" class="btn btn-success w-100 mt-3" style="display: none;">Continue</button>
+                </div>
+
+                <div id="new-password-section" style="display: none;">
+                    <div class="form-group mt-3">
+                        <label for="new-password">Enter New Password</label>
+                        <input type="password" id="new-password" class="form-control" placeholder="Enter New Password" />
+                    </div>
+                    <button onclick="updatePassword()" class="btn btn-success w-100 mt-3">Update Password</button>
                 </div>
 
             </div>
@@ -217,6 +238,13 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has("changePassword")) {
+                showChangePassFrom();
+            }
+        });
+
         function showErrorMessage(message) {
             let alertBox = $("#alert-message");
             alertBox.removeClass("alert-success").addClass("alert-danger");
@@ -243,7 +271,6 @@
             $("#alert-message-text").html(message);
         }
 
-
         $('#close_alert_message').click(function () {
             document.getElementById("alert-message").style.display = 'none';
             $('body').css('overflow', 'hidden');
@@ -265,13 +292,28 @@
         });
 
         function showOTPForm() {
-            $("#login-section").hide();
             $("#otp-section").show();
+            $("#enter-mail-phone-for-otp").show();
+            $("#otp-input").val("").prop("disabled", false);
+
+            $("#Back_to_Login_btn").show();
+            $("#Back_to_Change_New_Password_btn").hide();
+
+            $("#login-section").hide();
+            $("#change-password-section").hide();
+
+            $("#otp-verification-section").hide();
+            $("#otp-code").val("");
+            $("#new-password-section").hide();
+            $("#new-password").val("");
         }
 
         function showLoginForm() {
             $("#otp-section").hide();
             $("#login-section").show();
+            document.getElementById("alert-message").style.display = 'none';
+            $('body').css('overflow', 'hidden');
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         let otpTimer;
@@ -307,6 +349,11 @@
             var userInput = $("#otp-input").val().trim();
             if (userInput === "") {
                 showErrorMessage("Please enter your email or mobile number.");
+
+                $("#new-password-section").hide();
+                $("#new-password").val("");
+
+                $("#otp-input").prop("disabled", false);
                 return;
             }
 
@@ -335,9 +382,10 @@
             });
         }
 
-        function verifyOTP() {
+        function verifyOTP(action) {
             var userInput = $("#otp-input").val().trim();
             var enteredOTP = $("#otp-code").val().trim();
+
             if (enteredOTP === "") {
                 showErrorMessage("Please enter the OTP.");
                 return;
@@ -345,15 +393,29 @@
 
             $.ajax({
                 type: "POST",
-                url: 'login.aspx/verifyOTP',
-                data: JSON.stringify({ userInput: userInput, enteredOTP: enteredOTP }),
+                url: 'login.aspx/VerifyOrValidate',
+                data: JSON.stringify({ validationType: "OTP", userInput: userInput, enteredValue: enteredOTP }),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
                     if (response.d === "OTP Verified") {
                         clearInterval(otpTimer);
-                        sessionStorage.setItem('showAlert', 'true');
-                        window.location.href = "dashboard.aspx";
+
+                        if (action == "showChangeNewPassFrom") {
+                            clearInterval(otpTimer);
+                            $("#otp-timer").hide();
+                            $("#otp-verification-section").hide();
+                            $("#otp-code").val("");
+                            $("#otp-input").val("").prop("disabled", false);
+
+                            $("#new-password-section").show();
+                            $("#new-password").val("");
+
+                        } else {
+                            sessionStorage.setItem('showAlert', 'true');
+                            window.location.href = "dashboard.aspx";
+                        }
+
                     } else {
                         showErrorMessage("Invalid OTP. Please try again.");
                     }
@@ -366,11 +428,104 @@
 
         $("#otp-code").on("input", function () {
             if ($(this).val().trim().length > 0) {
-                $("#login-btn").show();
+                if ($("#Back_to_Change_New_Password_btn").is(":visible")) {
+                    $("#show-change-pass-btn").show();
+                    $("#login-btn").hide();
+                } else {
+                    $("#login-btn").show();
+                    $("#show-change-pass-btn").hide();
+                }
             } else {
                 $("#login-btn").hide();
             }
         });
+
+        function validateOldPassword() {
+            let oldPassword = $("#old-password").val().trim();
+
+            $.ajax({
+                type: "POST",
+                url: 'login.aspx/VerifyOrValidate',
+                data: JSON.stringify({ validationType: "OldPassword", userInput: "", enteredValue: oldPassword }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d === "Password Verified") {
+                        $("#new-password-section").show();
+                        $("#otp-validation-section").hide();
+                    } else {
+                        showErrorMessage("Invalid Password. Please try again.");
+                        $("#otp-validation-section").show();
+                        $("#new-password-section").hide();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire("Error!", `An error occurred: ${error}`, "error");
+                }
+            });
+        }
+
+        function showChangePassFrom() {
+            $("#otp-verification-section").hide();
+            clearInterval(otpTimer);
+            $("#otp-timer").hide();
+            $("#otp-code").val("");
+            $("#otp-input").val("").prop("disabled", false);
+
+            $("#new-password-section").hide();
+            $("#new-password").val("");
+
+            document.getElementById("enter-mail-phone-for-otp").style.display = "none";
+            document.getElementById("login-section").style.display = "none";
+            document.getElementById("otp-section").style.display = "block";
+            document.getElementById("change-password-section").style.display = "block";
+            $("#old-password").val("");
+        }
+
+        function changePasswordByOTP() {
+            $("#Back_to_Login_btn").hide();
+            $("#Back_to_Change_New_Password_btn").show();
+
+            $("#change-password-section").hide();
+            $("#new-password-section").hide();
+            $("#new-password-section").val("");
+            $("#otp-section").show();
+            $("#enter-mail-phone-for-otp").show();
+        }
+
+        function updatePassword() {
+            let newPassword = $("#new-password").val();
+
+            if (newPassword.length < 6) {
+                showErrorMessage("Password must be at least 6 characters.");
+                return;
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: 'login.aspx/updatePassword',
+                    data: JSON.stringify({ newPassword: newPassword }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d === "Password Updated") {
+                            showSuccessMessage("Password updated successfully!");
+                            $("#login-section").show();
+                            $("#otp-section").hide();
+                        } else {
+                            showErrorMessage("Error updating password. Try again.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: `An error occurred: ${error}. Response: ${xhr.responseText}`,
+                            icon: "error"
+                        });
+                    }
+                });
+            }
+        }
 
         function login_info() {
             var username = $("#username").val();
