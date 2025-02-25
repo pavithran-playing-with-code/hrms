@@ -123,7 +123,7 @@
         }
 
         #employeesTable tr.deactivated-row td {
-            background-color: hsl(8, 77%, 90%) !important; 
+            background-color: hsl(8, 77%, 90%) !important;
         }
 
         #employeesTable td button {
@@ -250,6 +250,7 @@
                                     <th>employee ID</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
+                                    <th>Blood Group</th>
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Date of Birth</th>
@@ -291,23 +292,34 @@
 
                                     <div class="row">
                                         <div class="col-md-6 form-group">
-                                            <label for="phone_number">Phone Number:</label>
-                                            <input type="number" name="phone_number" class="form-control" id="phone_number" placeholder="Phone Number" maxlength="100" />
+                                            <label for="dob">Date of Birth:</label>
+                                            <input type="date" name="dob" class="form-control" id="dob" />
                                         </div>
                                         <div class="col-md-6 form-group">
-                                            <label for="email">Email:</label>
-                                            <input type="text" name="email" class="form-control" id="email" placeholder="Email" maxlength="100" />
+                                            <label for="blood_group">Blood Group:</label>
+                                            <input type="text" name="email" class="form-control" id="blood_group" placeholder="Blood Group" maxlength="100" />
                                         </div>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 form-group">
-                                            <label for="dob">Date of Birth:</label>
-                                            <input type="date" name="dob" class="form-control" id="dob" />
+                                            <label for="phone_number">Phone Number:</label>
+                                            <input type="number" name="phone_number" class="form-control" id="phone_number" placeholder="Phone Number" maxlength="100" />
                                         </div>
                                         <div class="col-md-6 form-group">
                                             <label for="location">Location:</label>
                                             <input name="location" class="form-control" id="location" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 form-group">
+                                            <label for="email">Email:</label>
+                                            <input type="text" name="email" class="form-control" id="email" placeholder="Email" maxlength="100" />
+                                        </div>
+                                        <div class="col-md-6 form-group">
+                                            <label for="account_password">Password:</label>
+                                            <input type="text" name="email" class="form-control" id="account_password" placeholder="Password" maxlength="100" />
                                         </div>
                                     </div>
 
@@ -409,6 +421,7 @@
                             { data: 'emp_id', visible: false },
                             { data: 'first_name' },
                             { data: 'last_name' },
+                            { data: 'blood_group' },
                             { data: 'phone_number' },
                             { data: 'email' },
                             {
@@ -462,10 +475,10 @@
                         createdRow: function (row, data, dataIndex) {
                             if (data.is_active === "N") {
 
-                                $(row).addClass("deactivated-row"); 
+                                $(row).addClass("deactivated-row");
                             }
                             else {
-                                $(row).removeClass("deactivated-row"); 
+                                $(row).removeClass("deactivated-row");
                             }
 
                             $('td', row).addClass('text-center');
@@ -502,8 +515,10 @@
             document.getElementById("employee_id").value = "";
             document.getElementById("first_name").value = "";
             document.getElementById("last_name").value = "";
+            document.getElementById("blood_group").value = "";
             document.getElementById("phone_number").value = "";
             document.getElementById("email").value = "";
+            document.getElementById("account_password").value = "";
             document.getElementById("dob").value = "";
             document.getElementById("id_department").selectedIndex = 0;
             document.getElementById("id_job_position").selectedIndex = 0;
@@ -576,8 +591,10 @@
         function insertEmployee() {
             const firstName = $('#first_name').val();
             const lastName = $('#last_name').val();
+            const blood_group = $('#blood_group').val();
             const phoneNumber = $('#phone_number').val();
             const email = $('#email').val();
+            const account_password = $('#account_password').val();
             const dob = $('#dob').val();
             const location = $('#location').val();
             const department = $('#id_department').val();
@@ -585,7 +602,7 @@
             const careerLevel = $('#carrer_level').val();
             const accessLevel = $('#access_level').val();
 
-            if (!firstName || !lastName || !phoneNumber || !email || !dob || !department || !jobPosition || !careerLevel || !accessLevel) {
+            if (!firstName || !lastName || !blood_group || !phoneNumber || !email || !account_password || !dob || !department || !jobPosition || !careerLevel || !accessLevel) {
                 Swal.fire({
                     title: "Missing Fields",
                     text: "Please fill in all the required fields.",
@@ -597,8 +614,10 @@
             const data = {
                 firstName: firstName,
                 lastName: lastName,
+                blood_group: blood_group,
                 phoneNumber: phoneNumber,
                 email: email,
+                account_password: account_password,
                 dob: dob,
                 location: location,
                 department: department,
@@ -655,8 +674,10 @@
 
                     $('#first_name').val(employee.firstName);
                     $('#last_name').val(employee.lastName);
+                    $('#blood_group').val(employee.blood_group);
                     $('#phone_number').val(employee.phoneNumber);
                     $('#email').val(employee.email);
+                    $('#account_password').val(employee.account_password);
                     let dob = employee.dob ? employee.dob.split(" ")[0].split("-").reverse().join("-") : "";
                     $('#dob').val(dob);
                     $('#location').val(employee.location);
@@ -690,8 +711,10 @@
             const emp_id = $('#employee_id').val();
             const firstName = $('#first_name').val();
             const lastName = $('#last_name').val();
+            const blood_group = $('#blood_group').val();
             const phoneNumber = $('#phone_number').val();
             const email = $('#email').val();
+            const account_password = $('#account_password').val();
             const dob = $('#dob').val();
             const location = $('#location').val();
             const department = $('#id_department').val();
@@ -699,7 +722,7 @@
             const careerLevel = $('#carrer_level').val();
             const accessLevel = $('#access_level').val();
 
-            if (!firstName || !lastName || !phoneNumber || !email || !dob || !department || !jobPosition || !careerLevel || !accessLevel) {
+            if (!firstName || !lastName || !blood_group || !phoneNumber || !email || !account_password || !dob || !department || !jobPosition || !careerLevel || !accessLevel) {
                 Swal.fire({
                     title: "Missing Fields",
                     text: "Please fill in all the required fields.",
@@ -712,8 +735,10 @@
                 emp_id: emp_id,
                 firstName: firstName,
                 lastName: lastName,
+                blood_group: blood_group,
                 phoneNumber: phoneNumber,
                 email: email,
+                account_password: account_password,
                 dob: dob,
                 location: location,
                 department: department,

@@ -52,8 +52,10 @@ namespace hrms
             public string emp_id { get; set; }
             public string first_name { get; set; }
             public string last_name { get; set; }
+            public string blood_group { get; set; }
             public string phone_number { get; set; }
             public string email { get; set; }
+            public string account_password { get; set; }
             public string dob { get; set; }
             public string location { get; set; }
             public string department { get; set; }
@@ -93,8 +95,10 @@ namespace hrms
                             emp_id = row["emp_id"].ToString(),
                             first_name = row["first_name"].ToString(),
                             last_name = row["last_name"].ToString(),
+                            blood_group = row["blood_group"].ToString(),
                             phone_number = row["phone_number"].ToString(),
                             email = row["email"].ToString(),
+                            account_password = row["account_password"].ToString(),
                             dob = row["dob"].ToString(),
                             location = row["location"].ToString(),
                             department = row["department_name"].ToString(),
@@ -122,7 +126,7 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string insertEmployee(string firstName, string lastName, string phoneNumber, string email, string dob, string location, string department, string jobPosition, string careerLevel, string accessLevel)
+        public static string insertEmployee(string firstName, string lastName, string blood_group, string phoneNumber, string email, string account_password, string dob, string location, string department, string jobPosition, string careerLevel, string accessLevel)
         {
             var data = "";
 
@@ -139,16 +143,18 @@ namespace hrms
                             var emp_id = HttpContext.Current.Session["emp_id"];
 
                             string insertQuery = @"INSERT INTO hrms.employee 
-                                            (first_name, last_name, phone_number, email, dob, location, emp_dept_id, emp_job_position_id, career_level, access_level, is_active, created_by, created_time) 
+                                            (first_name, last_name, blood_group, phone_number, email, account_password, dob, location, emp_dept_id, emp_job_position_id, career_level, access_level, is_active, created_by, created_time) 
                                           VALUES 
-                                            (@firstName, @lastName, @phoneNumber, @email, @dob, @location, @department, @jobPosition, @careerLevel, @accessLevel, 'Y', @created_by, NOW());";
+                                            (@firstName, @lastName, @blood_group, @phoneNumber, @email, @account_password, @dob, @location, @department, @jobPosition, @careerLevel, @accessLevel, 'Y', @created_by, NOW());";
 
                             using (var cmd = new MySqlCommand(insertQuery, conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@firstName", firstName);
                                 cmd.Parameters.AddWithValue("@lastName", lastName);
+                                cmd.Parameters.AddWithValue("@blood_group", blood_group);
                                 cmd.Parameters.AddWithValue("@phoneNumber", phoneNumber);
                                 cmd.Parameters.AddWithValue("@email", email);
+                                cmd.Parameters.AddWithValue("@account_password", account_password);
                                 cmd.Parameters.AddWithValue("@dob", dob);
                                 cmd.Parameters.AddWithValue("@location", location);
                                 cmd.Parameters.AddWithValue("@department", department);
@@ -192,7 +198,7 @@ namespace hrms
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = @"SELECT first_name, last_name, phone_number, email, dob, location, emp_dept_id AS department,
+                    string query = @"SELECT first_name, last_name, blood_group, phone_number, email, account_password, dob, location, emp_dept_id AS department,
                                     emp_job_position_id AS jobPosition, career_level, access_level
                              FROM hrms.employee 
                              WHERE emp_id = @empId";
@@ -207,8 +213,10 @@ namespace hrms
                                 {
                                     firstName = reader["first_name"].ToString(),
                                     lastName = reader["last_name"].ToString(),
+                                    blood_group = reader["blood_group"].ToString(),
                                     phoneNumber = reader["phone_number"].ToString(),
                                     email = reader["email"].ToString(),
+                                    account_password = reader["account_password"].ToString(),
                                     dob = reader["dob"].ToString(),
                                     location = reader["location"].ToString(),
                                     department = reader["department"].ToString(),
@@ -231,7 +239,7 @@ namespace hrms
         }
 
         [WebMethod]
-        public static string updateEmployee(string emp_id, string firstName, string lastName, string phoneNumber, string email, string dob, string location, string department, string jobPosition, string careerLevel, string accessLevel)
+        public static string updateEmployee(string emp_id, string firstName, string lastName, string blood_group, string phoneNumber, string email, string account_password, string dob, string location, string department, string jobPosition, string careerLevel, string accessLevel)
         {
             var data = "";
 
@@ -246,8 +254,8 @@ namespace hrms
                         try
                         {
                             string updateQuery = @"UPDATE hrms.employee 
-                                           SET first_name = @firstName, last_name = @lastName, phone_number = @phoneNumber, 
-                                               email = @email, dob = @dob, location = @location, emp_dept_id = @department, 
+                                           SET first_name = @firstName, last_name = @lastName, blood_group = @blood_group, phone_number = @phoneNumber, 
+                                               email = @email, account_password = @account_password, dob = @dob, location = @location, emp_dept_id = @department, 
                                                emp_job_position_id = @jobPosition, career_level = @careerLevel, access_level = @accessLevel, 
                                                edited_by = @edited_by, edited_time = NOW()
                                            WHERE emp_id = @emp_id";
@@ -259,8 +267,10 @@ namespace hrms
                                 cmd.Parameters.AddWithValue("@emp_id", emp_id);
                                 cmd.Parameters.AddWithValue("@firstName", firstName);
                                 cmd.Parameters.AddWithValue("@lastName", lastName);
+                                cmd.Parameters.AddWithValue("@blood_group", blood_group);
                                 cmd.Parameters.AddWithValue("@phoneNumber", phoneNumber);
                                 cmd.Parameters.AddWithValue("@email", email);
+                                cmd.Parameters.AddWithValue("@account_password", account_password);
                                 cmd.Parameters.AddWithValue("@dob", dob);
                                 cmd.Parameters.AddWithValue("@location", location);
                                 cmd.Parameters.AddWithValue("@department", department);
