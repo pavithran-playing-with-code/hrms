@@ -41,7 +41,7 @@
     }
 
     .icon-items-container {
-        display: flex;
+        display: none; 
         flex-direction: column;
         align-items: center;
         gap: 5px;
@@ -49,7 +49,6 @@
         opacity: 0;
         pointer-events: none;
         transform: translateY(50px);
-        margin-top: 10px;
     }
 
         .icon-items-container.open {
@@ -439,11 +438,20 @@
     }
 
     function toggleIcons() {
-        const container = document.querySelector('.icon-items-container');
-        const quickActionButton = document.querySelector('.quick-action');
+        var container = document.querySelector(".icon-items-container");
+        var quickAction = document.querySelector(".quick-action");
 
-        container.classList.toggle('open');
-        quickActionButton.classList.toggle('open');
+        if (container.classList.contains("open")) {
+            container.classList.remove("open");
+            setTimeout(() => {
+                container.style.display = "none"; 
+            }, 300); 
+        } else {
+            container.style.display = "flex"; 
+            setTimeout(() => {
+                container.classList.add("open");
+            }, 10);
+        }
     }
 
     function open_createLeavemodal() {

@@ -1,152 +1,142 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="testing.aspx.cs" Inherits="hrms.testing" %>
 
+<%@ Register Src="~/left_navbar.ascx" TagName="LeftNavBar" TagPrefix="uc" %>
+<%@ Register Src="~/header_navbar.ascx" TagName="HeaderNavBar" TagPrefix="uc" %>
+<%@ Register Src="~/quick_action.ascx" TagName="Quick_action" TagPrefix="uc" %>
+
 <!DOCTYPE html>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <title>All Employee</title>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.1.2/css/searchPanes.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css" />
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>testing</title>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
     <style>
-        body {
-            background-color: #f8f9fa;
+        #Quickaction-container {
+            position: fixed;
+            right: 5px;
+            bottom: 10px;
+            user-select: none;
+            z-index: 1050;
+            cursor: pointer;
+        }
+
+        .main-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
             min-height: 100vh;
-            margin: 0;
+            transition: all 0.3s ease-in-out;
         }
 
-        .container {
-            max-width: 400px;
-            margin-top: 50px;
+        .left-navbar {
+            width: 15%;
+            flex-shrink: 0;
+            transition: all 0.3s ease-in-out;
         }
 
-        .card {
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+            .left-navbar.toggled {
+                width: 70px;
+            }
+
+        .content-container {
+            flex-grow: 1;
+            margin-left: 0;
+            overflow: auto;
+            transition: margin-left 0.3s ease;
         }
 
-        .input-group {
-            margin-bottom: 15px;
+        .wrapper {
+            overflow: auto;
+            margin-left: 20px;
+            margin-right: 20px;
         }
 
-        .timer {
-            color: red;
-            font-weight: bold;
+        .card-body {
+            overflow-x: auto;
+            padding: 0;
         }
+
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div id="login-section">
-                <h4 class="text-center">Sign In</h4>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" placeholder="Enter username" />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="Enter password" />
-                </div>
-                <button onclick="login_info()" class="btn btn-primary w-100">Login</button>
-                <p class="text-center mt-3">
-                    <a href="#" onclick="showOTPForm()">Login via OTP</a>
-                </p>
+<body style="background-color: #f8f9fa">
+    <div class="main-container">
+        <div id="sidebarContainer" class="left-navbar">
+            <uc:LeftNavBar runat="server" />
+        </div>
+        <div id="content-container" class="content-container">
+            <div class="header-container">
+                <uc:HeaderNavBar runat="server" />
             </div>
-
-            <div id="otp-section" style="display: none;">
-                <h4 class="text-center">Login via OTP</h4>
-                <div class="form-group">
-                    <label for="otp-input">Enter Email or Mobile</label>
-                    <input type="text" id="otp-input" class="form-control" placeholder="Email or Mobile" />
+            <div class="d-flex align-items-center justify-content-between bg-light p-3 mt-4 ml-3 mr-3">
+                <h1 style="font-family: 'Roboto', sans-serif; color: #333; font-size: 2.5rem;" class="m-0">Employees</h1>
+                <div id="dataTableControls" class="d-flex align-items-center ml-auto mr-4 mt-2" style="gap: 20px;"></div>
+                <button id="createemployee" class="btn btn-outline-custom"
+                    style="outline: none; border-radius: 0; border: 1px solid hsl(8, 77%, 56%); background-color: hsl(8, 77%, 56%); color: white;"
+                    onclick="opencreateemployeemodal()" title="Create employee">
+                    <i class="fa fa-plus"></i>&nbsp;Create
+               
+                </button>
+            </div>
+            <div class="mt-3">
+                <div class="wrapper" style="margin-left: 20px; margin-right: 20px">
+                    <div class="card-body p-3">
+                        <table id="employeesTable" class="table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th>employee ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Blood Group</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Date of Birth</th>
+                                    <th>Location</th>
+                                    <th>Department</th>
+                                    <th>Job Position</th>
+                                    <th>Carrer Level</th>
+                                    <th>Access Level</th>
+                                    <th>Working</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <button onclick="sendOTP()" class="btn btn-primary w-100">Send OTP</button>
-                <button onclick="showLoginForm()" class="btn btn-secondary w-100 mt-2">Back to Login</button>
-
-                <div id="otp-entry-section" style="display: none;">
-                    <label class="mt-3" for="entered-otp">Enter OTP</label>
-                    <input type="text" id="entered-otp" class="form-control" placeholder="Enter OTP" />
-                    <small class="timer" id="otp-timer"></small>
-                    <button onclick="verifyOTP()" class="btn btn-success w-100 mt-2">Login</button>
-                </div>
+            </div>
+            <div id="Quickaction-container">
+                <uc:Quick_action runat="server" />
             </div>
         </div>
     </div>
 
-    <script>
-        let otpTimer;
-        let countdown = 120; // 2 minutes
-        let generatedOTP = "123456"; // Simulated OTP (Replace with actual backend OTP logic)
-
-        function showOTPForm() {
-            $("#login-section").hide();
-            $("#otp-section").show();
-        }
-
-        function showLoginForm() {
-            $("#otp-section").hide();
-            $("#login-section").show();
-        }
-
-        function sendOTP() {
-            let userInput = $("#otp-input").val().trim();
-            if (userInput === "") {
-                Swal.fire("Error!", "Please enter your email or mobile number.", "error");
-                return;
-            }
-
-            Swal.fire("Success!", "OTP sent successfully!", "success");
-            $("#otp-entry-section").show();
-            startOTPTimer();
-        }
-
-        function startOTPTimer() {
-            clearInterval(otpTimer);
-            countdown = 120;
-            $("#otp-timer").text(`Time left: ${countdown}s`);
-
-            otpTimer = setInterval(() => {
-                countdown--;
-                $("#otp-timer").text(`Time left: ${countdown}s`);
-
-                if (countdown <= 0) {
-                    clearInterval(otpTimer);
-                    $("#entered-otp").val("");
-                    $("#otp-entry-section").hide();
-                    Swal.fire("Time Expired!", "OTP expired, please request a new one.", "warning");
-                }
-            }, 1000);
-        }
-
-        function verifyOTP() {
-            let enteredOTP = $("#entered-otp").val().trim();
-            if (enteredOTP === generatedOTP) {
-                Swal.fire("Success!", "Logged in successfully!", "success").then(() => {
-                    window.location.href = "dashboard.aspx"; // Redirect to the dashboard
-                });
-            } else {
-                Swal.fire("Error!", "Invalid OTP. Please try again.", "error");
-            }
-        }
-
-        function login_info() {
-            let username = $("#username").val().trim();
-            let password = $("#password").val().trim();
-
-            if (username === "" || password === "") {
-                Swal.fire("Error!", "Invalid username or password.", "error");
-            } else {
-                Swal.fire("Success!", "Logged in successfully!", "success").then(() => {
-                    window.location.href = "dashboard.aspx";
-                });
-            }
-        }
-    </script>
 </body>
 </html>
