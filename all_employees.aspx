@@ -304,7 +304,7 @@
                                     <div class="row">
                                         <div class="col-md-6 form-group">
                                             <label for="phone_number">Phone Number:</label>
-                                            <input type="number" name="phone_number" class="form-control" id="phone_number" placeholder="Phone Number" maxlength="100" />
+                                            <input type="text" name="phone_number" class="form-control" id="phone_number" placeholder="Phone Number" maxlength="10" />
                                         </div>
                                         <div class="col-md-6 form-group">
                                             <label for="location">Location:</label>
@@ -338,6 +338,7 @@
                                         <div class="col-md-6 form-group">
                                             <label for="carrer_level">Career Level:</label>
                                             <select name="carrer_level" class="form-control select2" id="carrer_level">
+                                                <option disabled="disabled" selected="selected">Select an Option</option>
                                                 <option value="Experienced">Experienced</option>
                                                 <option value="Fresher">Fresher</option>
                                             </select>
@@ -345,6 +346,7 @@
                                         <div class="col-md-6 form-group">
                                             <label for="access_level">Access Level:</label>
                                             <select name="access_level" class="form-control select2" id="access_level">
+                                                <option disabled="disabled" selected="selected">Select an Option</option>
                                                 <option value="high">High</option>
                                                 <option value="medium">Medium</option>
                                                 <option value="low">Low</option>
@@ -370,6 +372,12 @@
 
     <script>
         $(document).ready(function () {
+            $('#phone_number').on('input', function () {
+                let phoneNumber = $(this).val();
+                phoneNumber = phoneNumber.replace(/\D/g, '').substring(0, 10);
+                $(this).val(phoneNumber);
+            });
+
             populateemployees();
         });
 
@@ -621,6 +629,15 @@
                 return;
             }
 
+            if (phoneNumber.length !== 10) {
+                Swal.fire({
+                    title: "Invalid Phone Number",
+                    text: "Phone number must be exactly 10 digits.",
+                    icon: "warning"
+                });
+                return;
+            }
+
             const data = {
                 firstName: firstName,
                 lastName: lastName,
@@ -756,6 +773,15 @@
                 Swal.fire({
                     title: "Missing Fields",
                     text: "Please fill in all the required fields.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            if (phoneNumber.length !== 10) {
+                Swal.fire({
+                    title: "Invalid Phone Number",
+                    text: "Phone number must be exactly 10 digits.",
                     icon: "warning"
                 });
                 return;

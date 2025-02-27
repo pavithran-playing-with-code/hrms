@@ -319,6 +319,12 @@
                 });
             }
 
+            $('#max_leaves').on('input', function () {
+                let phoneNumber = $(this).val();
+                phoneNumber = phoneNumber.replace(/\D/g, '').substring(0, 10);
+                $(this).val(phoneNumber);
+            });
+
             getDepartmentsAndLeaveApprovals();
             populateLeaveTypes();
 
@@ -579,6 +585,15 @@
                 return;
             }
 
+            if (max_leaves > 30) {
+                Swal.fire({
+                    title: "Invalid Leave Count",
+                    text: "Maximum leaves cannot be more than 30.",
+                    icon: "warning"
+                });
+                return;
+            }
+
             const data = {
                 leave_type: newLeaveType,
                 priority_level: priority,
@@ -649,6 +664,33 @@
             const leave_type_id = row.data('id');
             const leave_type = row.find('td:nth-child(1)').text();
             const max_leaves = row.find('td:nth-child(3)').text();
+
+            if (!leave_type) {
+                Swal.fire({
+                    title: "Missing Fields",
+                    text: "Please enter leave type.",
+                    icon: "warning"
+                });
+                return;
+            }
+            else if (!max_leaves) {
+                Swal.fire({
+                    title: "Missing Fields",
+                    text: "Please enter max leaves.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            if (max_leaves > 30) {
+                Swal.fire({
+                    title: "Invalid Leave Count",
+                    text: "Maximum leaves cannot be more than 30.",
+                    icon: "warning"
+                });
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: 'leave_configuration.aspx/updateleavetypes',
