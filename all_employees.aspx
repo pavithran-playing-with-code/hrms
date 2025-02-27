@@ -534,6 +534,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     $('#id_employees, #id_department, #id_job_position').select2({
@@ -633,6 +643,16 @@
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     display_green_alert(response.d);
                     clearfields();
                     $('#createemployeemodal').modal('hide');
@@ -670,6 +690,16 @@
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     const employee = JSON.parse(response.d);
 
                     $('#first_name').val(employee.firstName);
@@ -754,6 +784,16 @@
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     display_green_alert(response.d);
                     clearfields();
                     $('#createemployeemodal').modal('hide');
@@ -799,6 +839,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             display_green_alert(response.d);
                             populateemployees();
                         },

@@ -587,6 +587,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     $('#id_employees, #id_department, #id_job_position').select2({
@@ -656,6 +666,16 @@
                         contentType: 'application/json',
                         data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "announcement" }),
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             resolve(response.d);
                         },
                         error: function (xhr, status, error) {
@@ -760,6 +780,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     if (data == "success") {
@@ -828,6 +858,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             let data = response.d;
                             data = JSON.parse(data);
                             if (data == "success") {
@@ -859,6 +899,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     $("#announcement_id").val(announcement_id);
                     document.getElementById("createannouncementmodalLabel").innerText = "Edit Announcement.";
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
@@ -950,6 +1000,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             let data = response.d;
                             data = JSON.parse(data);
 

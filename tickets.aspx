@@ -927,6 +927,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     $('#id_department').select2({
@@ -1092,6 +1102,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     display_green_alert(response.d);
                     populate_ticket_type();
                     clearfields();
@@ -1159,6 +1179,16 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     display_green_alert(response.d);
                     populate_ticket_type();
                     clearfields();
@@ -1193,6 +1223,16 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             display_green_alert(response.d);
                             if (table == "tickets") {
                                 populatetickets();

@@ -318,6 +318,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     $('#createpolicymodal').modal('hide');
                     display_green_alert(response.d);
                     populatepolicies();
@@ -363,6 +373,16 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     display_green_alert(response.d);
                     $('#createpolicymodal').modal('hide');
                     populatepolicies();
@@ -395,6 +415,16 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             display_green_alert(response.d);
                             populatepolicies();
                         },

@@ -853,6 +853,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             if (response.d === "Success") {
                                 display_green_alert(`The leave request${isBulk ? "s" : ""} have been approved successfully.`);
                                 populateleaves();
@@ -923,6 +933,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             if (response.d === "Success") {
                                 display_green_alert(`The leave request${isBulk ? "s" : ""} have been rejected successfully.`);
                                 populateleaves();

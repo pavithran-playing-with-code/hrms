@@ -637,33 +637,24 @@ namespace hrms
                     conn.Open();
                     var emp_id = HttpContext.Current.Session["emp_id"];
                     MySqlCommand cmd = new MySqlCommand();
+                    cmd.Connection = conn;
 
                     if (action == "publish_from_dashboard" && !string.IsNullOrEmpty(announcementId))
                     {
-                        string updateAnnouncementfromdashboardQuery = $@"UPDATE hrms.announcement SET posted_by = '{emp_id}', posted_on = NOW() 
-                        WHERE announcement_id = '{announcementId}';";
-
-                        cmd = new MySqlCommand(updateAnnouncementfromdashboardQuery, conn);
+                        cmd.CommandText = "UPDATE hrms.announcement SET posted_by = @emp_id, posted_on = NOW() WHERE announcement_id = @announcementId";
+                        cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                        cmd.Parameters.AddWithValue("@announcementId", announcementId);
                     }
                     else
                     {
-                        string departmentCondition = department != null && !department.Contains("All")
-                                               ? $"AND emp_dept_id IN ({string.Join(",", department.Select(v => $"'{v}'"))})"
-                                               : "";
+                        string departmentCondition = department != null && !department.Contains("All") ? $"AND emp_dept_id IN ({string.Join(",", department.Select(v => $"'{v}'"))})" : "";
+                        string jobPositionCondition = jobPosition != null && !jobPosition.Contains("All") ? $"AND emp_job_position_id IN ({string.Join(",", jobPosition.Select(v => $"'{v}'"))})" : "";
+                        string employeesCondition = employees != null && !employees.Contains("All") ? $"AND emp_id IN ({string.Join(",", employees.Select(v => $"'{v}'"))})" : "";
 
-                        string jobPositionCondition = jobPosition != null && !jobPosition.Contains("All")
-                            ? $"AND emp_job_position_id IN ({string.Join(",", jobPosition.Select(v => $"'{v}'"))})"
-                            : "";
+                        cmd.CommandText = $@"
+                    SELECT emp_id, email, phone_number FROM hrms.employee 
+                    WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition} {employeesCondition};";
 
-                        string employeesCondition = employees != null && !employees.Contains("All")
-                            ? $"AND emp_id IN ({string.Join(",", employees.Select(v => $"'{v}'"))})"
-                            : "";
-
-                        string employeeQuery = $@"
-                SELECT emp_id , email, phone_number
-                FROM hrms.employee 
-                WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition} {employeesCondition};";
-                        cmd = new MySqlCommand(employeeQuery, conn);
                         var reader = cmd.ExecuteReader();
                         var viewableByList = new List<string>();
                         var notifyby = new List<(string Email, string PhoneNumber)>();
@@ -681,42 +672,55 @@ namespace hrms
                             return JsonConvert.SerializeObject("No employees matched the criteria.");
                         }
 
-                        string notifyValue;
-                        if (notify != null && notify.Length > 0)
-                        {
-                            notifyValue = "'" + string.Join(",", notify) + "'";
-                        }
-                        else
-                        {
-                            notifyValue = "''";
-                        }
+                        string notifyValue = notify != null && notify.Length > 0 ? string.Join(",", notify) : "";
 
                         if (action == "edit" && !string.IsNullOrEmpty(announcementId))
                         {
-                            string updateAnnouncementQuery = $@"UPDATE hrms.announcement SET 
-                        Heading = '{title}', announcement_description = '{description}', attachments = '{attachments}', expire_date = '{expireDate}', 
-                        viewable_by = '{viewableBy}', notify = {notifyValue}, comments = '{disableComments}', edited_by = '{emp_id}', edited_time = NOW() 
-                        WHERE announcement_id = '{announcementId}';";
+                            cmd.CommandText = @"UPDATE hrms.announcement 
+                        SET Heading = @title, announcement_description = @description, attachments = @attachments, expire_date = @expireDate, 
+                            viewable_by = @viewableBy, notify = @notify, comments = @disableComments, edited_by = @emp_id, edited_time = NOW() 
+                        WHERE announcement_id = @announcementId";
 
-                            cmd = new MySqlCommand(updateAnnouncementQuery, conn);
+                            cmd.Parameters.AddWithValue("@title", title);
+                            cmd.Parameters.AddWithValue("@description", description);
+                            cmd.Parameters.AddWithValue("@attachments", attachments);
+                            cmd.Parameters.AddWithValue("@expireDate", expireDate);
+                            cmd.Parameters.AddWithValue("@viewableBy", viewableBy);
+                            cmd.Parameters.AddWithValue("@notify", notifyValue);
+                            cmd.Parameters.AddWithValue("@disableComments", disableComments);
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
+                            cmd.Parameters.AddWithValue("@announcementId", announcementId);
                         }
                         else if (action == "publish")
                         {
-                            string insertAnnouncementQuery = $@"INSERT INTO hrms.announcement 
-                    (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, notify, comments, created_by, created_time) 
-                    VALUES ('{title}', '{description}', '{attachments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}', '{expireDate}', '{viewableBy}', {notifyValue}, '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
+                            cmd.CommandText = @"INSERT INTO hrms.announcement 
+                        (Heading, announcement_description, attachments, posted_by, posted_on, expire_date, viewable_by, notify, comments, created_by, created_time) 
+                        VALUES (@title, @description, @attachments, @emp_id, NOW(), @expireDate, @viewableBy, @notify, @disableComments, @emp_id, NOW());";
 
-                            cmd = new MySqlCommand(insertAnnouncementQuery, conn);
+                            cmd.Parameters.AddWithValue("@title", title);
+                            cmd.Parameters.AddWithValue("@description", description);
+                            cmd.Parameters.AddWithValue("@attachments", attachments);
+                            cmd.Parameters.AddWithValue("@expireDate", expireDate);
+                            cmd.Parameters.AddWithValue("@viewableBy", viewableBy);
+                            cmd.Parameters.AddWithValue("@notify", notifyValue);
+                            cmd.Parameters.AddWithValue("@disableComments", disableComments);
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
                         }
                         else if (action == "save")
                         {
-                            string saveAnnouncementQuery = $@"INSERT INTO hrms.announcement 
-                    (Heading, announcement_description, attachments, expire_date, viewable_by, notify, comments, created_by, created_time) 
-                    VALUES ('{title}', '{description}', '{attachments}', '{expireDate}', '{viewableBy}', {notifyValue}, '{disableComments}', '{emp_id}', '{DateTime.Now:yyyy-MM-dd HH:mm:ss}');";
+                            cmd.CommandText = @"INSERT INTO hrms.announcement 
+                        (Heading, announcement_description, attachments, expire_date, viewable_by, notify, comments, created_by, created_time) 
+                        VALUES (@title, @description, @attachments, @expireDate, @viewableBy, @notify, @disableComments, @emp_id, NOW());";
 
-                            cmd = new MySqlCommand(saveAnnouncementQuery, conn);
+                            cmd.Parameters.AddWithValue("@title", title);
+                            cmd.Parameters.AddWithValue("@description", description);
+                            cmd.Parameters.AddWithValue("@attachments", attachments);
+                            cmd.Parameters.AddWithValue("@expireDate", expireDate);
+                            cmd.Parameters.AddWithValue("@viewableBy", viewableBy);
+                            cmd.Parameters.AddWithValue("@notify", notifyValue);
+                            cmd.Parameters.AddWithValue("@disableComments", disableComments);
+                            cmd.Parameters.AddWithValue("@emp_id", emp_id);
                         }
-
                     }
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -724,8 +728,8 @@ namespace hrms
 
                     if (action == "publish")
                     {
-                        var lastinsertidcmd = new MySqlCommand("SELECT LAST_INSERT_ID();", conn);
-                        var insertedAnnouncementId = lastinsertidcmd.ExecuteScalar()?.ToString();
+                        cmd.CommandText = "SELECT LAST_INSERT_ID();";
+                        var insertedAnnouncementId = cmd.ExecuteScalar()?.ToString();
 
                         if (!string.IsNullOrEmpty(insertedAnnouncementId))
                         {

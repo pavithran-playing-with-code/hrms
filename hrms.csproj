@@ -239,7 +239,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
-    <Content Include="forgot-password.aspx" />
     <Content Include="Global.asax" />
     <Content Include="header_navbar.ascx" />
     <Content Include="all_emp_leave_request.aspx" />
@@ -371,13 +370,6 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="forgot-password.aspx.cs">
-      <DependentUpon>forgot-password.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="forgot-password.aspx.designer.cs">
-      <DependentUpon>forgot-password.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

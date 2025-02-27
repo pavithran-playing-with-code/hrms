@@ -287,26 +287,46 @@ namespace hrms
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    string checkleave_typeQuery = $@"SELECT leave_type FROM hrms.leave_type WHERE deleted_by IS NULL AND leave_type_id != '{leave_type_id}' AND leave_type = '{leave_type}';";
 
-                    var checkleave_typeCmd = new MySqlCommand(checkleave_typeQuery, conn);
-                    var duplicate = checkleave_typeCmd.ExecuteScalar();
-                    if (duplicate != null)
+                    // Check for duplicate leave type
+                    string checkleave_typeQuery = @"SELECT leave_type FROM hrms.leave_type 
+                                            WHERE deleted_by IS NULL 
+                                            AND leave_type_id != @leave_type_id 
+                                            AND leave_type = @leave_type;";
+
+                    using (var checkleave_typeCmd = new MySqlCommand(checkleave_typeQuery, conn))
                     {
-                        return "duplicate";
+                        checkleave_typeCmd.Parameters.AddWithValue("@leave_type_id", leave_type_id);
+                        checkleave_typeCmd.Parameters.AddWithValue("@leave_type", leave_type);
+
+                        var duplicate = checkleave_typeCmd.ExecuteScalar();
+                        if (duplicate != null)
+                        {
+                            return "duplicate";
+                        }
                     }
 
                     var emp_id = HttpContext.Current.Session["emp_id"];
                     if (!string.IsNullOrEmpty(leave_type_id))
                     {
-                        string updatequery = $@"UPDATE hrms.leave_type SET leave_type = '{leave_type}', max_leave = '{max_leaves}', 
-                                                edited_by='{emp_id}', edited_time=NOW()  
-                                                WHERE leave_type_id = '{leave_type_id}';";
-                        MySqlCommand updatecmd = new MySqlCommand(updatequery, conn);
-                        int rowsAffected = updatecmd.ExecuteNonQuery();
-                        data = rowsAffected > 0 ? "success" : "failure";
+                        string updatequery = @"UPDATE hrms.leave_type 
+                                       SET leave_type = @leave_type, 
+                                           max_leave = @max_leaves, 
+                                           edited_by = @emp_id, 
+                                           edited_time = NOW()  
+                                       WHERE leave_type_id = @leave_type_id;";
+
+                        using (var updatecmd = new MySqlCommand(updatequery, conn))
+                        {
+                            updatecmd.Parameters.AddWithValue("@leave_type", leave_type);
+                            updatecmd.Parameters.AddWithValue("@max_leaves", max_leaves);
+                            updatecmd.Parameters.AddWithValue("@emp_id", emp_id);
+                            updatecmd.Parameters.AddWithValue("@leave_type_id", leave_type_id);
+
+                            int rowsAffected = updatecmd.ExecuteNonQuery();
+                            data = rowsAffected > 0 ? "success" : "failure";
+                        }
                     }
-                    conn.Close();
                 }
             }
             catch (Exception ex)

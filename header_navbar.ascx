@@ -100,6 +100,16 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function (response) {
+                if (response.d.includes("ExceptionMessage")) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.d,
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+
                 const cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                 const data = JSON.parse(cleanedResponse);
 

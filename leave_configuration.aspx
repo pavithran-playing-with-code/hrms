@@ -349,6 +349,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     const data = JSON.parse(response.d);
                     const container = $("#leave_approval_levels");
                     container.empty();
@@ -459,6 +469,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     if (data === "success") {
@@ -493,6 +513,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     const data = JSON.parse(response.d);
                     const tbody = $('#leavePriorityTable tbody');
                     tbody.empty();
@@ -562,6 +592,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     if (data === "success") {
@@ -616,6 +656,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response.d == "success") {
                         display_green_alert("Edited successfully.");
                     } else if (response.d === "duplicate") {
@@ -667,6 +717,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response.d == "success") {
                         display_green_alert("Priority saved successfully.");
                     } else {
@@ -706,6 +766,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             if (JSON.parse(response.d) == "success") {
                                 populateLeaveTypes();
                                 display_green_alert("Leave type has been removed successfully.");

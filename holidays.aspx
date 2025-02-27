@@ -260,6 +260,16 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     holidayData = response.d ? JSON.parse(response.d) : {};
                     holidayCache[`${year}-${month}`] = holidayData;
                     createCalendar(month, year, holidayData);
@@ -332,6 +342,16 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function () {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     $("#editModal").modal("hide");
                     fetchHolidays(currentMonth, currentYear);
                     display_green_alert(`The holiday have been saved successfully.`);

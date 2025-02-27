@@ -366,6 +366,16 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "tickets" }),
                     success: function (response) {
+                        if (response.d.includes("ExceptionMessage")) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.d,
+                                confirmButtonText: 'Ok'
+                            });
+                            return;
+                        }
+
                         resolve(response.d);
                     },
                     error: function (xhr, status, error) {
@@ -422,6 +432,16 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function (response) {
+                if (response.d.includes("ExceptionMessage")) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.d,
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+
                 $('#createticketmodal').modal('hide');
                 display_green_alert(response.d);
                 document.dispatchEvent(new Event("callpopulatetickets"));
@@ -466,6 +486,16 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function (response) {
+                if (response.d.includes("ExceptionMessage")) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.d,
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+
                 const data = JSON.parse(response.d);
                 const dropdown = $('#id_leave_type');
                 dropdown.find('option:not(:first)').remove();
@@ -531,6 +561,16 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "leave" }),
                     success: function (response) {
+                        if (response.d.includes("ExceptionMessage")) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.d,
+                                confirmButtonText: 'Ok'
+                            });
+                            return;
+                        }
+
                         resolve(response.d);
                     },
                     error: function (xhr, status, error) {
@@ -608,6 +648,16 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function (response) {
+                if (response.d.includes("ExceptionMessage")) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.d,
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+
                 let data = response.d;
                 data = JSON.parse(data);
                 if (data === "success") {

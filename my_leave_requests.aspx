@@ -476,6 +476,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             if (JSON.parse(response.d) == "success") {
                                 display_green_alert("The leave request has been canceled successfully.");
                                 populateleaves();

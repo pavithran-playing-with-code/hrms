@@ -570,6 +570,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     const data = JSON.parse(response.d);
 
                     $("#new_joining_today").text(data.newJoiningAfterToday || 0);
@@ -593,6 +603,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                     const data = JSON.parse(cleanedResponse);
@@ -655,6 +675,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     $('#announcement_info_modal').modal('show');
 
                     $.ajax({
@@ -664,6 +694,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                             cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
                             const announcementList = JSON.parse(cleanedResponse);
@@ -755,6 +795,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     $('#id_employees, #id_department, #id_job_position').select2({
@@ -824,6 +874,16 @@
                         contentType: 'application/json',
                         data: JSON.stringify({ fileName: file.name, fileData: base64File, where: "announcement" }),
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             resolve(response.d);
                         },
                         error: function (xhr, status, error) {
@@ -908,6 +968,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     let data = response.d;
                     data = JSON.parse(data);
                     if (data == "success") {
@@ -959,6 +1029,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             let data = response.d;
                             data = JSON.parse(data);
                             if (data == "success") {
@@ -995,6 +1075,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     document.getElementById("createannouncementmodalLabel").innerText = "Edit Announcement.";
                     let cleanedResponse = response.d.replace(/^"|"$/g, '').replace(/\\"/g, '"');
                     cleanedResponse = cleanedResponse.replace(/\\"/g, '"');
@@ -1085,6 +1175,16 @@
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            if (response.d.includes("ExceptionMessage")) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.d,
+                                    confirmButtonText: 'Ok'
+                                });
+                                return;
+                            }
+
                             let data = response.d;
                             data = JSON.parse(data);
 
@@ -1133,6 +1233,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     commentButton.style.display = "none";
                     $("#commentInput").val("");
 
@@ -1202,6 +1312,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response == "false") {
                         Swal.fire("issue while deleting comment");
                     } else {

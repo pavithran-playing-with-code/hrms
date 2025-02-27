@@ -364,6 +364,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response.d === "exists") {
                         showSuccessMessage("OTP has been sent successfully!");
                         $("#otp-verification-section").show();
@@ -398,6 +408,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response.d === "OTP Verified") {
                         clearInterval(otpTimer);
 
@@ -450,6 +470,16 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function (response) {
+                    if (response.d.includes("ExceptionMessage")) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.d,
+                            confirmButtonText: 'Ok'
+                        });
+                        return;
+                    }
+
                     if (response.d === "Password Verified") {
                         $("#new-password-section").show();
                         $("#otp-validation-section").hide();
@@ -508,6 +538,16 @@
                     contentType: 'application/json',
                     dataType: 'json',
                     success: function (response) {
+                        if (response.d.includes("ExceptionMessage")) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.d,
+                                confirmButtonText: 'Ok'
+                            });
+                            return;
+                        }
+
                         if (response.d === "Password Updated") {
                             showSuccessMessage("Password updated successfully!");
                             $("#login-section").show();
@@ -544,6 +584,16 @@
                     contentType: 'application/json',
                     dataType: 'json',
                     success: function (response) {
+                        if (response.d.includes("ExceptionMessage")) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.d,
+                                confirmButtonText: 'Ok'
+                            });
+                            return;
+                        }
+
                         if (response.d == "true") {
                             sessionStorage.setItem('showAlert', 'true');
                             window.location.href = "dashboard.aspx";
