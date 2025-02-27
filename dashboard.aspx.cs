@@ -348,9 +348,7 @@ namespace hrms
                     if (dropdowntype == "department")
                     {
                         string departmentQuery = value != null && value.Length > 0
-                                            ? $@"SELECT department_id, department_name 
-                         FROM hrms.department 
-                         WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});"
+                                            ? $@"SELECT department_id, department_name FROM hrms.department WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});"
                                             : "SELECT department_id, department_name FROM hrms.department;";
                         using (var departmentCmd = new MySqlCommand(departmentQuery, conn))
                         using (var departmentReader = departmentCmd.ExecuteReader())
@@ -374,64 +372,99 @@ namespace hrms
 
                     if (dropdowntype == "job_position")
                     {
-                        string jobPositionQuery = value.Contains("All")
-                            ? "SELECT job_position_id, job_position_name FROM hrms.job_position;"
-                            : $@"SELECT job_position_id, job_position_name 
-                        FROM hrms.job_position WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});";
+                        string jobPositionQuery = "";
 
-                        using (var jobPositionCmd = new MySqlCommand(jobPositionQuery, conn))
-                        using (var jobPositionReader = jobPositionCmd.ExecuteReader())
+                        if (value != null && value.Length > 0)
                         {
-                            var jobPositions = new List<object>();
-                            while (jobPositionReader.Read())
+                            if (value.Contains("All"))
                             {
-                                jobPositions.Add(new
+                                jobPositionQuery = "SELECT job_position_id, job_position_name FROM hrms.job_position;";
+                            }
+                            else
+                            {
+                                jobPositionQuery = $@"SELECT job_position_id, job_position_name FROM hrms.job_position 
+                                  WHERE department_id IN ({string.Join(",", value.Select(v => $"'{v}'"))});";
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(jobPositionQuery))
+                        {
+                            using (var jobPositionCmd = new MySqlCommand(jobPositionQuery, conn))
+                            using (var jobPositionReader = jobPositionCmd.ExecuteReader())
+                            {
+                                var jobPositions = new List<object>();
+                                while (jobPositionReader.Read())
                                 {
-                                    id = jobPositionReader["job_position_id"].ToString(),
-                                    name = jobPositionReader["job_position_name"].ToString()
-                                });
+                                    jobPositions.Add(new
+                                    {
+                                        id = jobPositionReader["job_position_id"].ToString(),
+                                        name = jobPositionReader["job_position_name"].ToString()
+                                    });
+                                }
+
+                                if (jobPositions.Count > 1)
+                                {
+                                    data.Add(new { id = "All", name = "All" });
+                                }
+                                data.AddRange(jobPositions);
                             }
-                            if (jobPositions.Count > 1)
-                            {
-                                data.Add(new { id = "All", name = "All" });
-                            }
-                            data.AddRange(jobPositions);
                         }
                     }
 
                     if (dropdowntype == "employees")
                     {
-                        string departmentCondition = departmentValues != null && !departmentValues.Contains("All")
-                            ? $"AND emp_dept_id IN ({string.Join(",", departmentValues.Select(v => $"'{v}'"))})"
-                            : "";
+                        string employeeQuery = "";
 
-                        string jobPositionCondition = value.Contains("All")
-                            ? ""
-                            : $"AND emp_job_position_id IN ({string.Join(",", value.Select(v => $"'{v}'"))})";
-
-                        string employeeQuery = $@"SELECT emp_id, CONCAT(first_name, ' ', last_name) AS emp_name 
-                                        FROM hrms.employee 
-                                        WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition};";
-
-                        using (var employeeCmd = new MySqlCommand(employeeQuery, conn))
-                        using (var employeeReader = employeeCmd.ExecuteReader())
+                        string departmentCondition = "";
+                        if (departmentValues != null && departmentValues.Length > 0)
                         {
-                            var employees = new List<object>();
-                            while (employeeReader.Read())
+                            if (!departmentValues.Contains("All"))
                             {
-                                employees.Add(new
+                                departmentCondition = $"AND emp_dept_id IN ({string.Join(",", departmentValues.Select(v => $"'{v}'"))})";
+                            }
+                        }
+
+                        string jobPositionCondition = "";
+                        if (value != null && value.Length > 0)
+                        {
+                            if (!value.Contains("All"))
+                            {
+                                jobPositionCondition = $"AND emp_job_position_id IN ({string.Join(",", value.Select(v => $"'{v}'"))})";
+                            }
+                        }
+
+                        if ((value != null && value.Contains("All")) || !string.IsNullOrEmpty(departmentCondition) || !string.IsNullOrEmpty(jobPositionCondition))
+                        {
+                            employeeQuery = $@"
+        SELECT emp_id, CONCAT(first_name, ' ', last_name) AS emp_name 
+        FROM hrms.employee 
+        WHERE is_active = 'Y' {departmentCondition} {jobPositionCondition};";
+                        }
+
+                        if (!string.IsNullOrEmpty(employeeQuery))
+                        {
+                            using (var employeeCmd = new MySqlCommand(employeeQuery, conn))
+                            using (var employeeReader = employeeCmd.ExecuteReader())
+                            {
+                                var employees = new List<object>();
+                                while (employeeReader.Read())
                                 {
-                                    id = employeeReader["emp_id"].ToString(),
-                                    name = employeeReader["emp_name"].ToString()
-                                });
+                                    employees.Add(new
+                                    {
+                                        id = employeeReader["emp_id"].ToString(),
+                                        name = employeeReader["emp_name"].ToString()
+                                    });
+                                }
+
+                                if (employees.Count > 1)
+                                {
+                                    data.Add(new { id = "All", name = "All" });
+                                }
+                                data.AddRange(employees);
                             }
-                            if (employees.Count > 1)
-                            {
-                                data.Add(new { id = "All", name = "All" });
-                            }
-                            data.AddRange(employees);
                         }
                     }
+
                 }
             }
             catch (Exception ex)

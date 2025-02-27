@@ -554,6 +554,8 @@
         function opencreateannouncementmodal() {
             clearannouncementfields();
             populatecreateannouncementmodal("department", null, null);
+            populatecreateannouncementmodal("job_position", null, null);
+            populatecreateannouncementmodal("employees", null, null);
             $("#announcement_id").val('');
             $('#publishannouncementbtn').show();
             $('#editannouncementbtn').hide();

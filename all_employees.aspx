@@ -520,8 +520,8 @@
             document.getElementById("email").value = "";
             document.getElementById("account_password").value = "";
             document.getElementById("dob").value = "";
-            document.getElementById("id_department").selectedIndex = 0;
-            document.getElementById("id_job_position").selectedIndex = 0;
+            $('#id_department').val(null).trigger('change');
+            $('#id_job_position').val(null).trigger('change');
             document.getElementById("carrer_level").selectedIndex = 0;
             document.getElementById("access_level").selectedIndex = 0;
         }
